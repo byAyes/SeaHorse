@@ -1,11 +1,13 @@
+import { Job } from '../../../types/job';
+
 export interface MatchResult {
-  score: number;            // 0-100
-  matchedSkills: string[];  // Skills encontradas
-  matchedInterests: string[]; // Intereses coincidentes
-  missingSkills: string[]; // Skills requeridas que faltan
-  reason: string;          // Explicación del score
+  score: number;
+  matchedSkills: string[];
+  matchedInterests: string[];
+  missingSkills: string[];
+  reason: string;
 }
 
 export interface Matcher {
-  calculateMatchScore(job: any, interests: string[]): Promise<MatchResult>;
+  calculateMatchScore(job: Job, interests: string[]): Promise<MatchResult>;
 }

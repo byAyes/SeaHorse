@@ -8,10 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parsePDF } from '../../../lib/pdf/pdfParser';
 import { extractJobsFromText } from '../../../lib/pdf/jobExtractor';
 import { isDuplicate } from '../../../lib/pdf/duplicateDetector';
-import { PrismaClient } from '../../../generated/prisma';
+import { prisma } from '../../../lib/prisma';
 import { ExtractedJob } from '../../../types/pdf';
-
-const prisma = new PrismaClient();
 
 /**
  * POST handler for PDF upload

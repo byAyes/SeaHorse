@@ -1,71 +1,72 @@
 import { MatchResult, Matcher } from './types';
+import { Job } from '../../../types/job';
 
-// Mapeo de providers a matchers
-const matchers: Record<string, Matcher> = {};
+let matcherInstance: Matcher | null = null;
+let matcherInit: Promise<Matcher> | null = null;
 
-// Registrar matcher según configuración
-function registerMatcher() {
-  const provider = process.env.MATCHING_PROVIDER || process.env.EMAIL_PROVIDER || 'openai';
-  
+function getMatcher(): Promise<Matcher> {
+  if (matcherInstance) return Promise.resolve(matcherInstance);
+  if (matcherInit) return matcherInit;
+
+  matcherInit = initMatcher();
+  return matcherInit;
+}
+
+async function initMatcher(): Promise<Matcher> {
+  const provider = process.env.MATCHING_PROVIDER || 'keyword';
+
   switch (provider) {
-    case 'keyword':
-      matchers.keyword = require('./keyword').default;
-      console.log('✅ Using Keyword Matcher (100% gratis, sin IA)');
-      break;
-      
-    case 'ollama':
-      matchers.ollama = require('./ollama').default;
-      console.log('✅ Using Ollama Matcher (local, gratuito)');
-      break;
-      
-    case 'gemini':
-      matchers.gemini = require('./gemini').default;
-      console.log('✅ Using Gemini Matcher (gratis, API)');
-      break;
-      
-    case 'resend':
-    case 'sendgrid':
-    case 'smtp':
-      // Para resend/sendgrid/smtp, default usamos keyword si no hay OpenAI
-      if (!process.env.OPENAI_API_KEY) {
-        matchers.keyword = require('./keyword').default;
-        console.log('✅ OpenAI no configurado → Usando Keyword Matcher (gratis)');
-      } else {
-        matchers.openai = require('./openai').default;
-        console.log('✅ Using OpenAI Matcher (premium, pago)');
-      }
-      break;
-      
-    case 'openai':
-    default:
+    case 'keyword': {
+      console.log('Using Keyword Matcher (no AI, free)');
+      const m = await import('./keyword');
+      matcherInstance = m.default;
+      return matcherInstance;
+    }
+
+    case 'ollama': {
+      console.log('Using Ollama Matcher (local, free)');
+      const m = await import('./ollama');
+      matcherInstance = m.default;
+      return matcherInstance;
+    }
+
+    case 'gemini': {
+      console.log('Using Gemini Matcher (free API)');
+      const m = await import('./gemini');
+      matcherInstance = m.default;
+      return matcherInstance;
+    }
+
+    case 'openai': {
       if (process.env.OPENAI_API_KEY) {
-        matchers.openai = require('./openai').default;
-        console.log('✅ Using OpenAI Matcher');
-      } else {
-        matchers.keyword = require('./keyword').default;
-        console.log('✅ OpenAI key not found → Usando Keyword Matcher (gratis)');
+        console.log('Using OpenAI Matcher');
+        const m = await import('./openai');
+        matcherInstance = m.default;
+        return matcherInstance;
       }
+      console.log('OpenAI key not found → Using Keyword Matcher (free)');
+      const m = await import('./keyword');
+      matcherInstance = m.default;
+      return matcherInstance;
+    }
+
+    default: {
+      if (process.env.OPENAI_API_KEY) {
+        console.log('Using OpenAI Matcher');
+        const m = await import('./openai');
+        matcherInstance = m.default;
+        return matcherInstance;
+      }
+      console.log('Using Keyword Matcher (no AI, free)');
+      const m = await import('./keyword');
+      matcherInstance = m.default;
+      return matcherInstance;
+    }
   }
 }
 
-// Inicializa matchers
-registerMatcher();
-
-/**
- * Calcula el match score entre un job y los intereses del usuario
- */
-export async function calculateMatchScore(job: any, userInterests: string[]): Promise<MatchResult> {
-  const provider = process.env.MATCHING_PROVIDER || 
-                   (process.env.OPENAI_API_KEY ? 'openai' : 'keyword');
-  
-  const matcher = matchers[provider] || matchers.keyword;
-  
-  if (!matcher) {
-    // Fallback a keyword si no hay matcher configurado
-    const { default: keywordMatcher } = await import('./keyword');
-    return keywordMatcher.calculateMatchScore(job, userInterests);
-  }
-  
+export async function calculateMatchScore(job: Job, userInterests: string[]): Promise<MatchResult> {
+  const matcher = await getMatcher();
   return matcher.calculateMatchScore(job, userInterests);
 }
 

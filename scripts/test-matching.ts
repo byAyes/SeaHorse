@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../src/lib/prisma';
 import { scoreAndSortJobs } from '../src/matching/scorer';
-
-const prisma = new PrismaClient();
 
 async function testMatching() {
   try {

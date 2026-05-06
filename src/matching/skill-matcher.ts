@@ -9,10 +9,11 @@
 const skillSynonyms: Record<string, string> = {
   'javascript': 'javascript',
   'js': 'javascript',
+  'node': 'node.js',
   'reactjs': 'react',
   'react.js': 'react',
+  'reactjavascript': 'react',
   'nodejs': 'node.js',
-  'node.js': 'node.js',
   'typescript': 'typescript',
   'ts': 'typescript',
 };
@@ -26,14 +27,19 @@ export function normalizeSkill(skill: string): string {
   const normalized = skill
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, ' ') // normalize spaces
-    .replace(/\.js$/i, 'javascript') // .js -> javascript
-    .replace(/reactjs/i, 'react') // reactjs -> react
-    .replace(/nodejs/i, 'node.js') // nodejs -> node.js
+    .replace(/\s+/g, ' ')
     .trim();
-  
-  // Check for known synonyms
-  return skillSynonyms[normalized] || normalized;
+
+  if (skillSynonyms[normalized]) {
+    return skillSynonyms[normalized];
+  }
+
+  const withoutDotJs = normalized.replace(/\.js$/, 'js');
+  if (skillSynonyms[withoutDotJs]) {
+    return skillSynonyms[withoutDotJs];
+  }
+
+  return withoutDotJs;
 }
 
 /**
@@ -85,19 +91,25 @@ function levenshteinDistance(s1: string, s2: string): number {
  * @returns true if skills match
  */
 function skillsMatch(userSkill: string, jobSkill: string): boolean {
-  // Exact match
   if (userSkill === jobSkill) {
     return true;
   }
-  
-  // Substring match (e.g., "react" matches "react.js")
-  if (userSkill.includes(jobSkill) || jobSkill.includes(userSkill)) {
+
+  const minLen = Math.min(userSkill.length, jobSkill.length);
+  const maxLen = Math.max(userSkill.length, jobSkill.length);
+
+  if (minLen <= 2) {
+    return false;
+  }
+
+  const isSubstring = userSkill.includes(jobSkill) || jobSkill.includes(userSkill);
+  if (isSubstring && (maxLen - minLen) <= 2) {
     return true;
   }
-  
-  // Fuzzy match using Levenshtein distance (max distance of 2 for typos)
+
   const distance = levenshteinDistance(userSkill, jobSkill);
-  return distance <= 2;
+  const maxDistance = Math.max(1, Math.floor(minLen / 3));
+  return distance <= maxDistance;
 }
 
 /**

@@ -3,32 +3,29 @@
  * Updates user profiles based on extracted CV data
  */
 
-import { PrismaClient } from '../src/generated/prisma';
+import { prisma } from '../src/lib/prisma';
 import { parseCV } from '../src/lib/cv/cvParser';
 import { extractSkills } from '../src/lib/cv/skillExtractor';
 import { trackProfileChange } from '../src/lib/cv/profileHistory';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const prisma = new PrismaClient();
-
 async function autoUpdateProfiles() {
   console.log('🔄 Auto-updating profiles from CVs...');
   
   try {
-    // Buscar CVs procesados pero no aplicados al perfil
-    const processedCVs = await prisma.cV.findMany({
-      where: {
-        processed: true,
-        appliedToProfile: false
-      },
-      include: {
-        user: true
-      },
-      orderBy: {
-        createdAt: 'asc'
-      }
-    });
+  // Buscar CVs procesados pero no aplicados al perfil
+  const processedCVs = await prisma.cV.findMany({
+    where: {
+      status: 'processed'
+    },
+    include: {
+      user: true
+    },
+    orderBy: {
+      uploadedAt: 'asc'
+    }
+  });
 
     if (processedCVs.length === 0) {
       console.log('✅ No CVs to apply to profiles');
@@ -121,11 +118,11 @@ async function autoUpdateProfiles() {
             data: updateData
           });
           
-          // Marcar CV como aplicado al perfil
-          await prisma.cV.update({
-            where: { id: cv.id },
-            data: { appliedToProfile: true }
-          });
+        // Marcar CV como aplicado al perfil
+        await prisma.cV.update({
+          where: { id: cv.id },
+          data: { status: 'applied' }
+        });
           
           console.log(`✅ Profile updated for user ${cv.userId}`);
         } else {

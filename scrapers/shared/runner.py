@@ -26,7 +26,8 @@ def run_all(config: ScraperConfig, yaml_path: str = "scrapers.yaml"):
 
     for name, board_cfg in enabled.items():
         module_path = board_cfg.get("module", f"scrapers.{name}")
-        cls_name = board_cfg.get("class", f"{name.capitalize()}Scraper")
+        default_cls = "".join(part.capitalize() for part in name.split("-")) + "Scraper"
+        cls_name = board_cfg.get("class", default_cls)
 
         try:
             mod = importlib.import_module(module_path)

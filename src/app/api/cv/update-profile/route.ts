@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma';
+import { prisma } from '../../../../lib/prisma';
 import { calculateYearsOfExperience, inferExperienceLevel } from '../../../../lib/cv/skillExtractor';
 import { trackProfileChange } from '../../../../lib/cv/profileHistory';
-
-const prisma = new PrismaClient();
 
 /**
  * POST /api/cv/update-profile

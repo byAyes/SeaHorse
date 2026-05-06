@@ -39,9 +39,10 @@ export function calculateSalaryMatch(
       return Math.max(0, 100 - gapPercent);
     }
     
-    // Job salary is above maximum - still good, but maybe overqualified
     if (jobSalary > userMax) {
-      return 100; // Better than expected is still good
+      const excess = jobSalary - userMax;
+      const excessPercent = (excess / userMax) * 100;
+      return Math.max(50, 100 - excessPercent);
     }
   }
   
@@ -57,7 +58,12 @@ export function calculateSalaryMatch(
   
   // If user only has maximum expectation
   if (!userMin && userMax) {
-    return jobSalary <= userMax ? 100 : 100; // Over budget is still acceptable
+    if (jobSalary <= userMax) {
+      return 100;
+    }
+    const excess = jobSalary - userMax;
+    const excessPercent = (excess / userMax) * 100;
+    return Math.max(50, 100 - excessPercent);
   }
   
   return 100;

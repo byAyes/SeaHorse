@@ -1,32 +1,52 @@
-/**
- * Match Jobs Script
- * Matches jobs to updated user profiles
- */
-
-import { PrismaClient } from '../src/generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/prisma';
+import { calculateMatchScore } from '../src/lib/automation/matcher';
 
 async function matchJobs() {
-  console.log('🎯 Matching jobs to profiles...');
-  
   try {
     const users = await prisma.userProfile.findMany({
-      include: {
-        cvs: true
-      }
+      include: { cvs: { where: { status: 'applied' }, take: 1 } }
     });
 
-    console.log(`📊 Matching jobs for ${users.length} users`);
+    console.log(`Matching jobs for ${users.length} users`);
+
+    const recentJobs = await prisma.job.findMany({
+      where: {
+        scrapedAt: {
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        }
+      },
+      take: 100,
+      orderBy: { scrapedAt: 'desc' }
+    });
+
+    console.log(`Found ${recentJobs.length} recent jobs to match`);
+
+    let totalMatches = 0;
 
     for (const user of users) {
-      console.log(`✅ User ${user.id}: Profile matched with CV data`);
-      console.log(`   CV Versions: ${user.cvs.length}`);
+      const interests = [...(user.interests || [])];
+      const cv = user.cvs[0];
+      if (cv) {
+        interests.push(...(cv.skills || []));
+      }
+
+      if (interests.length === 0) continue;
+
+      for (const job of recentJobs) {
+        try {
+          const result = await calculateMatchScore(job, interests);
+          if (result.score >= 70) {
+            totalMatches++;
+          }
+        } catch {
+          // Skip individual match failures
+        }
+      }
     }
 
-    console.log('✅ Job matching complete');
+    console.log(`Matching complete: ${totalMatches} high-quality matches found`);
   } catch (error) {
-    console.error('❌ Error in job matching:', error);
+    console.error('Error in job matching:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();

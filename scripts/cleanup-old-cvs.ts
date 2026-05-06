@@ -3,9 +3,7 @@
  * Removes old CV versions, keeping only the latest N versions
  */
 
-import { PrismaClient } from '../src/generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/prisma';
 
 async function cleanupOldCVs(keepVersions = 3) {
   console.log(`🧹 Cleaning up old CVs (keeping latest ${keepVersions})...`);
@@ -16,7 +14,7 @@ async function cleanupOldCVs(keepVersions = 3) {
 
     for (const user of users) {
       const cvs = await prisma.cV.findMany({
-        where: { userId: user.id },
+        where: { userId: user.userId },
         orderBy: { version: 'desc' }
       });
 
@@ -24,13 +22,13 @@ async function cleanupOldCVs(keepVersions = 3) {
         const toDelete = cvs.slice(keepVersions);
         
         for (const cv of toDelete) {
-          console.log(`🗑️ Deleting old CV version ${cv.version} for user ${user.id}`);
+          console.log(`🗑️ Deleting old CV version ${cv.version} for user ${user.userId}`);
           await prisma.cV.delete({
             where: { id: cv.id }
           });
         }
         
-        console.log(`✅ Deleted ${toDelete.length} old CVs for user ${user.id}`);
+        console.log(`✅ Deleted ${toDelete.length} old CVs for user ${user.userId}`);
       }
     }
 

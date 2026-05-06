@@ -1,4 +1,5 @@
 import type { Job } from '../../types/job';
+import { prisma } from '../../lib/prisma';
 
 /**
  * Filter jobs to only include new jobs (not already in database or already emailed)
@@ -7,13 +8,28 @@ import type { Job } from '../../types/job';
  */
 export async function filterNewJobs(jobs: Job[]): Promise<Job[]> {
   try {
-    // TODO: Implement with Prisma when database is configured
-    // For now, return all jobs (no filtering)
-    console.log('filterNewJobs: Database not configured, returning all jobs');
-    return jobs;
+    if (jobs.length === 0) return [];
+
+    const existingUrls = await prisma.job.findMany({
+      where: {
+        url: { in: jobs.map(j => j.url) },
+      },
+      select: { url: true, emailedAt: true },
+    });
+
+    const emailedUrlSet = new Set(
+      existingUrls.filter(j => j.emailedAt !== null).map(j => j)
+    );
+    const existingUrlSet = new Set(existingUrls.map(j => j.url));
+
+    return jobs.filter(job => {
+      if (existingUrlSet.has(job.url)) {
+        return !emailedUrlSet.has(job.url);
+      }
+      return true;
+    });
   } catch (error) {
     console.error('Error filtering jobs:', error);
-    // On error, return all jobs (fail-open)
     return jobs;
   }
 }
@@ -25,9 +41,14 @@ export async function filterNewJobs(jobs: Job[]): Promise<Job[]> {
  */
 export async function markJobsAsEmailed(jobIds: string[]): Promise<number> {
   try {
-    // TODO: Implement with Prisma when database is configured
-    console.log('markJobsAsEmailed: Database not configured, skipping');
-    return 0;
+    if (jobIds.length === 0) return 0;
+
+    const result = await prisma.job.updateMany({
+      where: { id: { in: jobIds } },
+      data: { emailedAt: new Date() },
+    });
+
+    return result.count;
   } catch (error) {
     console.error('Error marking jobs as emailed:', error);
     return 0;
@@ -41,9 +62,16 @@ export async function markJobsAsEmailed(jobIds: string[]): Promise<number> {
  */
 export async function cleanupOldJobs(retentionMonths: number = 3): Promise<number> {
   try {
-    // TODO: Implement with Prisma when database is configured
-    console.log(`cleanupOldJobs: Database not configured, skipping cleanup`);
-    return 0;
+    const cutoffDate = new Date();
+    cutoffDate.setMonth(cutoffDate.getMonth() - retentionMonths);
+
+    const result = await prisma.job.deleteMany({
+      where: {
+        scrapedAt: { lt: cutoffDate },
+      },
+    });
+
+    return result.count;
   } catch (error) {
     console.error('Error cleaning up old jobs:', error);
     return 0;

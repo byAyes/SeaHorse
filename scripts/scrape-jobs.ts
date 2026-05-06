@@ -1,38 +1,45 @@
-/**
- * Scrape Jobs Script
- * Runs job scraping with updated user profiles
- */
-
-import { PrismaClient } from '../src/generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../src/lib/prisma';
+import { ScraperRunner } from '../src/scrapers';
 
 async function scrapeJobs() {
-  console.log('🔍 Running job scraping...');
-  
+  const query = process.env.SCRAPE_QUERY || 'software developer';
+  const maxJobs = parseInt(process.env.SCRAPE_MAX_JOBS || '20', 10);
+
   try {
-    // Obtener todos los usuarios con perfiles actualizados
     const users = await prisma.userProfile.findMany({
       where: {
         updatedAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Últimas 24 horas
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
         }
-      }
+      },
+      select: { userId: true, skills: true, interests: true }
     });
 
-    console.log(`👥 Found ${users.length} users with updated profiles`);
+    console.log(`Found ${users.length} users with updated profiles`);
 
-    // Aquí iría la lógica de scraping
-    // Por ahora solo mostramos el estado
-    for (const user of users) {
-      console.log(`✅ User ${user.id} profile ready for scraping`);
-      console.log(`   Skills: ${user.skills?.join(', ') || 'N/A'}`);
-      console.log(`   Experience: ${user.experienceLevel || 'N/A'}`);
+    const runner = new ScraperRunner();
+    const queries = [query];
+
+    for (const interest of users.flatMap(u => u.interests || []).slice(0, 5)) {
+      if (!queries.includes(interest)) queries.push(interest);
     }
 
-    console.log('✅ Job scraping complete');
+    let totalScraped = 0;
+
+    for (const q of queries.slice(0, 3)) {
+      console.log(`Scraping query: "${q}" (max ${maxJobs})`);
+      try {
+        const jobs = await runner.run({ query: q, maxJobs });
+        totalScraped += jobs.length;
+        console.log(`Scraped ${jobs.length} jobs for "${q}"`);
+      } catch (error) {
+        console.error(`Failed to scrape "${q}":`, error);
+      }
+    }
+
+    console.log(`Scraping complete: ${totalScraped} total jobs`);
   } catch (error) {
-    console.error('❌ Error in job scraping:', error);
+    console.error('Error in job scraping:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();

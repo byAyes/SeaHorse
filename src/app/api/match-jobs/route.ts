@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../generated/prisma';
+import { prisma } from '../../lib/prisma';
 import { scoreAndSortJobs } from '../../matching/scorer';
 import { Job } from '../../types/job';
 import { UserProfile } from '../../types/user-profile';
-
-const prisma = new PrismaClient();
 
 /**
  * GET handler for matching jobs

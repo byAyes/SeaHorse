@@ -9,19 +9,24 @@ import type { Job as ScrapedJob, ScraperStats } from '../scrapers/types';
  * Convert scraped job to database job format
  */
 function convertToDbJob(scraped: ScrapedJob) {
-return {
-id: scraped.id,
-title: scraped.title,
-company: scraped.company,
-location: scraped.location || null,
-description: scraped.description || null,
-url: scraped.link,
-salary: null,
-postedAt: null,
-scrapedAt: scraped.scrapedAt,
-skills: [] as string[],
-category: null,
-};
+  const scrapedSalary = (scraped as any).salary ?? null;
+  const scrapedSkills = (scraped as any).skills ?? [];
+  const scrapedCategory = (scraped as any).category ?? null;
+  const scrapedPostedAt = (scraped as any).postedAt ?? null;
+
+  return {
+    id: scraped.id,
+    title: scraped.title,
+    company: scraped.company,
+    location: scraped.location || null,
+    description: scraped.description || null,
+    url: scraped.link,
+    salary: scrapedSalary,
+    postedAt: scrapedPostedAt,
+    scrapedAt: scraped.scrapedAt,
+    skills: Array.isArray(scrapedSkills) ? scrapedSkills : [],
+    category: scrapedCategory,
+  };
 }
 
 /**
@@ -30,7 +35,21 @@ category: null,
  * @param days - Number of days (default: 3)
  * @returns Jobs from the last N days
  */
-function filterByDate(jobs: any[], days: number = 3): any[] {
+interface DbJob {
+  id: string;
+  title: string;
+  company: string;
+  location: string | null;
+  description: string | null;
+  url: string;
+  salary: any;
+  postedAt: any;
+  scrapedAt: Date;
+  skills: string[];
+  category: string | null;
+}
+
+function filterByDate(jobs: DbJob[], days: number = 3): DbJob[] {
 const cutoffDate = new Date();
 cutoffDate.setDate(cutoffDate.getDate() - days);
 

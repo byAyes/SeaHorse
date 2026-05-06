@@ -9,9 +9,7 @@ import { ExtractedJob } from '../../types/pdf';
 import { Job } from '../../types/job';
 import { MatchedJob } from '../../types/job-match';
 import { UserProfile } from '../../types/user-profile';
-import { PrismaClient } from '../../generated/prisma';
-
-const prisma = new PrismaClient();
+import { prisma } from '../prisma';
 
 /**
  * Convert ExtractedJob to Job format

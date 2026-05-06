@@ -3,12 +3,10 @@
  * Matches jobs to users based on CV-extracted profile data
  */
 
-import { PrismaClient } from '../../../generated/prisma';
-import { scoreAndSortJobs } from '../scorer';
-import { Job } from '../../../types/job';
-import { UserProfile } from '../../../types/user-profile';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
+import { scoreAndSortJobs } from './scorer';
+import { Job } from '../types/job';
+import { UserProfile } from '../types/user-profile';
 
 /**
  * Match jobs to a user's CV profile

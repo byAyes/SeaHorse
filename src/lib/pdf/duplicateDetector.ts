@@ -3,10 +3,8 @@
  * Prevents the same job from being added multiple times from different sources
  */
 
-import { PrismaClient } from '../../../generated/prisma';
+import { prisma } from '../prisma';
 import { ExtractedJob } from '../../types/pdf';
-
-const prisma = new PrismaClient();
 
 /**
  * Normalize text for comparison

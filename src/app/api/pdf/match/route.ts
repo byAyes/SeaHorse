@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma';
+import { prisma } from '../../../../lib/prisma';
 import { scoreAndSortJobs } from '../../../../matching/scorer';
 import { Job } from '../../../../types/job';
 import { UserProfile } from '../../../../types/user-profile';
@@ -14,8 +14,6 @@ import { ExtractedJob } from '../../../../types/pdf';
 import { matchPDFJobs, preparePDFJobsForEmail, savePDFMatches } from '../../../../lib/pdf/pdfIntegration';
 import { parsePDF } from '../../../../lib/pdf/pdfParser';
 import { extractJobsFromText } from '../../../../lib/pdf/jobExtractor';
-
-const prisma = new PrismaClient();
 
 /**
  * GET handler for matching PDF jobs

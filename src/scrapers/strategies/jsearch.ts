@@ -36,7 +36,6 @@ export class JSearchScraper {
       const url = `${this.baseUrl}/search?${params.toString()}`;
       
       console.log(`[JSearch] Searching for: ${query}`);
-      console.log(`[JSearch] URL: ${url}`);
 
       // API headers
       const headers: any = {

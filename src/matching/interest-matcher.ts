@@ -14,25 +14,28 @@ export function calculateInterestMatch(
   jobCategory: string
 ): number {
   if (!jobCategory || userInterests.length === 0) {
-    return 100; // No preference = neutral
+    return 100;
   }
-  
+
   const normalizedCategory = jobCategory.toLowerCase().trim();
-  
+
+  let bestScore = 0;
+
   for (const interest of userInterests) {
     const normalizedInterest = interest.toLowerCase().trim();
-    
-    // Exact match
+
     if (normalizedInterest === normalizedCategory) {
       return 100;
     }
-    
-    // Partial match (e.g., "Frontend" matches "Frontend Development")
-    if (normalizedInterest.includes(normalizedCategory) || 
-        normalizedCategory.includes(normalizedInterest)) {
-      return 100;
+
+    if (normalizedInterest.includes(normalizedCategory) || normalizedCategory.includes(normalizedInterest)) {
+      const shorterLen = Math.min(normalizedInterest.length, normalizedCategory.length);
+      const longerLen = Math.max(normalizedInterest.length, normalizedCategory.length);
+      const overlapRatio = shorterLen / longerLen;
+      const score = Math.round(50 + 50 * overlapRatio);
+      if (score > bestScore) bestScore = score;
     }
   }
-  
-  return 0;
+
+  return bestScore;
 }

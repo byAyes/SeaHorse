@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../generated/prisma';
+import { prisma } from '../../../lib/prisma';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { parsePDF } from '../../../lib/pdf/pdfParser';
 import type { CVUploadResult } from '../../../types/cv';
-
-const prisma = new PrismaClient();
 
 /**
  * POST /api/cv/upload

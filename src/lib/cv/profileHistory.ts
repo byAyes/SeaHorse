@@ -3,9 +3,16 @@
  * Tracks all changes to user profiles over time
  */
 
-import { PrismaClient } from '../../../generated/prisma';
+import { prisma } from '../prisma';
 
-const prisma = new PrismaClient();
+function safeJsonParse(value: string, context: string): any {
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.error(`Failed to parse JSON for ${context}:`, error);
+    return value;
+  }
+}
 
 /**
  * Profile change input type
@@ -56,13 +63,13 @@ export async function getProfileHistory(
       take: limit,
     });
 
-    return changes.map((change) => ({
-      ...change,
-      previousValue: change.previousValue
-        ? JSON.parse(change.previousValue)
-        : null,
-      newValue: JSON.parse(change.newValue),
-    }));
+  return changes.map((change) => ({
+    ...change,
+    previousValue: change.previousValue
+      ? safeJsonParse(change.previousValue, `profileChange:${change.id}:previousValue`)
+      : null,
+    newValue: safeJsonParse(change.newValue, `profileChange:${change.id}:newValue`),
+  }));
   } catch (error) {
     console.error('Error fetching profile history:', error);
     return [];

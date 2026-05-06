@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma';
+import { prisma } from '../../../../lib/prisma';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { parseCV } from '../../../../lib/cv/cvParser';
 import { extractSkills, extractExperience, extractEducation } from '../../../../lib/cv/skillExtractor';
-
-const prisma = new PrismaClient();
 
 /**
  * POST /api/cv/process

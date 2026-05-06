@@ -35,7 +35,7 @@ class ScraplingBaseScraper(ABC):
         ...
 
     def _generate_id(self, link: str) -> str:
-        h = hashlib.md5(link.encode()).hexdigest()[:10]
+        h = hashlib.sha256(link.encode()).hexdigest()[:16]
         return f"job-{h}"
 
     def _log(self, level: str, message: str):

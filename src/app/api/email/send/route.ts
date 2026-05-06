@@ -1,11 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from "../../../../lib/email"';
+import { sendEmail } from '../../../../lib/email';
 
-/**
- * POST handler - Send an email
- * Accepts { to, subject, body } in request body
- */
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  entry.count++;
+  if (entry.count > RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  return true;
+}
+
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || request.headers.get('x-real-ip')
+    || 'unknown';
+
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Try again later.' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { to, subject, body: emailBody } = body;
@@ -39,11 +67,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-/**
- * GET handler - Test email endpoint
- * Sends a test email to the configured GMAIL_RECIPIENT address
- */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authToken = request.headers.get('authorization');
+  const expectedToken = process.env.ADMIN_API_TOKEN;
+
+  if (expectedToken && authToken !== `Bearer ${expectedToken}`) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
   const testEmail = process.env.GMAIL_RECIPIENT;
 
   if (!testEmail) {

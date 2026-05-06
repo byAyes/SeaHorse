@@ -15,23 +15,36 @@ export function calculateLocationMatch(
   jobLocation: string,
   remoteOnly: boolean
 ): number {
-  // If user wants remote only
+  const jobLower = jobLocation.toLowerCase();
+  const isRemoteJob = jobLower.includes('remote') || jobLower.includes('remoto');
+
   if (remoteOnly) {
-    // Check if job is remote (case-insensitive check)
-    const isRemote = jobLocation.toLowerCase().includes('remote');
-    return isRemote ? 100 : 0;
+    return isRemoteJob ? 100 : 0;
   }
-  
-  // If user has no location preference
+
   if (!userLocation) {
-    return 100; // Neutral
-  }
-  
-  // Exact location match (case-insensitive)
-  if (userLocation.toLowerCase() === jobLocation.toLowerCase()) {
     return 100;
   }
-  
-  // No match
+
+  const userLower = userLocation.toLowerCase();
+
+  if (userLower === jobLower) {
+    return 100;
+  }
+
+  if (jobLower.includes(userLower) || userLower.includes(jobLower)) {
+    return 80;
+  }
+
+  const userCity = userLower.split(',')[0].trim();
+  const jobCity = jobLower.split(',')[0].trim();
+  if (userCity && jobCity && (jobLower.includes(userCity) || userLower.includes(jobCity))) {
+    return 70;
+  }
+
+  if (isRemoteJob) {
+    return 50;
+  }
+
   return 0;
 }
