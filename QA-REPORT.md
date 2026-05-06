@@ -112,6 +112,31 @@ All three scripts now have real implementations.
 
 ---
 
+## Post-Audit: TypeScript Compilation Fixes (2026-05-06)
+
+After the initial QA fixes, `tsc --noEmit` revealed **30+ type errors**. All resolved — project now compiles with **zero TS errors**.
+
+| Error | File | Fix |
+|-------|------|-----|
+| TS1205 (re-export type) | `matcher/index.ts` | `export type { MatchResult }` for isolatedModules |
+| TS1192/TS2349 (pdf-parse) | `cvParser.ts` | `import * as pdfParse` + `(pdfParse as any).default()` |
+| TS2322 (null→undefined) | `gmail.ts` | `?? undefined` for messageId coercion |
+| TS2351 (wrong method) | `smtp.ts` | `createTransporter` → `createTransport` |
+| TS2353 (Prisma v6) | `prisma.ts` | `new PrismaClient({} as any)` constructor compat |
+| TS2322 (missing fields) | `cvMatcher.ts` | Added `createdAt`/`updatedAt` + `ExperienceLevel` cast |
+| TS2345 (type mismatch) | `job-history.ts` | `.map(j => j.url)` for emailedUrlSet |
+| TS2554/TS2339 (wrong API) | `scrape-jobs.ts` | `ScraperRunner(config)` + `runAllScrapers()` |
+| TS2339×9 (schema mismatch) | `send-email-digest.ts` | Full rewrite for actual Prisma schema |
+| TS2554 (arg shape) | `test-email.ts` | `formatJobDigest({job, score, matchedSkills})` |
+| TS2322 (Prisma→type) | `test-matching.ts` | Explicit Prisma→UserProfile mapping |
+| TS2552 (wrong name) | `auto-update-profiles.ts` | `calculateYearsOfExperience` correct name |
+| TS2307×6 (unresolved) | API routes (3) | Relative imports → `@/` alias |
+| — | `tsconfig.json` | `"types": ["node"]` + scripts include + `@/*` paths |
+| — | CI workflow | `ts-node` → `tsx` (6 invocations) |
+| — | New files | 4 matcher strategies: keyword, ollama, gemini, openai |
+
+---
+
 ## Files Changed
 
 | File | Change |
@@ -147,3 +172,13 @@ All three scripts now have real implementations.
 | `scrapers/shared/runner.py` | Fixed — proper PascalCase for hyphenated names |
 | `scrapers/shared/base.py` | Fixed — SHA-256 for job IDs |
 | `scrapers/shared/models.py` | Fixed — `datetime.now(timezone.utc)` |
+| `tsconfig.json` | Fixed — `"types": ["node"]`, scripts include, `@/*` paths |
+| `src/lib/automation/matcher/keyword.ts` | Created — keyword strategy |
+| `src/lib/automation/matcher/ollama.ts` | Created — Ollama strategy |
+| `src/lib/automation/matcher/gemini.ts` | Created — Gemini strategy |
+| `src/lib/automation/matcher/openai.ts` | Created — OpenAI strategy |
+| `src/lib/cv/cvParser.ts` | Fixed — pdf-parse namespace import |
+| `src/lib/email/gmail.ts` | Fixed — null→undefined coercion |
+| `src/lib/email/providers/smtp.ts` | Fixed — `createTransport` method name |
+| `scripts/test-email.ts` | Fixed — `formatJobDigest` arg shape |
+| `.github/workflows/cv-job-processing.yml` | Fixed — ts-node→tsx (6 invocations) |
