@@ -1,3 +1,16 @@
+# Project Skills
+
+> These skills define the design system, frontend approach, and agent orchestration patterns for this project.
+> The AI assistant MUST load these skills when working on tasks matching their descriptions.
+
+| Skill | When to use |
+|-------|-------------|
+| `ui-ux-pro-max` | Building UI components, design systems, layouts, styling — premium design with semantic palettes, editorial typography, 8px spacing system |
+| `superpowers` | Discovering and using available skills to supercharge development — always check this skill before starting complex tasks |
+| `agentic-skills` | Multi-agent orchestration, dispatching parallel agents, structuring complex workflows across sub-agents |
+
+---
+
 # context-mode — MANDATORY routing rules
 
 You have context-mode MCP tools available. These rules are NOT optional — they protect your context window from flooding. A single unrouted command can dump 56 KB into context and waste the entire session.

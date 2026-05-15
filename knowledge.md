@@ -1,5 +1,16 @@
 # Seahorse — Job Email Automation
 
+## Project Skills
+
+> 📖 **Always read `AGENTS.md` in the project root** — it defines the active skills for this project.
+> The AI assistant MUST load the listed skills when working on relevant tasks:
+>
+> | Skill | Purpose |
+> |-------|---------|
+> | `ui-ux-pro-max` | Premium design system, semantic palettes, editorial typography |
+> | `superpowers` | Discover and use available skills for development |
+> | `agentic-skills` | Orchestrate multi-agent workflows and parallel agents |
+
 ## What This Is
 Automated job board scraper → AI profile extraction → AI matcher → email digest pipeline. Upload a CV/PDF, it extracts your profile via Gemini AI, scrapes 5+ sources, scores jobs with weighted matching, and sends a beautiful HTML email with emojis and real match scores.
 
