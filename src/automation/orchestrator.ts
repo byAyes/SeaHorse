@@ -1,5 +1,5 @@
 import { logger } from '../lib/automation/logger';
-import { filterNewJobs, markJobsAsEmailed, cleanupOldJobs } from '../lib/automation/job-history';
+import { filterNewJobs, saveNewJobs, markJobsAsEmailed, cleanupOldJobs } from '../lib/automation/job-history';
 import { formatJobDigest } from '../lib/email/template';
 import type { ProfileInfo } from '../lib/email/template';
 import { sendEmail } from '../lib/email';
@@ -134,6 +134,14 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
     result.matched = newJobs.length;
     logger.info(`Found ${newJobs.length} new jobs`);
 
+    // Step 2.5: Persist new jobs to database
+    let savedIds: string[] = [];
+    if (newJobs.length > 0) {
+      logger.info('Persisting new jobs to database...');
+      savedIds = await saveNewJobs(newJobs);
+      logger.info(`Saved ${savedIds.length} jobs to database`);
+    }
+
     // Build user profile for matching (if profile extracted)
     let userProfile: UserProfile | null = null;
     if (profile) {
@@ -200,8 +208,9 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
         result.sent = newJobs.length;
         logger.success(`Sent email with ${result.sent} jobs${process.env.EMAIL_CC ? ` (CC: ${process.env.EMAIL_CC})` : ''}`);
         
-        // Step 4: Mark jobs as emailed
-        await markJobsAsEmailed(newJobs.map(job => job.id));
+        // Step 4: Mark jobs as emailed (use DB UUIDs; fallback to scraper IDs if persist failed)
+        const idsToMark = savedIds.length > 0 ? savedIds : newJobs.map(job => job.id);
+        await markJobsAsEmailed(idsToMark);
       } else {
         logger.error('Failed to send email', new Error(emailResult.error));
       }

@@ -2,6 +2,44 @@ import type { Job } from '../../types/job';
 import { prisma } from '../../lib/prisma';
 
 /**
+ * Save new jobs to the database, skipping any that already exist by URL
+ * @param jobs Array of jobs to save
+ * @returns Array of DB IDs for the saved jobs
+ */
+export async function saveNewJobs(jobs: Job[]): Promise<string[]> {
+  try {
+    if (jobs.length === 0) return [];
+
+    await prisma.job.createMany({
+      data: jobs.map(j => ({
+        title: j.title,
+        company: j.company,
+        location: j.location ?? null,
+        description: j.description ?? null,
+        url: j.url,
+        salary: typeof j.salary === 'number' ? j.salary : null,
+        postedAt: j.postedAt ?? null,
+        scrapedAt: j.scrapedAt ?? new Date(),
+        skills: j.skills ?? [],
+        category: j.category ?? null,
+      })),
+      skipDuplicates: true,
+    });
+
+    // Query back to get the DB-generated UUIDs
+    const created = await prisma.job.findMany({
+      where: { url: { in: jobs.map(j => j.url) } },
+      select: { id: true },
+    });
+
+    return created.map(j => j.id);
+  } catch (error) {
+    console.error('Error saving new jobs:', error);
+    return [];
+  }
+}
+
+/**
  * Filter jobs to only include new jobs (not already in database or already emailed)
  * @param jobs Array of jobs to filter
  * @returns Array of new jobs that haven't been emailed
