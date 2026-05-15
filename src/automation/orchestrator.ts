@@ -5,6 +5,9 @@ import type { ProfileInfo } from '../lib/email/template';
 import { sendEmail } from '../lib/email';
 import { ScraperRunner } from '../scrapers/index';
 import type { Job as ScrapedJob, ScraperStats } from '../scrapers/types';
+import { calculateMatchScore } from '../matching/scorer';
+import type { UserProfile } from '../types/user-profile';
+import type { Job } from '../types/job';
 
 /**
  * Convert scraped job to database job format
@@ -131,15 +134,55 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
     result.matched = newJobs.length;
     logger.info(`Found ${newJobs.length} new jobs`);
 
+    // Build user profile for matching (if profile extracted)
+    let userProfile: UserProfile | null = null;
+    if (profile) {
+      userProfile = {
+        id: 'extracted-profile',
+        userId: 'extracted',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        skills: profile.skills || [],
+        interests: profile.jobTitles || [],
+        location: profile.locations?.[0] || null,
+        remoteOnly: (profile.locations || []).some(l => l.toLowerCase().includes('remoto') || l.toLowerCase().includes('remote')) || false,
+        experienceLevel: (profile.experienceLevel as any) || null,
+        minSalary: null,
+        maxSalary: null,
+        skillWeight: 0.4,
+        interestWeight: 0.3,
+        locationWeight: 0.2,
+        salaryWeight: 0.1,
+      };
+      logger.info(`Building profile for matching: ${profile.skills?.length || 0} skills, ${profile.jobTitles?.length || 0} target roles`);
+    }
+
     // Step 3: Send email digest if there are jobs
     if (newJobs.length > 0) {
       logger.info('Sending email digest...');
-      const { text, html } = formatJobDigest(
-        newJobs.map(job => ({
+
+      // Calculate real match scores from profile
+      const scoredJobs = newJobs.map(job => {
+        if (userProfile) {
+          const matchScore = calculateMatchScore(userProfile, job as Job);
+          return {
+            job,
+            score: Math.round(matchScore.overall),
+            matchedSkills: matchScore.matchedSkills,
+          };
+        }
+        // No profile — keep neutral scoring
+        return {
           job,
-          score: 100, // TODO: Calculate actual match score
+          score: 100,
           matchedSkills: [],
-        })),
+        };
+      });
+
+      logger.info(`Match scores calculated: ${scoredJobs.filter(j => j.score >= 80).length} excellent, ${scoredJobs.filter(j => j.score >= 60 && j.score < 80).length} good, ${scoredJobs.filter(j => j.score < 60).length} potential`);
+
+      const { text, html } = formatJobDigest(
+        scoredJobs,
         new Date().toISOString(),
         profile // Pass profile for personalized email header
       );

@@ -7,7 +7,7 @@
  * Palette:    Slate Navy primary · Amber accent · Emerald success · Blue info
  * Typography: Palatino (editorial headings) + System sans (UI)
  * Spacing:    8px/12px/16px/20px/24px/32px/40px/48px/56px rhythm
- * Icons:      Inline SVG — zero emoji usage
+ * Icons:      Inline SVG + friendly emoji accents
  * ────────────────────────────────────────────────────────────────────────
  */
 
@@ -192,12 +192,12 @@ export function formatJobDigest(
                   </td>
                 </tr>
               </table>
-              <h1 style="color:#ffffff;font-size:30px;font-weight:700;margin:0 0 8px;font-family:${FONT.editorial};letter-spacing:-0.5px;">Weekly Job Digest</h1>
-              <p style="color:${TOKENS.textMuted};font-size:14px;margin:0 0 28px;font-family:${FONT.ui};">${displayDate}</p>
+              <h1 style="color:#ffffff;font-size:30px;font-weight:700;margin:0 0 8px;font-family:${FONT.editorial};letter-spacing:-0.5px;">📬 Weekly Job Digest</h1>
+              <p style="color:${TOKENS.textMuted};font-size:14px;margin:0 0 28px;font-family:${FONT.ui};">📅 ${displayDate}</p>
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
                   <td style="background:${TOKENS.overlay};border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 28px;">
-                    <span style="color:${TOKENS.accent};font-size:16px;font-weight:600;font-family:${FONT.ui};">No new jobs at the moment</span>
+                    <span style="color:${TOKENS.accent};font-size:16px;font-weight:600;font-family:${FONT.ui};">🔇 No new jobs at the moment</span>
                   </td>
                 </tr>
               </table>
@@ -213,9 +213,9 @@ export function formatJobDigest(
                   </td>
                 </tr>
               </table>
-              <h2 style="color:${TOKENS.textPrimary};font-size:24px;font-weight:700;margin:0 0 12px;font-family:${FONT.editorial};">No matching jobs found</h2>
+              <h2 style="color:${TOKENS.textPrimary};font-size:24px;font-weight:700;margin:0 0 12px;font-family:${FONT.editorial};">😔 No matching jobs found</h2>
               <p style="color:${TOKENS.textSecondary};font-size:15px;line-height:1.7;margin:0 0 4px;font-family:${FONT.ui};">Your search may be too specific, or fewer postings</p>
-              <p style="color:${TOKENS.textSecondary};font-size:15px;line-height:1.7;margin:0 0 28px;font-family:${FONT.ui};">are available than usual. Check back next week!</p>
+              <p style="color:${TOKENS.textSecondary};font-size:15px;line-height:1.7;margin:0 0 28px;font-family:${FONT.ui};">are available than usual. 🍀 Check back next week!</p>
             </td>
           </tr>
           <!-- ═══ FOOTER ═══ -->
@@ -253,7 +253,7 @@ ${headerClose}`,
                                 ${ICONS.user}
                               </td>
                               <td style="vertical-align:middle;">
-                                <span style="color:${TOKENS.profile};font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;font-family:${FONT.ui};">Your Profile</span>
+                                <span style="color:${TOKENS.profile};font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;font-family:${FONT.ui};">🙋 Your Profile</span>
                               </td>
                             </tr>
                           </table>
@@ -265,7 +265,7 @@ ${headerClose}`,
                         <td style="padding-bottom:10px;">
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">Roles</td>
+                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">💼 Roles</td>
                               <td style="color:${TOKENS.textPrimary};font-size:15px;font-weight:600;font-family:${FONT.editorial};">${escapeHtml(profile.jobTitles.slice(0, 3).join(' · '))}</td>
                             </tr>
                           </table>
@@ -277,7 +277,7 @@ ${headerClose}`,
                         <td style="padding-bottom:10px;">
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">Level</td>
+                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">📈 Level</td>
                               <td style="color:${TOKENS.textSecondary};font-size:14px;font-family:${FONT.ui};">${escapeHtml(profile.experienceLevel.charAt(0).toUpperCase() + profile.experienceLevel.slice(1))}</td>
                             </tr>
                           </table>
@@ -289,7 +289,7 @@ ${headerClose}`,
                         <td style="padding-bottom:10px;">
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">Location</td>
+                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">📍 Location</td>
                               <td style="color:${TOKENS.textSecondary};font-size:14px;font-family:${FONT.ui};">${escapeHtml(profile.locations.join(', '))}</td>
                             </tr>
                           </table>
@@ -301,7 +301,7 @@ ${headerClose}`,
                         <td style="padding-top:6px;">
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-bottom:10px;font-family:${FONT.ui};">Skills</td>
+                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-bottom:10px;font-family:${FONT.ui};">🔧 Skills</td>
                             </tr>
                           </table>
                           <table cellpadding="0" cellspacing="0">
@@ -320,7 +320,7 @@ ${headerClose}`,
                         <td style="padding-top:14px;">
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">Languages</td>
+                              <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">🗣️ Languages</td>
                               <td style="color:${TOKENS.textSecondary};font-size:13px;font-family:${FONT.ui};">${profile.languages.map(l => `<span style="font-weight:500;color:${TOKENS.textPrimary};">${l.language}</span> (${l.level})`).join(' · ')}</td>
                             </tr>
                           </table>
@@ -383,8 +383,8 @@ ${headerClose}`,
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                               <td>
-                                ${job.source ? `<table cellpadding="0" cellspacing="0" style="display:inline-block;margin-right:12px;"><tr><td style="${STYLES.badge('#f1f5f9', TOKENS.textSecondary)}">${escapeHtml(job.source)}</td></tr></table>` : ''}
-                                ${salaryStr ? `<span style="color:${TOKENS.success};font-size:13px;font-weight:700;font-family:${FONT.mono};">${escapeHtml(salaryStr)}</span>` : ''}
+                                ${job.source ? `<table cellpadding="0" cellspacing="0" style="display:inline-block;margin-right:12px;"><tr><td style="${STYLES.badge('#f1f5f9', TOKENS.textSecondary)}">🌐 ${escapeHtml(job.source)}</td></tr></table>` : ''}
+                                ${salaryStr ? `<span style="color:${TOKENS.success};font-size:13px;font-weight:700;font-family:${FONT.mono};">💰 ${escapeHtml(salaryStr)}</span>` : ''}
                               </td>
                               <td align="right">
                                 <table cellpadding="0" cellspacing="0" style="background:${sScore.bg};border-radius:10px;">
@@ -395,7 +395,7 @@ ${headerClose}`,
                                           <td style="color:${sScore.color};font-size:18px;font-weight:800;font-family:${FONT.ui};">${Math.round(score)}</td>
                                           <td style="padding-left:4px;">
                                             <table cellpadding="0" cellspacing="0">
-                                              <tr><td style="color:${sScore.color};font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.1;font-family:${FONT.ui};">match</td></tr>
+                                              <tr><td style="color:${sScore.color};font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;line-height:1.1;font-family:${FONT.ui};">🎯 match</td></tr>
                                               <tr><td style="color:${sScore.color};font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;line-height:1.2;font-family:${FONT.ui};">${sScore.label}</td></tr>
                                             </table>
                                           </td>
@@ -420,9 +420,9 @@ ${headerClose}`,
                       <!-- Row 3: Company · Location -->
                       <tr>
                         <td style="padding-bottom:14px;">
-                          <span style="color:${TOKENS.textSecondary};font-size:14px;font-weight:600;font-family:${FONT.ui};">${escapeHtml(job.company)}</span>
+                          <span style="color:${TOKENS.textSecondary};font-size:14px;font-weight:600;font-family:${FONT.ui};">🏢 ${escapeHtml(job.company)}</span>
                           <span style="color:#cbd5e1;padding:0 8px;">·</span>
-                          <span style="color:${TOKENS.textMuted};font-size:14px;font-family:${FONT.ui};">${escapeHtml(locationStr)}</span>
+                          <span style="color:${TOKENS.textMuted};font-size:14px;font-family:${FONT.ui};">📍 ${escapeHtml(locationStr)}</span>
                         </td>
                       </tr>
                       <!-- Row 4: Matched Skills -->
@@ -453,7 +453,7 @@ ${headerClose}`,
                             <tr>
                               <td style="background-color:#1e293b;background:linear-gradient(135deg,#1e293b,#334155);border-radius:10px;">
                                 <a href="${escapeHtml(job.url)}" style="display:block;padding:11px 28px;color:#ffffff;font-size:13px;font-weight:600;text-decoration:none;font-family:${FONT.ui};">
-                                  View Job &nbsp;${ICONS.external}
+                                  🚀 View Job &nbsp;${ICONS.external}
                                 </a>
                               </td>
                             </tr>
@@ -492,8 +492,8 @@ ${headerClose}`,
                 </tr>
               </table>
               <!-- Title -->
-              <h1 style="color:#ffffff;font-size:30px;font-weight:700;margin:0 0 6px;font-family:${FONT.editorial};letter-spacing:-0.5px;">Weekly Job Digest</h1>
-              <p style="color:${TOKENS.textMuted};font-size:14px;margin:0 0 28px;font-family:${FONT.ui};">${displayDate}</p>
+              <h1 style="color:#ffffff;font-size:30px;font-weight:700;margin:0 0 6px;font-family:${FONT.editorial};letter-spacing:-0.5px;">📬 Weekly Job Digest</h1>
+              <p style="color:${TOKENS.textMuted};font-size:14px;margin:0 0 28px;font-family:${FONT.ui};">📅 ${displayDate}</p>
               <!-- Header Stats Bar -->
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;background:${TOKENS.overlay};border:1px solid rgba(255,255,255,0.06);border-radius:14px;">
                 <tr>
@@ -502,17 +502,17 @@ ${headerClose}`,
                       <tr>
                         <td style="padding:0 20px;text-align:center;min-width:80px;">
                           <div style="color:#ffffff;font-size:28px;font-weight:800;font-family:${FONT.ui};">${totalJobs}</div>
-                          <div style="color:${TOKENS.textMuted};font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding-top:2px;font-family:${FONT.ui};">Jobs</div>
+                          <div style="color:${TOKENS.textMuted};font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding-top:2px;font-family:${FONT.ui};">📊 Jobs</div>
                         </td>
                         <td style="width:1px;height:44px;background:rgba(255,255,255,0.06);"></td>
                         <td style="padding:0 20px;text-align:center;min-width:80px;">
                           <div style="color:#34d399;font-size:28px;font-weight:800;font-family:${FONT.ui};">${avgScore}<span style="font-size:16px;">%</span></div>
-                          <div style="color:${TOKENS.textMuted};font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding-top:2px;font-family:${FONT.ui};">Avg</div>
+                          <div style="color:${TOKENS.textMuted};font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding-top:2px;font-family:${FONT.ui};">⭐ Avg</div>
                         </td>
                         <td style="width:1px;height:44px;background:rgba(255,255,255,0.06);"></td>
                         <td style="padding:0 20px;text-align:center;min-width:80px;">
                           <div style="color:#fbbf24;font-size:28px;font-weight:800;font-family:${FONT.ui};">${topScore}<span style="font-size:16px;">%</span></div>
-                          <div style="color:${TOKENS.textMuted};font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding-top:2px;font-family:${FONT.ui};">Best</div>
+                          <div style="color:${TOKENS.textMuted};font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding-top:2px;font-family:${FONT.ui};">🏆 Best</div>
                         </td>
                       </tr>
                     </table>
@@ -538,21 +538,21 @@ ${headerClose}`,
                           <table cellpadding="0" cellspacing="0" style="background:${TOKENS.successBg};border-radius:14px;width:100%;">
                             <tr><td align="center" style="padding:18px 12px 6px;">${ICONS.briefcaseFilled}</td></tr>
                             <tr><td align="center" style="color:${TOKENS.success};font-size:26px;font-weight:800;padding:4px 12px 0;font-family:${FONT.ui};">${totalJobs}</td></tr>
-                            <tr><td align="center" style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding:4px 12px 18px;font-family:${FONT.ui};">Jobs Found</td></tr>
+                            <tr><td align="center" style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding:4px 12px 18px;font-family:${FONT.ui};">📋 Jobs Found</td></tr>
                           </table>
                         </td>
                         <td width="33%" style="padding:0 6px;">
                           <table cellpadding="0" cellspacing="0" style="background:${TOKENS.infoBg};border-radius:14px;width:100%;">
                             <tr><td align="center" style="padding:18px 12px 6px;">${ICONS.starFilled}</td></tr>
                             <tr><td align="center" style="color:${TOKENS.info};font-size:26px;font-weight:800;padding:4px 12px 0;font-family:${FONT.ui};">${avgScore}<span style="font-size:16px;">%</span></td></tr>
-                            <tr><td align="center" style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding:4px 12px 18px;font-family:${FONT.ui};">Avg Match</td></tr>
+                            <tr><td align="center" style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding:4px 12px 18px;font-family:${FONT.ui};">🎯 Avg Match</td></tr>
                           </table>
                         </td>
                         <td width="33%" style="padding:0 6px;">
                           <table cellpadding="0" cellspacing="0" style="background:${TOKENS.warningBg};border-radius:14px;width:100%;">
                             <tr><td align="center" style="padding:18px 12px 6px;">${ICONS.trending}</td></tr>
                             <tr><td align="center" style="color:${TOKENS.warning};font-size:26px;font-weight:800;padding:4px 12px 0;font-family:${FONT.ui};">${topScore}<span style="font-size:16px;">%</span></td></tr>
-                            <tr><td align="center" style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding:4px 12px 18px;font-family:${FONT.ui};">Best Match</td></tr>
+                            <tr><td align="center" style="color:#6b7280;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;padding:4px 12px 18px;font-family:${FONT.ui};">🔥 Best Match</td></tr>
                           </table>
                         </td>
                       </tr>
@@ -582,11 +582,11 @@ ${headerClose}`,
                       <tr>
                         <td style="vertical-align:middle;padding-right:10px;">${ICONS.star}</td>
                         <td style="vertical-align:middle;">
-                          <h2 style="color:#0f172a;font-size:19px;font-weight:700;margin:0;font-family:${FONT.editorial};">Matched Jobs</h2>
+                          <h2 style="color:#0f172a;font-size:19px;font-weight:700;margin:0;font-family:${FONT.editorial};">💼 Matched Jobs</h2>
                         </td>
                       </tr>
                     </table>
-                    <p style="color:${TOKENS.textMuted};font-size:13px;margin:10px 0 0;font-family:${FONT.ui};">Sorted by match score — highest first</p>
+                    <p style="color:${TOKENS.textMuted};font-size:13px;margin:10px 0 0;font-family:${FONT.ui};">📊 Sorted by match score — highest first</p>
                   </td>
                 </tr>
               </table>
@@ -605,10 +605,10 @@ ${headerClose}`,
           <tr>
             <td style="background-color:#0b1120;background:linear-gradient(135deg,#0b1120,#1a2442);border-radius:0 0 16px 16px;padding:36px 32px;text-align:center;">
               <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0 0 12px;font-family:${FONT.ui};">
-                You're receiving this because you subscribed to
+                ✉️ You're receiving this because you subscribed to
               </p>
               <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0 0 20px;font-family:${FONT.ui};">
-                job alerts from Seahorse.
+                job alerts from Seahorse 🐴💨
               </p>
               <!-- Decorative divider -->
               <table cellpadding="0" cellspacing="0" style="margin:0 auto 20px;">
