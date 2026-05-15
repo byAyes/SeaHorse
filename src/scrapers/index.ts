@@ -209,7 +209,9 @@ export async function runScrapers(
   return jobs;
 }
 
-if (require.main === module) {
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __filename) {
   const query = process.argv[2] || 'software engineer';
   const maxJobs = parseInt(process.argv[3] || '10', 10);
   const output = process.argv[4] || 'data/jobs.json';

@@ -19,6 +19,7 @@ export class SMTPProvider {
       host: config.host,
       port: config.port,
       secure: config.port === 465, // true for port 465, false for other ports
+      requireTLS: true, // enforce TLS on port 587 (required by Gmail)
       auth: {
         user: config.user,
         pass: config.password,

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { sendEmail } from '../src/lib/email';
 import { formatJobDigest } from '../src/lib/email/template';
 
@@ -31,7 +32,9 @@ async function testEmail() {
   const result = await sendEmail(
     process.env.GMAIL_RECIPIENT || 'test@example.com',
     'Test Job Digest - Software Engineer Jobs',
-    emailBody
+    emailBody.text,
+    undefined,
+    emailBody.html
   );
 
   if (result.success) {

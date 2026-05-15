@@ -1,6 +1,7 @@
 import { logger } from '../lib/automation/logger';
 import { filterNewJobs, markJobsAsEmailed, cleanupOldJobs } from '../lib/automation/job-history';
 import { formatJobDigest } from '../lib/email/template';
+import type { ProfileInfo } from '../lib/email/template';
 import { sendEmail } from '../lib/email';
 import { ScraperRunner } from '../scrapers/index';
 import type { Job as ScrapedJob, ScraperStats } from '../scrapers/types';
@@ -83,8 +84,10 @@ interface PipelineResult {
  * 4. Send email digest
  * 5. Mark jobs as emailed
  * 6. Clean up old jobs
+ *
+ * @param profile Optional extracted CV profile for email personalization
  */
-export async function executePipeline(): Promise<PipelineResult> {
+export async function executePipeline(profile?: ProfileInfo): Promise<PipelineResult> {
   const result: PipelineResult = {
     scraped: 0,
     matched: 0,
@@ -137,7 +140,8 @@ export async function executePipeline(): Promise<PipelineResult> {
           score: 100, // TODO: Calculate actual match score
           matchedSkills: [],
         })),
-        new Date().toISOString()
+        new Date().toISOString(),
+        profile // Pass profile for personalized email header
       );
 
       const emailResult = await sendEmail(

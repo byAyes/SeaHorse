@@ -4,7 +4,7 @@
  * Detects sections: Skills, Experience, Education
  */
 
-import * as pdfParse from 'pdf-parse';
+import { parsePDF } from '../pdf/pdfParser';
 import type { CVParsedResult } from '../../types/cv';
 
 /**
@@ -14,9 +14,14 @@ import type { CVParsedResult } from '../../types/cv';
  */
 export async function parseCV(pdfBuffer: Buffer): Promise<CVParsedResult> {
   try {
-    // Parse PDF using pdf-parse
-    const data = await (pdfParse as any).default(pdfBuffer);
-    const rawText = data.text;
+    // Parse PDF using shared PDF parser
+    const result = await parsePDF(pdfBuffer);
+
+    if (!result.success || !result.text) {
+      throw new Error(result.error || 'Failed to extract text from PDF');
+    }
+
+    const rawText = result.text;
 
     // Clean and normalize text
     const cleanedText = cleanText(rawText);
@@ -47,7 +52,7 @@ function cleanText(text: string): string {
     // Replace multiple spaces with single space
     .replace(/[ \t]+/g, ' ')
     // Remove special PDF characters
-    .replace(/[•▪▸→◆]/g, '-')
+    .replace(/[\x80-\xFF]/g, '-')
     // Normalize line breaks
     .replace(/\r\n/g, '\n')
     .trim();

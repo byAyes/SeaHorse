@@ -3,9 +3,21 @@
  * Extracts text content from PDF documents using pdf-parse library
  */
 
-// @ts-ignore - pdf-parse doesn't have types
-import pdfParse from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 import { PDFUploadResult } from '../../types/pdf.js';
+import path from 'path';
+import fs from 'fs';
+import { pathToFileURL } from 'url';
+
+// ── pdf.js Worker Configuration ────────────────────────────────────────────
+// In Next.js/Turbopack, the pdf.js worker isn't automatically bundled.
+// We configure it explicitly using the worker file copied to public/.
+const PDF_WORKER_PATH = path.join(process.cwd(), 'public', 'pdf.worker.mjs');
+if (fs.existsSync(PDF_WORKER_PATH)) {
+  PDFParse.setWorker(pathToFileURL(PDF_WORKER_PATH).href);
+} else {
+  console.warn('[PDFParser] pdf.worker.mjs not found in public/ — PDF extraction may fail in Next.js. Run: cp node_modules/pdf-parse/dist/pdf-parse/esm/pdf.worker.mjs public/pdf.worker.mjs');
+}
 
 /**
  * Parse a PDF buffer and extract text content
@@ -13,13 +25,18 @@ import { PDFUploadResult } from '../../types/pdf.js';
  * @returns Promise resolving to PDFUploadResult with extracted text and metadata
  */
 export async function parsePDF(buffer: Buffer): Promise<PDFUploadResult> {
+  let parser: PDFParse | null = null;
   try {
-    // Parse PDF using pdf-parse
-    const data = await pdfParse(buffer);
+    // Create PDF parser instance
+    parser = new PDFParse({ data: buffer });
 
-    // Extract text from all pages
-    const text = data.text;
-    const pageCount = data.numpages;
+    // Load the PDF document
+    await parser.load();
+
+    // Extract text from all pages (use newline as page separator)
+    const textResult = await parser.getText({ pageJoiner: '\n' });
+    const text = textResult.text;
+    const pageCount = textResult.total;
 
     // Clean extracted text: normalize whitespace and line breaks
     const cleanedText = cleanText(text);
@@ -37,6 +54,9 @@ export async function parsePDF(buffer: Buffer): Promise<PDFUploadResult> {
       pageCount: 0,
       error: errorMessage,
     };
+  } finally {
+    // Clean up resources
+    parser?.destroy();
   }
 }
 

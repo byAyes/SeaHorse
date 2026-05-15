@@ -10,32 +10,42 @@ class IndeedScraper(ScraplingBaseScraper):
         return f"{base}/jobs?q={query}&sort=date&fromage=3"
 
     def _wait_selector(self) -> str | None:
-        return None
+        # Wait for job search results to render
+        return ".mosaic-zone, [id*='job'], .jobsearch-ResultsList, [data-testid='job-card'], .job_seen_beacon"
 
     def _fetcher_options(self) -> dict:
-        return {"network_idle": False, "wait": 3000}
+        return {"network_idle": True, "wait": 5000}
 
     def parse_page(self, page) -> list[Job]:
         jobs: list[Job] = []
         # Indeed uses multiple card selectors depending on A/B testing
         card_selectors = [
-            "[class*='job_seen_beacon']",
+            ".job_seen_beacon",
             ".cardOutline",
             "[data-testid='job-card']",
             "li[class*='job']",
             "div[class*='jobsearch'] > div > div",
+            "[class*='card']",
+            # Broader fallbacks
+            "div[id*='job']",
+            "a[href*='/rc/clk']",
         ]
+
         job_elements = []
         for sel in card_selectors:
             found = page.css(sel)
             if found and len(found) > 0:
+                # For the broader selectors, only use them if we get 2+ results
+                if sel.startswith("div[id*='job']") or sel.startswith("a[href*='/rc/clk']"):
+                    if len(found) < 3:
+                        continue
                 job_elements = found
                 self._log("info", f"Found {len(job_elements)} cards with selector: {sel}")
                 break
 
         if not job_elements:
-            # Fallback: try finding any element with job-related class
-            job_elements = page.css("[class*='card']")
+            self._log("warning", "No job cards found — page structure may have changed")
+            return []
 
         self._log("info", f"Total card elements: {len(job_elements)}")
 
@@ -48,7 +58,7 @@ class IndeedScraper(ScraplingBaseScraper):
 
     def _parse_card(self, el) -> Job | None:
         try:
-            # Title - multiple selector attempts
+            # Title — try multiple selector patterns
             title = ""
             for sel in [
                 "h2 a[data-testid='job-card-title']",
@@ -58,6 +68,10 @@ class IndeedScraper(ScraplingBaseScraper):
                 "a[class*='jobtitle']",
                 "a[class*='title']",
                 "h2 span",
+                "span[class*='title']",
+                # Broader fallback: any link with job-related text
+                "a[href*='/rc/clk']",
+                "a[href*='job']",
             ]:
                 found = el.css(sel)
                 if found and found[0].text:
@@ -76,11 +90,28 @@ class IndeedScraper(ScraplingBaseScraper):
                 "div[class*='company']",
                 "a[class*='company']",
                 "[class*='companyName']",
+                "[data-testid*='company']",
+                # 2025+: Indeed sometimes puts company in a data attribute
+                "[class*='employer']",
             ]:
                 found = el.css(sel)
                 if found and found[0].text:
                     company = found[0].text.strip()
                     break
+
+            # Try parsing from heading structure as fallback
+            if not company:
+                # Sometimes company is in a div sibling after heading
+                heading = el.css("h2")
+                if heading:
+                    parent = heading[0].parent()
+                    if parent:
+                        all_divs = parent.css("div")
+                        for d in all_divs:
+                            text = d.text.strip()
+                            if text and text != title and len(text) < 60:
+                                company = text
+                                break
 
             # Location
             location = ""
@@ -89,6 +120,8 @@ class IndeedScraper(ScraplingBaseScraper):
                 "[data-testid='text-location']",
                 "div[class*='location']",
                 "[class*='location']",
+                "[class*='loc']",
+                "[data-testid*='location']",
             ]:
                 found = el.css(sel)
                 if found and found[0].text:
@@ -102,8 +135,8 @@ class IndeedScraper(ScraplingBaseScraper):
                 "a.jobCardLink",
                 "a[class*='title']",
                 "a[href*='/rc/clk']",
-                "a[href*='/jobs?']",
-                "a[href*='indeed.com']",
+                "a[href*='job']",
+                "a[href*='jk=']",
             ]:
                 found = el.css(sel)
                 if found:

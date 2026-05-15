@@ -31,6 +31,10 @@ export async function runAutomation(): Promise<void> {
 }
 
 // Main guard - run if this file is executed directly
-if (typeof module !== 'undefined' && require.main === module) {
+// ESM equivalent of require.main === module
+import { fileURLToPath } from 'url';
+const isMainModule = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isMainModule) {
   runAutomation().catch(console.error);
 }
+
