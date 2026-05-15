@@ -85,8 +85,14 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r scrapers/requirements.txt
 
+      - name: Install browsers & extras
+        run: |
+          playwright install chromium --with-deps
+          patchright install chromium --with-deps
+          echo "msgspec already included in requirements.txt"
+
       - name: Run automation pipeline
-        run: npm run automate
+        run: npm run automate 2>&1 | tee automation.log
 
       - name: Upload logs as artifact
         if: always()
