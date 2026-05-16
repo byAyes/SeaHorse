@@ -133,7 +133,9 @@ async function manageResendDomains() {
 }
 
 // Run the domain management tool if called directly
-if (require.main === module) {
+import { fileURLToPath } from 'node:url';
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   manageResendDomains().catch(console.error);
 }
 
