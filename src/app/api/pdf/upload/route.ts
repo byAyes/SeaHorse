@@ -10,12 +10,16 @@ import { extractJobsFromText } from '@/lib/pdf/jobExtractor';
 import { isDuplicate } from '@/lib/pdf/duplicateDetector';
 import { prisma } from '@/lib/prisma';
 import { ExtractedJob } from '@/types/pdf';
+import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * POST handler for PDF upload
  * Accepts PDF file, extracts jobs, checks duplicates, saves non-duplicates
  */
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     // Get the request body as buffer
     const contentType = request.headers.get('content-type') || '';

@@ -80,7 +80,7 @@ export async function extractProfileFromText(
   const start = startTime ?? Date.now();
 
   // Detect AI provider: explicit config from request → env vars
-  const aiConfig = detectProvider(
+  const aiConfig = await detectProvider(
     options?.aiProvider
       ? { provider: options.aiProvider, apiKey: options.aiApiKey || '' }
       : undefined

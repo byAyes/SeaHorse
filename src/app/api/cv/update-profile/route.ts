@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { calculateYearsOfExperience, inferExperienceLevel } from '../../../../lib/cv/skillExtractor';
 import { trackProfileChange } from '../../../../lib/cv/profileHistory';
+import { authenticate } from '../../../../lib/auth/middleware';
 
 /**
  * POST /api/cv/update-profile
  * Update UserProfile with extracted CV data
  */
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const { userId, cvId } = body;

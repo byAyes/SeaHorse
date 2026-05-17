@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '../../../../lib/email';
+import { authenticate } from '../../../../lib/auth/middleware';
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -23,6 +24,9 @@ function checkRateLimit(ip: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
     || request.headers.get('x-real-ip')
     || 'unknown';
@@ -68,15 +72,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const authToken = request.headers.get('authorization');
-  const expectedToken = process.env.ADMIN_API_TOKEN;
-
-  if (expectedToken && authToken !== `Bearer ${expectedToken}`) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
-  }
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
 
   const testEmail = process.env.GMAIL_RECIPIENT;
 

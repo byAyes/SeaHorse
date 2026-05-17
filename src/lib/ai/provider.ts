@@ -8,10 +8,13 @@
  *
  * Priority order when multiple keys are available:
  * 1. Explicit provider + apiKey passed in request
- * 2. GEMINI_API_KEY env var
- * 3. OPENROUTER_API_KEY env var
- * 4. NIM_API_KEY env var
+ * 2. Server config store (saved via Settings UI → data/config.json)
+ * 3. GEMINI_API_KEY env var
+ * 4. OPENROUTER_API_KEY env var
+ * 5. NIM_API_KEY env var
  */
+
+import { getApiKey } from '@/lib/config/store';
 
 export type AIProvider = "gemini" | "openrouter" | "nim";
 
@@ -22,11 +25,11 @@ export interface AIProviderConfig {
 
 /**
  * Detects which AI provider to use based on available credentials.
- * Priority: explicit config → env vars
+ * Priority: explicit config → server config store → env vars.
  */
-export function detectProvider(
+export async function detectProvider(
   explicit?: { provider?: string; apiKey?: string }
-): AIProviderConfig | null {
+): Promise<AIProviderConfig | null> {
   // 1. Explicit provider + key passed from client
   if (explicit?.provider && explicit?.apiKey) {
     return {
@@ -35,7 +38,21 @@ export function detectProvider(
     };
   }
 
-  // 2. Check environment variables
+  // 2. Check server config store (persisted via Settings UI)
+  try {
+    const geminiKey = await getApiKey('geminiApiKey');
+    if (geminiKey) return { provider: "gemini", apiKey: geminiKey };
+
+    const openrouterKey = await getApiKey('openrouterApiKey');
+    if (openrouterKey) return { provider: "openrouter", apiKey: openrouterKey };
+
+    const nimKey = await getApiKey('nimApiKey');
+    if (nimKey) return { provider: "nim", apiKey: nimKey };
+  } catch {
+    // Config store not available — fall through to env vars
+  }
+
+  // 3. Check environment variables
   if (process.env.GEMINI_API_KEY) {
     return { provider: "gemini", apiKey: process.env.GEMINI_API_KEY };
   }
@@ -74,10 +91,14 @@ export async function callAI(
  */
 async function callGemini(prompt: string, apiKey: string): Promise<string> {
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+
+      },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {

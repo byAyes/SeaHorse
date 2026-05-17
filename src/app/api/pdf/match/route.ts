@@ -11,6 +11,7 @@ import { Job } from '../../../../types/job';
 import { UserProfile } from '../../../../types/user-profile';
 import { MatchedJob } from '../../../../types/job-match';
 import { ExtractedJob } from '../../../../types/pdf';
+import { authenticate } from '../../../../lib/auth/middleware';
 import { matchPDFJobs, preparePDFJobsForEmail, savePDFMatches } from '../../../../lib/pdf/pdfIntegration';
 import { parsePDF } from '../../../../lib/pdf/pdfParser';
 import { extractJobsFromText } from '../../../../lib/pdf/jobExtractor';
@@ -23,6 +24,9 @@ import { extractJobsFromText } from '../../../../lib/pdf/jobExtractor';
  * - limit: number (optional, default 100) - Maximum results to return
  */
 export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     // Parse query params
     const { searchParams } = new URL(request.url);
@@ -127,6 +131,9 @@ export async function GET(request: NextRequest) {
  * Does not save to database unless explicitly requested
  */
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     // Parse request body
     const formData = await request.formData();

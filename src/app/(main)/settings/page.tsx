@@ -44,6 +44,7 @@ export default function SettingsPage() {
   const [openrouterKey, setOpenrouterKey] = useState("");
   const [nimKey, setNimKey] = useState("");
   const [savedKeys, setSavedKeys] = useState(false);
+  const [savingKeys, setSavingKeys] = useState(false);
 
   // Email config
   const [emailHost, setEmailHost] = useState("");
@@ -81,14 +82,34 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveKeys = () => {
-    if (jsearchKey) localStorage.setItem("JSEARCH_API_KEY", jsearchKey);
-    if (geminiKey) localStorage.setItem("GEMINI_API_KEY", geminiKey);
-    if (openrouterKey) localStorage.setItem("OPENROUTER_API_KEY", openrouterKey);
-    if (nimKey) localStorage.setItem("NIM_API_KEY", nimKey);
-    setSavedKeys(true);
-    showToast("success", t("settings.saved"));
-    setTimeout(() => setSavedKeys(false), 2000);
+  const handleSaveKeys = async () => {
+    setSavingKeys(true);
+    try {
+      const payload: Record<string, string> = {};
+      if (jsearchKey) payload.jsearchApiKey = jsearchKey;
+      if (geminiKey) payload.geminiApiKey = geminiKey;
+      if (openrouterKey) payload.openrouterApiKey = openrouterKey;
+      if (nimKey) payload.nimApiKey = nimKey;
+
+      const res = await fetch('/api/config/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error || 'Failed to save keys');
+      }
+
+      setSavedKeys(true);
+      showToast("success", t("settings.saved"));
+      setTimeout(() => setSavedKeys(false), 2000);
+    } catch (err) {
+      showToast("error", err instanceof Error ? err.message : t("settings.saveError"));
+    } finally {
+      setSavingKeys(false);
+    }
   };
 
   const handleSaveEmail = () => {
@@ -346,7 +367,7 @@ export default function SettingsPage() {
                 {showKeys ? <EyeOff size={14} /> : <Eye size={14} />}
                 {showKeys ? t("settings.apiKeys.hide") : t("settings.apiKeys.show")}
               </Button>
-              <Button onClick={handleSaveKeys} className="relative overflow-hidden">
+              <Button onClick={handleSaveKeys} disabled={savingKeys} className="relative overflow-hidden">
                 <motion.span
                   key={savedKeys ? "check" : "save"}
                   initial={{ y: -10, opacity: 0 }}

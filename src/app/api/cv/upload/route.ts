@@ -4,12 +4,16 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { parsePDF } from '@/lib/pdf/pdfParser';
 import type { CVUploadResult } from '@/types/cv';
+import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * POST /api/cv/upload
  * Upload a CV PDF and store with versioning
  */
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
@@ -119,6 +123,9 @@ export async function POST(request: NextRequest) {
  * Get all CV versions for a user
  */
 export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');

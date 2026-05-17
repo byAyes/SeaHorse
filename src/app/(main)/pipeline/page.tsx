@@ -119,15 +119,18 @@ export default function PipelinePage() {
     `⚡ ${t("pipeline.logs.ready")} ${t("pipeline.logs.configureKey")}`,
   ]);
 
-  // Check if any AI API key is configured
+  // Check if any AI API key is configured (server-side)
   const [hasAiKey, setHasAiKey] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const gemini = localStorage.getItem("GEMINI_API_KEY");
-    const openrouter = localStorage.getItem("OPENROUTER_API_KEY");
-    const nim = localStorage.getItem("NIM_API_KEY");
-    setHasAiKey(!!(gemini || openrouter || nim));
+    fetch('/api/config/keys')
+      .then(res => res.json())
+      .then(data => {
+        setHasAiKey(!!data.activeProvider);
+      })
+      .catch(() => {
+        setHasAiKey(false);
+      });
   }, []);
 
   const isRunning = pipelineStatus?.status === "running";

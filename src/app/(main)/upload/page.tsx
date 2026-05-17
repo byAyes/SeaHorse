@@ -22,18 +22,8 @@ export default function UploadPage() {
   const processCv = useProcessCv();
   const matchJobs = useMatchJobs({ userId: "default-user", threshold: 0 });
 
-  // Read API provider config from localStorage (for sending to process endpoint)
-  const getAiProviderConfig = () => {
-    if (typeof window === "undefined") return {};
-    const geminiKey = localStorage.getItem("GEMINI_API_KEY");
-    const openrouterKey = localStorage.getItem("OPENROUTER_API_KEY");
-    const nimKey = localStorage.getItem("NIM_API_KEY");
-
-    if (geminiKey) return { provider: "gemini", apiKey: geminiKey };
-    if (openrouterKey) return { provider: "openrouter", apiKey: openrouterKey };
-    if (nimKey) return { provider: "nim", apiKey: nimKey };
-    return {};
-  };
+  // API key resolution is handled server-side via config store
+  // (saved via Settings page) or environment variables.
 
   const { toasts, showToast, dismissToast } = createToast();
 
@@ -53,7 +43,6 @@ export default function UploadPage() {
         showToast("info", t("upload.processing.extracting"));
         const processResult = await processCv.mutateAsync({
           cvId: uploadResult.id,
-          ...getAiProviderConfig(),
         });
 
         if (processResult.profile) {

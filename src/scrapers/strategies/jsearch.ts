@@ -10,11 +10,10 @@ import { Job, ScraperConfig, ScraperResult } from '../types';
  */
 export class JSearchScraper {
   private readonly baseUrl = 'https://jsearch.p.rapidapi.com';
-  private readonly apiKey: string;
+  private apiKey: string = '';
 
   constructor(config: ScraperConfig) {
-    // API key from environment or empty (works without key for limited usage)
-    this.apiKey = process.env.JSEARCH_API_KEY || '';
+    // Initialized lazily in search() from config store → env var
   }
 
   /**
@@ -25,6 +24,20 @@ export class JSearchScraper {
   async search(config: ScraperConfig): Promise<ScraperResult> {
     try {
       const { query, maxJobs = 10 } = config;
+
+      // Resolve API key: server config store → environment variable
+      if (!this.apiKey) {
+        try {
+          const { getApiKey } = await import('@/lib/config/store');
+          const stored = await getApiKey('jsearchApiKey');
+          if (stored) this.apiKey = stored;
+        } catch {
+          // Config store not available — fall through
+        }
+        if (!this.apiKey) {
+          this.apiKey = process.env.JSEARCH_API_KEY || '';
+        }
+      }
       
       // Build search parameters
       const params = new URLSearchParams({

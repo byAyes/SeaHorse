@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
+import { authenticate } from '../../../../lib/auth/middleware';
 
 /**
  * GET /api/profile/history
  * Get profile change history for a user
  */
 export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');

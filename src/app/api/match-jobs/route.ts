@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { scoreAndSortJobs } from '@/matching/scorer';
 import { Job } from '@/types/job';
 import { UserProfile } from '@/types/user-profile';
+import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * GET handler for matching jobs
@@ -12,6 +13,9 @@ import { UserProfile } from '@/types/user-profile';
  * - limit: number (optional, default 100) - Maximum results to return
  */
 export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     // Parse query params
     const { searchParams } = new URL(request.url);

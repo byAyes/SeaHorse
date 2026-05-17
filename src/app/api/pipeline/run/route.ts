@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ScraperRunner } from "@/scrapers/index";
 import { scoreAndSortJobs } from "@/matching/scorer";
 import { saveNewJobs, cleanupEmailedJobs, cleanupOldJobs } from "@/lib/automation/job-history";
+import { authenticate } from "@/lib/auth/middleware";
 import type { UserProfile } from "@/types/user-profile";
 import type { Job } from "@/types/job";
 import type { MatchedJob } from "@/types/job-match";
@@ -276,6 +277,9 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
  * Start a new pipeline execution and persist to DB.
  */
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json().catch(() => ({}));
     const profile = body.profile || null;
@@ -324,6 +328,9 @@ export async function POST(request: NextRequest) {
  * Poll for pipeline status — reads from cache (active) or DB (completed).
  */
 export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   const runId = request.nextUrl.searchParams.get("runId");
 
   if (!runId) {

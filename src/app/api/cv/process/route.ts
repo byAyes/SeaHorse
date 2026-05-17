@@ -5,6 +5,7 @@ import { join } from 'path';
 import { parseCV } from '../../../../lib/cv/cvParser';
 import { extractSkills, extractExperience, extractEducation } from '../../../../lib/cv/skillExtractor';
 import { extractProfileFromText } from '../../../../lib/ai/pdfProfileExtractor';
+import { authenticate } from '../../../../lib/auth/middleware';
 
 /**
  * POST /api/cv/process
@@ -14,6 +15,9 @@ import { extractProfileFromText } from '../../../../lib/ai/pdfProfileExtractor';
  * for intelligent profile extraction alongside the local CV parsing.
  */
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await request.json();
     const { cvId, provider, apiKey } = body;

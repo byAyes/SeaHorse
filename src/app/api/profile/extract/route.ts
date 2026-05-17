@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { extractProfileFromPDF, extractProfileFromText } from '@/lib/ai';
+import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * GET /api/profile/extract?userId=xxx
@@ -14,6 +15,9 @@ import { extractProfileFromPDF, extractProfileFromText } from '@/lib/ai';
  * In mock mode, returns default empty profile data.
  */
 export async function GET(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') || 'default-user';
@@ -46,6 +50,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await authenticate(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const contentType = request.headers.get('content-type') || '';
 

@@ -8,9 +8,24 @@ import type { UserProfile } from "@/types/user-profile";
 
 // ── Generic fetch helpers ──
 
+function getAuthHeaders(): Record<string, string> {
+  // Check runtime env (Next.js public env vars at build time won't update
+  // if changed at runtime — so we also check localStorage as a fallback
+  const token =
+    (typeof window !== 'undefined' && localStorage.getItem('ADMIN_API_TOKEN')) ||
+    process.env.NEXT_PUBLIC_ADMIN_TOKEN ||
+    '';
+
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
+}
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
     ...options,
   });
   if (!res.ok) {
@@ -162,7 +177,11 @@ export function useUploadCv() {
       const formData = new FormData();
       formData.append("file", payload.file);
       if (payload.userId) formData.append("userId", payload.userId);
-      const res = await fetch("/api/cv/upload", { method: "POST", body: formData });
+      const res = await fetch("/api/cv/upload", {
+        method: "POST",
+        body: formData,
+        headers: getAuthHeaders(), // Don't set Content-Type — browser sets multipart boundary
+      });
       if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
       return res.json() as Promise<{ id: string }>;
     },
