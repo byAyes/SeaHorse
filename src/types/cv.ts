@@ -1,9 +1,20 @@
-import { CVModel } from '../generated/prisma/models/CV';
-
 /**
- * CV model matching Prisma CV schema
+ * CV model — matches the CVRecord shape from prisma.ts
  */
-export type CV = CVModel;
+export interface CV {
+  id: string;
+  userId: string;
+  version: number;
+  fileUrl: string;
+  fileName: string;
+  fileSize: number;
+  rawText: string;
+  status: string;
+  skills: string[];
+  experience: string[];
+  education: string[];
+  uploadedAt: Date;
+}
 
 /**
  * CV upload result returned by API
