@@ -6,7 +6,7 @@ import { ResendProvider } from '../src/lib/email/providers/resend';
 jest.mock('../src/lib/email/providers/resend');
 
 describe('manageResendDomains', () => {
-  const mockApiKey = 're_test_' + 'x'.repeat(40);
+  const mockApiKey = 'unit-test-mock-key-do-not-use';
   const mockFromEmail = 'test@example.com';
   const mockListDomainsResult = {
     success: true,

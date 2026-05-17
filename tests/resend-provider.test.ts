@@ -3,7 +3,7 @@ import { ResendProvider } from '../src/lib/email/providers/resend';
 import type { SendResult } from '../src/lib/email/gmail';
 
 describe('ResendProvider', () => {
-  const mockApiKey = 're_test_' + 'x'.repeat(40);
+  const mockApiKey = 'unit-test-mock-key-do-not-use';
   const mockFromEmail = 'test@example.com';
   let provider: ResendProvider;
 
