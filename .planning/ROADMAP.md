@@ -14,8 +14,9 @@
 | 3 | Email Notifications | Send weekly digests with HTML template + emojis | ✅ **Complete** | — |
 | 4 | Automation & Scheduling | GitHub Actions weekly pipeline | ✅ **Complete** | — |
 | 5 | PDF Profile Extraction | Extract job profile from CV/PDF with Gemini AI | ✅ **Complete** | #7 ✅ |
-| 6 | CV Database & Auto-Update | Persist CVs, profiles, job history in Supabase | 🔜 **Blocked** | #9 |
-| 7 | Frontend UI Dashboard | React SPA for pipeline management | 🔜 **Planned** | #8 |
+| 6 | ~~Supabase Database Integration~~ (IPv6 block) | 🔴 **Cancelado** → reemplazado por Fase 8 | #9 🔁 #10 |
+| 7 | Frontend UI Dashboard | React SPA for pipeline management | ✅ **Complete** | #8 ✅ |
+| 8 | **Refactor: Almacenamiento Local JSON** | Reemplazar Prisma + Supabase por archivos JSON locales, 0 config de DB | 🔜 **Planificado** | #10 |
 
 ---
 
@@ -97,6 +98,8 @@
 
 | Component | Detail | Status |
 |-----------|--------|--------|
+| Storage | Local JSON files (`data/database.json`) — 0 dependencias externas | 🔜 **Planificado (#10)** |
+|-----------|--------|--------|
 | GitHub Actions | `.github/workflows/main.yml` | ✅ **Running** |
 | Trigger | Push to `main` + weekly cron (Thu 9 AM UTC) | ✅ |
 | Email provider | SMTP (Gmail App Password) via secrets | ✅ Configurado |
@@ -144,51 +147,37 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 
 ---
 
-## Phase 6: CV Database & Auto-Update 🔜
+## Phase 6: CV Database & Auto-Update 🔴 Cancelado
 
 **Goal:** Persist all data in Supabase (PostgreSQL) for history, dedup, and dashboard.
 
-**Status:** ⏸️ **Deferred** — Blocked by Supabase connectivity from Windows (IPv6 hostname issue).
+**Status:** ❌ **Cancelado** — Bloqueado por conectividad IPv6 con Supabase desde Windows.
 
-**Issue:** [#9 — Integración Supabase](https://github.com/byAyes/SeaHorse/issues/9)
+**Issue:** [#9 — Integración Supabase](https://github.com/byAyes/SeaHorse/issues/9) → **Reemplazado por #10**
 
-| Requirement | Status | Depends on |
-|-------------|--------|------------|
-| CV-01: Store CVs with versioning | 🔜 Planned | #9 |
+**Motivo:** Supabase solo resuelve hostnames IPv6 desde ciertos ISP/configuraciones de red en Windows, haciendo imposible la conexión directa.
+
+**Resolución:** En lugar de luchar con conectividad cloud, se optó por **almacenamiento local en archivos JSON** — ver Fase 8.
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| CV-01: Store CVs with versioning | ✅ **Refactorizado en Fase 8** | JSON local |
 | CV-02: Auto-extract skills from CV | ✅ **Done in #7** | — |
 | CV-03: Update profile from CV | ✅ **Done in #7** | — |
 | CV-04: Use profile for matching | ✅ **Done in #7** | — |
-| CV-05: Track profile changes | 🔜 Planned | #9 |
-
-**Current workaround:** Mock Prisma client via JavaScript Proxy that returns empty/safe defaults:
-- `findMany → []` · `findFirst → null` · `create → { id: 'mock-id' }`
-- Pipeline runs without DB — data lost between executions
-
-**To unblock:**
-1. Research Supabase IPv6 connectivity from Windows
-2. Configure `DATABASE_URL` with `sslmode=require`
-3. Run `npx prisma migrate dev`
-4. Swap mock client for real `PrismaClient`
-5. Add `DATABASE_URL` as GitHub secret
-
-**Schema ready (4 models + 1 changelog):**
-- `UserProfile` — profile with scoring weights
-- `Job` — scraped jobs (unique by URL)
-- `EmailDigest` — sent digest records
-- `CV` — versioned CV uploads
-- `ProfileChangeLog` — audit trail
+| CV-05: Track profile changes | ✅ **Refactorizado en Fase 8** | JSON local |
 
 ---
 
-## Phase 7: Frontend UI Dashboard 🔜
+## Phase 7: Frontend UI Dashboard ✅
 
 **Goal:** React SPA to manage the pipeline visually — no more CLI/`.env` config.
 
 **Issue:** [#8 — Frontend UI Dashboard](https://github.com/byAyes/SeaHorse/issues/8)
 
-**Blocked by:** #9 (Supabase) — dashboard needs real data
+**Status:** ✅ **Completado**
 
-**Planned features:**
+**Features implementadas:**
 - 📄 PDF drag & drop upload zone
 - 📧 Email configuration form (SMTP, destination, CC)
 - 📊 Dashboard with job stats, scores, history
@@ -196,20 +185,63 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 - 💼 Job table with filters and scores
 - ⚙️ Settings (API keys, profile management)
 - 🌙 Dark/light mode
-- 🎬 Animations with Framer Motion
+- 🎬 Micro-interacciones con Framer Motion (animaciones, transiciones)
 
-**Tech stack:**
-- Vite + React 19 · Tailwind v4 · Zustand · TanStack Query · Recharts
-- Design skills: `UI-UIX PRO MAX` · `SUPERPOWERS` · `FRONTEND-DESING`
+**Stack usado:**
+- Next.js App Router · Tailwind CSS · Framer Motion · Recharts
 
+---
+
+## Phase 8: Refactor — Almacenamiento Local JSON 🔜
+
+**Goal:** Eliminar toda dependencia de base de datos externa. Reemplazar Prisma + PostgreSQL por archivos JSON locales.
+
+**Issue:** [#10 — Refactor a almacenamiento local JSON](https://github.com/byAyes/SeaHorse/issues/10)
+
+**Documento detallado:** `.planning/REFACTOR-local-database.md`
+
+**Motivación:**
+- 🚫 **0 config**: No más `DATABASE_URL`, ni Docker, ni servicios cloud
+- 🔧 **Portable**: `git clone + npm install + npm run dev = funciona`
+- 📁 **Persistencia real**: Datos guardados en `data/database.json`
+- 🧹 **Menos dependencias**: Eliminar `@prisma/client`, `prisma`, `pg`
+
+**Arquitectura:**
+
+```
+src/lib/local-data/
+├── types.ts           ← Interfaces de datos (reemplazan schema.prisma)
+├── utils.ts           ← load/save JSON, UUID, migraciones
+├── index.ts           ← LocalData facade
+└── stores/
+    ├── user-profiles.ts
+    ├── jobs.ts
+    ├── cvs.ts
+    ├── job-matches.ts
+    ├── pipeline-runs.ts
+    ├── email-digests.ts
+    └── profile-changes.ts
+```
+
+**Cambios principales:**
+1. Crear `src/lib/local-data/` con stores por entidad
+2. Re-escribir `src/lib/prisma.ts` como wrapper de compatibilidad sobre `LocalData`
+3. Refactorizar `src/lib/automation/job-history.ts`, `src/lib/cv/profileHistory.ts`, `src/lib/pdf/duplicateDetector.ts`, `src/lib/pdf/pdfIntegration.ts`, `src/matching/cvMatcher.ts`
+4. Refactorizar `src/app/api/stats/route.ts` (el más crítico — usa SQL raw)
+5. Eliminar `prisma/`, `prisma.config.ts`, `src/generated/prisma/`
+6. Eliminar dependencias npm: `@prisma/client`, `prisma`, `@prisma/adapter-pg`, `pg`
+7. Tests unitarios para cada store
+
+**Ver documento completo para detalle de cada archivo y orden de trabajo.**
 ---
 
 ## Issues Overview
 
 | # | Title | State | Phase |
 |---|-------|-------|-------|
-| **9** | [BACKEND] Integración Supabase | 🟢 **Open** | Phase 6 |
-| **8** | [FEATURE] Frontend UI Dashboard | 🟢 **Open** | Phase 7 |
+| **10** | [REFACTOR] Almacenamiento local JSON | 🟢 **Open** | Phase 8 |
+| **9** | [BACKEND] Integración Supabase | 🔵 **Closed** (reemplazado por #10) | Phase 6 |
+| **8** | [FEATURE] Frontend UI Dashboard | 🔵 **Closed** ✅ | Phase 7 |
 | **7** | [FEATURE] AI PDF profile extraction | 🔵 **Closed** ✅ | Phase 5 |
 | **6** | [DEFERRED] process-cv pipeline | 🔵 **Closed** — absorbed | Phase 6 |
 
@@ -227,18 +259,18 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 | JOB-06 | Email integration (SMTP/Resend/Gmail) | 3 | ✅ Complete |
 | JOB-07 | Email formatting (HTML + emojis + scores) | 3 | ✅ Complete |
 | JOB-08 | GitHub Actions workflow | 4 | ✅ Complete |
-| JOB-09 | Job history management | 4 | 🔜 Blocked by #9 |
+| JOB-09 | Job history management | 4 | ✅ **Refactorizado en Fase 8** |
 | PDF-01 | PDF upload and parsing | 5 | ✅ Complete |
 | PDF-02 | Profile extraction from text | 5 | ✅ Complete |
 | PDF-03 | Integration with matching | 5 | ✅ Complete |
 | PDF-04 | Integration with email | 5 | ✅ Complete |
 | PDF-05 | Duplicate detection | 5 | ✅ Complete |
-| CV-01 | Store CVs with versioning | 6 | 🔜 Planned (#9) |
+| CV-01 | Store CVs with versioning | 6 | ✅ **Refactorizado en Fase 8** |
 | CV-02 | Auto-extract skills from CV | 6 | ✅ Complete (in #7) |
 | CV-03 | Update profile from CV data | 6 | ✅ Complete (in #7) |
 | CV-04 | Use profile for job matching | 6 | ✅ Complete (in #7) |
-| CV-05 | Track profile changes | 6 | 🔜 Planned (#9) |
-| UI-01 | React frontend dashboard | 7 | 🔜 Planned (#8) |
+| CV-05 | Track profile changes | 6 | ✅ **Refactorizado en Fase 8** |
+| UI-01 | React frontend dashboard | 7 | ✅ **Complete** |
 
 ---
 
@@ -252,8 +284,8 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 | Scoring | Weighted (40/30/20/10) | ✅ |
 | Email | SMTP · Resend · Gmail API | ✅ |
 | CI/CD | GitHub Actions (weekly + push) | ✅ |
-| Database | Supabase/PostgreSQL (Prisma) | 🔜 #9 |
-| Frontend | React 19 · Vite · Tailwind v4 | 🔜 #8 |
+| Storage | Local JSON files (`data/database.json`) | ✅ **Refactorizado** |
+| Frontend | Next.js · Tailwind CSS · Framer Motion · Recharts | ✅ **Complete** |
 
 ---
 

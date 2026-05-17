@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "test": "jest",
     "test:watch": "jest --watch",
     "automate": "tsx src/automation/scheduler.ts"
@@ -15,13 +18,18 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@tanstack/react-query": "^5.100.10",
     "@types/nodemailer": "^8.0.0",
     "axios": "^1.13.6",
     "cheerio": "^1.2.0",
+    "clsx": "^2.1.1",
     "dotenv": "^17.3.1",
+    "framer-motion": "^12.38.0",
     "google-auth-library": "^10.6.2",
     "googleapis": "^171.4.0",
     "js-yaml": "^4.1.0",
+    "lucide-react": "^1.16.0",
     "next": "^16.2.1",
     "nodemailer": "^8.0.5",
     "pdf-parse": "^2.4.5",
@@ -29,7 +37,11 @@
     "prisma": "^7.8.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "typescript": "^6.0.2"
+    "recharts": "^3.8.1",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.2",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",

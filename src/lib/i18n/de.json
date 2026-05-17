@@ -1,0 +1,281 @@
+{
+  "app": {
+    "name": "Seahorse"
+  },
+  "header": {
+    "dashboard": "Dashboard",
+    "upload": "CV Hochladen",
+    "jobs": "Ergebnisse",
+    "pipeline": "Pipeline",
+    "settings": "Einstellungen"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "upload": "CV Hochladen",
+    "jobs": "Ergebnisse",
+    "pipeline": "Pipeline",
+    "settings": "Einstellungen",
+    "collapse": "Einklappen"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Job-Pipeline-Übersicht",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "refreshing": "Aktualisiere...",
+    "refresh": "Aktualisieren",
+    "uploadCv": "CV Hochladen",
+    "runPipeline": "Pipeline Ausführen",
+    "viewJobs": "Jobs Ansehen",
+    "configure": "Konfigurieren",
+    "actions": {
+      "uploadCv": "CV Hochladen",
+      "uploadCvDesc": "Profil mit KI extrahieren",
+      "runPipeline": "Pipeline Ausführen",
+      "runPipelineDesc": "Scraping + Matching",
+      "viewJobs": "Jobs Ansehen",
+      "viewJobsDesc": "Detaillierte Ergebnisse",
+      "configure": "Konfigurieren",
+      "configureDesc": "Profil & Präferenzen"
+    },
+    "topSkills": "Top-Fähigkeiten",
+    "noSkills": "Keine Fähigkeiten registriert",
+    "noSkillsDesc": "Fähigkeiten erscheinen, sobald Jobs gescrapt wurden",
+    "lastRun": "Letzter Pipeline-Lauf",
+    "successful": "Erfolgreich",
+    "error": "Fehler",
+    "scraped": "gescrapt",
+    "jobs30d": "Jobs (30T)",
+    "matched": "übereinstimmend",
+    "noRuns": "Keine vorherigen Läufe",
+    "noRunsDesc": "Führen Sie die Pipeline aus, um Ergebnisse zu sehen",
+    "execute": "Ausführen"
+  },
+  "jobs": {
+    "title": "Matching-Ergebnisse",
+    "subtitle": "Jobs basierend auf Ihrem CV-Profil bewertet",
+    "search": "Jobs suchen...",
+    "evaluated": "bewertet",
+    "match": "Treffer",
+    "matches": "Treffer",
+    "noResults": "Keine passenden Jobs gefunden",
+    "noResultsDesc": "Passen Sie den Bewertungsfilter oder Suchbegriff an",
+    "table": {
+      "title": "Titel",
+      "company": "Unternehmen",
+      "location": "Standort",
+      "score": "Punktzahl",
+      "salary": "Gehalt",
+      "date": "Datum",
+      "source": "Quelle"
+    },
+    "modal": {
+      "scoreBreakdown": "Punktzahl-Aufschlüsselung",
+      "skills": "Fähigkeiten",
+      "interests": "Interessen",
+      "location": "Standort",
+      "salary": "Gehalt",
+      "matchedSkills": "Übereinstimmende Fähigkeiten",
+      "jobDescription": "Stellenbeschreibung",
+      "viewJob": "Job Ansehen",
+      "close": "Schließen",
+      "salaryNotSpecified": "Nicht angegeben",
+      "noDescription": "Keine Beschreibung verfügbar"
+    },
+    "score": {
+      "all": "Alle",
+      "excellent": "Hervorragend",
+      "good": "Gut",
+      "potential": "Potenzial"
+    },
+    "loading": "Lade Jobs..."
+  },
+  "upload": {
+    "title": "CV Hochladen",
+    "subtitle": "Laden Sie Ihren CV oder ein PDF hoch, um Ihr Profil zu extrahieren",
+    "dropzone": {
+      "title": "CV hier ablegen",
+      "subtitle": "oder klicken Sie zum Durchsuchen",
+      "formats": "PDF, DOCX, TXT — Max 10MB",
+      "uploading": "Lade hoch...",
+      "drop": "Datei hier ablegen..."
+    },
+    "processing": {
+      "title": "Verarbeite Ihren CV",
+      "subtitle": "Analysiere und extrahiere Ihr Berufsprofil",
+      "extracting": "Extrahiere Informationen...",
+      "analyzing": "Analysiere Fähigkeiten und Erfahrung...",
+      "building": "Erstelle Ihr Profil..."
+    },
+    "preview": {
+      "title": "Extrahiertes Profil",
+      "edit": "Bearbeiten",
+      "confirm": "Profil Bestätigen",
+      "reupload": "Anderen CV Hochladen"
+    },
+    "results": {
+      "skills": "Fähigkeiten",
+      "experience": "Erfahrung",
+      "education": "Ausbildung",
+      "languages": "Sprachen",
+      "locations": "Bevorzugte Standorte",
+      "jobTitles": "Zielpositionen",
+      "level": "Erfahrungsstufe"
+    },
+    "done": {
+      "title": "Profil Vollständig!",
+      "subtitle": "Ihr CV wurde verarbeitet und Ihr Profil ist bereit",
+      "viewJobs": "Passende Jobs Ansehen",
+      "runPipeline": "Pipeline Ausführen",
+      "uploadAnother": "Weiteres Hochladen"
+    },
+    "error": {
+      "title": "Upload-Fehler",
+      "noFile": "Keine Datei ausgewählt",
+      "invalidFormat": "Ungültiges Dateiformat. Verwenden Sie PDF, DOCX oder TXT",
+      "tooLarge": "Datei überschreitet das 10MB-Limit",
+      "processingFailed": "CV-Verarbeitung fehlgeschlagen. Versuchen Sie es erneut."
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Konfigurieren Sie Ihr Profil, E-Mail und API-Schlüssel",
+    "saved": "Einstellungen erfolgreich gespeichert",
+    "saveError": "Fehler beim Speichern",
+    "profile": {
+      "title": "Berufsprofil",
+      "description": "Ihre Jobpräferenzen und beruflichen Informationen",
+      "skills": "Fähigkeiten (kommasepariert)",
+      "skillsPlaceholder": "z.B. JavaScript, Python, React",
+      "jobTitles": "Gewünschte Positionen",
+      "jobTitlesPlaceholder": "z.B. Softwareentwickler, Full Stack Dev",
+      "locations": "Bevorzugte Standorte",
+      "locationsPlaceholder": "z.B. Remote, Berlin, München",
+      "level": "Erfahrungsstufe",
+      "junior": "Einsteiger",
+      "mid": "Mittelstufe",
+      "senior": "Senior",
+      "lead": "Lead / Manager",
+      "languages": "Sprachen",
+      "languagesPlaceholder": "z.B. Deutsch, Englisch",
+      "salary": "Gehaltsspanne (USD)",
+      "salaryMin": "Minimum",
+      "salaryMax": "Maximum",
+      "remote": "Remote-Arbeit",
+      "remoteYes": "Ja",
+      "remoteNo": "Nein",
+      "save": "Profil Speichern",
+      "saving": "Speichere..."
+    },
+    "email": {
+      "title": "E-Mail-Konfiguration",
+      "description": "SMTP-Einstellungen für Job-Digest-E-Mails",
+      "host": "SMTP-Server",
+      "port": "Port",
+      "user": "Benutzer",
+      "password": "Passwort",
+      "from": "Absender-E-Mail",
+      "recipient": "Empfänger-E-Mail",
+      "cc": "CC-E-Mail (optional)",
+      "save": "E-Mail-Konfiguration Speichern",
+      "saving": "Speichere..."
+    },
+    "apiKeys": {
+      "title": "API-Schlüssel",
+      "description": "Konfigurieren Sie API-Schlüssel für KI und Job-Suche",
+      "jsearch": "JSearch API-Schlüssel",
+      "jsearchDesc": "Erforderlich für Job-Scraping",
+      "gemini": "Gemini API-Schlüssel",
+      "geminiDesc": "Erforderlich für KI-Profil-Extraktion",
+      "openrouter": "OpenRouter API-Schlüssel",
+      "openrouterDesc": "Alternativer KI-Anbieter",
+      "nim": "NVIDIA NIM API-Schlüssel",
+      "nimDesc": "Alternativer KI-Anbieter",
+      "save": "API-Schlüssel Speichern",
+      "saving": "Speichere...",
+      "show": "Anzeigen",
+      "hide": "Ausblenden"
+    },
+    "theme": {
+      "title": "Erscheinungsbild",
+      "description": "Wählen Sie Ihr bevorzugtes Farbschema",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    }
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "subtitle": "Führen Sie die Job-Scraping- und Matching-Pipeline aus",
+    "apiKeyRequired": "KI-API-Schlüssel Erforderlich",
+    "apiKeyRequiredDesc": "Sie benötigen mindestens einen KI-API-Schlüssel (Gemini, OpenRouter oder NVIDIA NIM), um die Pipeline auszuführen.",
+    "goToSettings": "Zu den Einstellungen",
+    "run": "Pipeline Ausführen",
+    "running": "Wird ausgeführt...",
+    "reset": "Zurücksetzen",
+    "progress": "Fortschritt",
+    "starting": "Starte...",
+    "steps": {
+      "scraping": "Scraping",
+      "scrapingDesc": "Suche Jobs aus mehreren Quellen",
+      "matching": "Matching",
+      "matchingDesc": "Bewerte Übereinstimmungen mit Ihrem Profil",
+      "completion": "Abschluss",
+      "completionDesc": "Verarbeite Ergebnisse und bereinige Daten"
+    },
+    "status": {
+      "completed": "Abgeschlossen",
+      "error": "Fehler",
+      "pending": "Ausstehend"
+    },
+    "logs": {
+      "title": "Protokoll",
+      "live": "Live",
+      "ready": "Pipeline bereit zur Ausführung.",
+      "configureKey": "Konfigurieren Sie zuerst einen KI-API-Schlüssel in den Einstellungen.",
+      "running": "Pipeline wird ausgeführt, bitte warten..."
+    },
+    "results": {
+      "title": "Ergebnisse",
+      "jobsFound": "Jobs Gefunden",
+      "jobsScraped": "Jobs Gescrapt",
+      "matchScores": "Bewertungen",
+      "savedInDb": "Gespeichert",
+      "jobsCleaned": "Jobs Bereinigt",
+      "topMatches": "Beste Übereinstimmungen",
+      "matched": "Übereinstimmungen",
+      "warnings": "Warnungen",
+      "sources": "Quellen",
+      "lastExecution": "Letzte Ausführung",
+      "noPreviousRuns": "Keine vorherigen Läufe",
+      "noWarnings": "Keine Warnungen",
+      "noMatches": "Keine Übereinstimmungen gefunden",
+      "duration": "Dauer",
+      "status": "Status",
+      "completed": "Abgeschlossen",
+      "failed": "Fehlgeschlagen"
+    }
+  },
+  "common": {
+    "loading": "Lädt...",
+    "saving": "Speichere...",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "save": "Speichern",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "search": "Suchen",
+    "language": "Sprache",
+    "noData": "Keine Daten verfügbar",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Wiederholen",
+    "yes": "Ja",
+    "no": "Nein",
+    "days": "Tage",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "seconds": "Sekunden"
+  }
+}

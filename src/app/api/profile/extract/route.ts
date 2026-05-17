@@ -8,6 +8,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractProfileFromPDF, extractProfileFromText } from '@/lib/ai';
 
+/**
+ * GET /api/profile/extract?userId=xxx
+ * Returns the user profile for the dashboard settings page.
+ * In mock mode, returns default empty profile data.
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId') || 'default-user';
+
+    return NextResponse.json({
+      id: userId,
+      userId,
+      skills: [],
+      interests: [],
+      location: null,
+      remoteOnly: false,
+      minSalary: null,
+      maxSalary: null,
+      experienceLevel: null,
+      createdAt: new Date().toISOString(),
+      weightings: {
+        skills: 0.4,
+        interests: 0.3,
+        location: 0.2,
+        salary: 0.1,
+      },
+    });
+  } catch (error) {
+    console.error('Profile GET error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type') || '';

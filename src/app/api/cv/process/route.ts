@@ -4,15 +4,19 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { parseCV } from '../../../../lib/cv/cvParser';
 import { extractSkills, extractExperience, extractEducation } from '../../../../lib/cv/skillExtractor';
+import { extractProfileFromText } from '../../../../lib/ai/pdfProfileExtractor';
 
 /**
  * POST /api/cv/process
  * Process a CV PDF and extract skills, experience, education
+ *
+ * Accepts optional provider + apiKey to use a specific AI provider
+ * for intelligent profile extraction alongside the local CV parsing.
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { cvId } = body;
+    const { cvId, provider, apiKey } = body;
 
     if (!cvId) {
       return NextResponse.json(
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
       : [];
 
     // Update CV record with extracted data
-    const updatedCV = await prisma.cV.update({
+    await prisma.cV.update({
       where: { id: cvId },
       data: {
         skills,
@@ -96,12 +100,54 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Use AI profile extraction to get a rich profile for the upload preview
+    let profile: Record<string, unknown> | null = null;
+    if (parsed.rawText && parsed.rawText.length > 50) {
+      try {
+        const aiResult = await extractProfileFromText(parsed.rawText, {
+          aiProvider: provider,
+          aiApiKey: apiKey,
+        });
+        if (aiResult.success && aiResult.profile) {
+          profile = {
+            skills: aiResult.profile.skills,
+            jobTitles: aiResult.profile.jobTitles,
+            locations: aiResult.profile.locations,
+            experienceLevel: aiResult.profile.experienceLevel,
+            industries: aiResult.profile.industries,
+            languages: aiResult.profile.languages,
+            summary: aiResult.profile.summary,
+            salaryRange: aiResult.profile.salaryRange,
+            experience: experienceEntries.map((e) => ({
+              role: e.jobTitle,
+              company: e.company,
+              duration: e.duration,
+            })),
+            education: educationEntries.map((e) => ({
+              degree: e.degree,
+              institution: e.institution,
+              graduationYear: e.graduationYear,
+            })),
+            remoteOnly: false,
+            location: (aiResult.profile.locations && aiResult.profile.locations.length > 0)
+              ? aiResult.profile.locations[0]
+              : null,
+          };
+        }
+      } catch (err) {
+        // AI extraction failed — provide partial profile with CV-parsed data
+        console.warn('[CV Process] AI extraction optional, using partial profile:', err instanceof Error ? err.message : String(err));
+      }
+    }
+
+    // Build response with profile for upload preview
     return NextResponse.json({
       success: true,
       skills,
       experience: experienceEntries.length,
       education: educationEntries.length,
       rawText: parsed.rawText,
+      profile,
     });
   } catch (error) {
     console.error('Error processing CV:', error);

@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       location: job.location,
       description: job.description,
       url: job.url,
-      salary: job.salary,
+      salary: job.salary ? Number(job.salary) : null,
       postedAt: job.postedAt,
       scrapedAt: job.scrapedAt,
       skills: job.skills,

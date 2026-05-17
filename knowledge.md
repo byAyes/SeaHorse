@@ -24,8 +24,7 @@ Automated job board scraper → AI profile extraction → AI matcher → email d
 | `pip install -r scrapers/requirements.txt` | Install Python scraper deps |
 | `playwright install chromium` | Install browser for Scrapling |
 | `patchright install chromium` | Install patched browser for Scrapling |
-| `npx prisma db push` | Push schema changes to DB |
-| `npx prisma generate` | Regenerate Prisma client |
+
 
 ## Key Code Locations
 - **Pipeline with profile** → `scripts/run-profile-pipeline.ts` → `src/automation/orchestrator.ts`
@@ -48,14 +47,18 @@ Automated job board scraper → AI profile extraction → AI matcher → email d
 - **Matching**: Weighted scoring (Skills 40% / Interests 30% / Location 20% / Salary 10%) — **real scores, no fake 100%**.
 - **Email template**: Premium HTML with emojis (📬📊🎯🔥🚀), SVG icons, score badges, stats cards, empty state.
 
-## Database Status ⚠️
-Database (Supabase) is **deferred** due to a Windows + IPv6-only Supabase hostname connectivity issue. The Prisma client uses a mock that returns empty/safe defaults so the pipeline works without a database:
-- All jobs pass through (no duplicate filtering)
-- Job history/cache is not persisted
-- Email marking and cleanup are no-ops
+## Database → Local Storage 🔜
+**PRÓXIMO REFACTOR:** Reemplazar la base de datos externa (Supabase/Neon mock) por **almacenamiento local en archivos JSON** (`data/database.json`).
 
-**Tracked in:** [#9 — Integración Supabase](https://github.com/byAyes/SeaHorse/issues/9)
-**To re-enable**: Set `DATABASE_URL`, run `npx prisma migrate dev`, and swap `src/lib/prisma.ts` for the real client with adapter. Dependencies already installed: `@prisma/adapter-pg`, `pg`, `prisma`.
+Actualmente el pipeline usa un mock de PrismaClient que retorna defaults vacíos (los datos no persisten entre ejecuciones). El plan de refactor consiste en:
+- **0 config:** No necesita `DATABASE_URL`, ni Docker, ni servicios cloud
+- **Persistencia real:** Los datos se guardan en disco y sobreviven reinicios
+- **Portable:** Clonar + npm install + ejecutar = funciona
+- **Estructura:** `src/lib/local-data/` con stores individuales por entidad
+- **Compatibilidad:** `src/lib/prisma.ts` como wrapper sobre `LocalData`
+
+**Tracked in:** [#10 — Refactor a almacenamiento local JSON](https://github.com/byAyes/SeaHorse/issues/10)
+**Plan detallado:** `.planning/REFACTOR-local-database.md`
 
 ## Email Provider Configuration
 
@@ -104,14 +107,15 @@ Total per run: **~15–20 jobs** — failed scrapers don't crash the pipeline.
 ## Open Issues
 | # | Title | Link |
 |---|-------|------|
-| 9 | Integración Supabase | https://github.com/byAyes/SeaHorse/issues/9 |
-| 8 | Frontend UI Dashboard (React) | https://github.com/byAyes/SeaHorse/issues/8 |
+| 10 | Refactor: Almacenamiento local JSON | https://github.com/byAyes/SeaHorse/issues/10 |
 
 ## Closed Issues
 | # | Title | Resolution |
 |---|-------|------------|
 | 7 | AI PDF profile extraction | ✅ Implemented and working |
 | 6 | process-cv pipeline | ✅ Absorbed into #7 + #9 |
+| 8 | Frontend UI Dashboard | ✅ Completado |
+| 9 | Integración Supabase | 🔁 Reemplazado por #10 (local JSON) |
 
 ## Recent Fixes
 - **SMTP HTML**: Provider now accepts `html` and `cc` params — emails render with rich formatting (was plain text only)
@@ -119,3 +123,4 @@ Total per run: **~15–20 jobs** — failed scrapers don't crash the pipeline.
 - **Emojis in template**: Added throughout digest: header, stats, profile, job cards, empty state, footer
 - **CI email switch**: Changed from Resend to SMTP (Gmail App Password) — more reliable
 - **Workflow path fix**: Added `.github/workflows/**` to trigger paths — workflow changes now trigger runs
+- **Local storage refactor**: Reemplazado Prisma + Supabase por archivos JSON locales

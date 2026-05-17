@@ -7,7 +7,8 @@
  * Experience level — reuses the existing type from user-profile.ts
  * Values: 'junior' | 'mid' | 'senior' | 'lead'
  */
-export type { ExperienceLevel } from './user-profile';
+import type { ExperienceLevel } from './user-profile';
+export type { ExperienceLevel };
 
 /**
  * Structured profile extracted from a CV/resume PDF
@@ -73,4 +74,8 @@ export interface ProfileExtractionOptions {
   provider?: 'gemini' | 'openai' | 'ollama' | 'keyword';
   /** Language of the CV for prompt optimization */
   language?: string;
+  /** Specific AI provider (gemini | openrouter | nim) */
+  aiProvider?: string;
+  /** API key for the AI provider */
+  aiApiKey?: string;
 }

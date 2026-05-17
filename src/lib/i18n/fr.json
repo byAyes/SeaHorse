@@ -1,0 +1,281 @@
+{
+  "app": {
+    "name": "Seahorse"
+  },
+  "header": {
+    "dashboard": "Tableau de Bord",
+    "upload": "Importer CV",
+    "jobs": "Résultats",
+    "pipeline": "Pipeline",
+    "settings": "Paramètres"
+  },
+  "sidebar": {
+    "dashboard": "Tableau de Bord",
+    "upload": "Importer CV",
+    "jobs": "Résultats",
+    "pipeline": "Pipeline",
+    "settings": "Paramètres",
+    "collapse": "Réduire"
+  },
+  "dashboard": {
+    "title": "Tableau de Bord",
+    "subtitle": "Aperçu du pipeline d'offres d'emploi",
+    "lastUpdated": "Dernière mise à jour",
+    "refreshing": "Actualisation...",
+    "refresh": "Actualiser",
+    "uploadCv": "Importer CV",
+    "runPipeline": "Lancer le Pipeline",
+    "viewJobs": "Voir les Offres",
+    "configure": "Configurer",
+    "actions": {
+      "uploadCv": "Importer CV",
+      "uploadCvDesc": "Extrayez votre profil avec l'IA",
+      "runPipeline": "Lancer le Pipeline",
+      "runPipelineDesc": "Scraping + matching",
+      "viewJobs": "Voir les Offres",
+      "viewJobsDesc": "Résultats détaillés",
+      "configure": "Configurer",
+      "configureDesc": "Profil et préférences"
+    },
+    "topSkills": "Compétences Clés",
+    "noSkills": "Aucune compétence enregistrée",
+    "noSkillsDesc": "Les compétences apparaîtront lorsque des offres seront collectées",
+    "lastRun": "Dernière Exécution",
+    "successful": "Succès",
+    "error": "Erreur",
+    "scraped": "collectées",
+    "jobs30d": "offres (30j)",
+    "matched": "correspondantes",
+    "noRuns": "Aucune exécution précédente",
+    "noRunsDesc": "Lancez le pipeline pour voir les résultats ici",
+    "execute": "Lancer"
+  },
+  "jobs": {
+    "title": "Résultats de Matching",
+    "subtitle": "Offres notées par rapport à votre profil CV",
+    "search": "Rechercher des offres...",
+    "evaluated": "évaluées",
+    "match": "correspondance",
+    "matches": "correspondances",
+    "noResults": "Aucune offre correspondante trouvée",
+    "noResultsDesc": "Essayez d'ajuster le filtre de score ou le terme de recherche",
+    "table": {
+      "title": "Titre",
+      "company": "Entreprise",
+      "location": "Lieu",
+      "score": "Score",
+      "salary": "Salaire",
+      "date": "Date",
+      "source": "Source"
+    },
+    "modal": {
+      "scoreBreakdown": "Détail du Score",
+      "skills": "Compétences",
+      "interests": "Intérêts",
+      "location": "Lieu",
+      "salary": "Salaire",
+      "matchedSkills": "Compétences Correspondantes",
+      "jobDescription": "Description du Poste",
+      "viewJob": "Voir l'Offre",
+      "close": "Fermer",
+      "salaryNotSpecified": "Non spécifié",
+      "noDescription": "Aucune description disponible"
+    },
+    "score": {
+      "all": "Tous",
+      "excellent": "Excellent",
+      "good": "Bon",
+      "potential": "Potentiel"
+    },
+    "loading": "Chargement des offres..."
+  },
+  "upload": {
+    "title": "Importer CV",
+    "subtitle": "Importez votre CV ou PDF pour extraire votre profil professionnel",
+    "dropzone": {
+      "title": "Déposez votre CV ici",
+      "subtitle": "ou cliquez pour parcourir les fichiers",
+      "formats": "PDF, DOCX, TXT — Max 10 Mo",
+      "uploading": "Importation...",
+      "drop": "Déposez le fichier ici..."
+    },
+    "processing": {
+      "title": "Traitement de votre CV",
+      "subtitle": "Analyse et extraction de votre profil professionnel",
+      "extracting": "Extraction des informations...",
+      "analyzing": "Analyse des compétences et de l'expérience...",
+      "building": "Construction de votre profil..."
+    },
+    "preview": {
+      "title": "Profil Extrait",
+      "edit": "Modifier",
+      "confirm": "Confirmer le Profil",
+      "reupload": "Importer un Autre CV"
+    },
+    "results": {
+      "skills": "Compétences",
+      "experience": "Expérience",
+      "education": "Formation",
+      "languages": "Langues",
+      "locations": "Lieux Préférés",
+      "jobTitles": "Postes Recherchés",
+      "level": "Niveau d'Expérience"
+    },
+    "done": {
+      "title": "Profil Complet !",
+      "subtitle": "Votre CV a été traité et votre profil est prêt",
+      "viewJobs": "Voir les Offres Correspondantes",
+      "runPipeline": "Lancer le Pipeline",
+      "uploadAnother": "Importer un Autre"
+    },
+    "error": {
+      "title": "Erreur d'Import",
+      "noFile": "Aucun fichier sélectionné",
+      "invalidFormat": "Format de fichier invalide. Utilisez PDF, DOCX ou TXT",
+      "tooLarge": "Le fichier dépasse la limite de 10 Mo",
+      "processingFailed": "Échec du traitement du CV. Réessayez."
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Configurez votre profil, e-mail et clés API",
+    "saved": "Paramètres enregistrés avec succès",
+    "saveError": "Erreur lors de l'enregistrement",
+    "profile": {
+      "title": "Profil Professionnel",
+      "description": "Vos préférences de poste et informations professionnelles",
+      "skills": "Compétences (séparées par des virgules)",
+      "skillsPlaceholder": "ex: JavaScript, Python, React",
+      "jobTitles": "Postes Souhaités",
+      "jobTitlesPlaceholder": "ex: Ingénieur Logiciel, Développeur Full Stack",
+      "locations": "Lieux Préférés",
+      "locationsPlaceholder": "ex: Télétravail, Paris, Lyon",
+      "level": "Niveau d'Expérience",
+      "junior": "Junior",
+      "mid": "Intermédiaire",
+      "senior": "Senior",
+      "lead": "Lead / Manager",
+      "languages": "Langues",
+      "languagesPlaceholder": "ex: Français, Anglais",
+      "salary": "Fourchette de Salaire (USD)",
+      "salaryMin": "Minimum",
+      "salaryMax": "Maximum",
+      "remote": "Télétravail",
+      "remoteYes": "Oui",
+      "remoteNo": "Non",
+      "save": "Enregistrer le Profil",
+      "saving": "Enregistrement..."
+    },
+    "email": {
+      "title": "Configuration E-mail",
+      "description": "Paramètres SMTP pour les e-mails de résumé d'offres",
+      "host": "Serveur SMTP",
+      "port": "Port",
+      "user": "Utilisateur",
+      "password": "Mot de passe",
+      "from": "E-mail Expéditeur",
+      "recipient": "E-mail Destinataire",
+      "cc": "E-mail CC (optionnel)",
+      "save": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "apiKeys": {
+      "title": "Clés API",
+      "description": "Configurez les clés API pour l'IA et la recherche d'emploi",
+      "jsearch": "Clé API JSearch",
+      "jsearchDesc": "Requis pour le scraping d'offres",
+      "gemini": "Clé API Gemini",
+      "geminiDesc": "Requis pour l'extraction de profil IA",
+      "openrouter": "Clé API OpenRouter",
+      "openrouterDesc": "Fournisseur IA alternatif",
+      "nim": "Clé API NVIDIA NIM",
+      "nimDesc": "Fournisseur IA alternatif",
+      "save": "Enregistrer les Clés",
+      "saving": "Enregistrement...",
+      "show": "Afficher",
+      "hide": "Masquer"
+    },
+    "theme": {
+      "title": "Apparence",
+      "description": "Choisissez votre schéma de couleurs préféré",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    }
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "subtitle": "Lancez le pipeline de scraping et matching d'offres",
+    "apiKeyRequired": "Clé API IA Requise",
+    "apiKeyRequiredDesc": "Vous avez besoin d'au moins une clé API IA (Gemini, OpenRouter ou NVIDIA NIM) pour lancer le pipeline.",
+    "goToSettings": "Aller aux Paramètres",
+    "run": "Lancer le Pipeline",
+    "running": "En cours...",
+    "reset": "Réinitialiser",
+    "progress": "Progression",
+    "starting": "Démarrage...",
+    "steps": {
+      "scraping": "Scraping",
+      "scrapingDesc": "Recherche d'offres depuis plusieurs sources",
+      "matching": "Matching",
+      "matchingDesc": "Évaluation des correspondances avec votre profil",
+      "completion": "Finalisation",
+      "completionDesc": "Traitement des résultats et nettoyage des données"
+    },
+    "status": {
+      "completed": "Terminé",
+      "error": "Erreur",
+      "pending": "En attente"
+    },
+    "logs": {
+      "title": "Journaux",
+      "live": "En Direct",
+      "ready": "Pipeline prêt à être lancé.",
+      "configureKey": "Configurez d'abord une clé API IA dans les Paramètres.",
+      "running": "Pipeline en cours d'exécution, veuillez patienter..."
+    },
+    "results": {
+      "title": "Résultats",
+      "jobsFound": "Offres Trouvées",
+      "jobsScraped": "Offres Collectées",
+      "matchScores": "Scores de Matching",
+      "savedInDb": "Sauvegardées",
+      "jobsCleaned": "Offres Nettoyées",
+      "topMatches": "Meilleures Correspondances",
+      "matched": "correspondances",
+      "warnings": "Avertissements",
+      "sources": "Sources",
+      "lastExecution": "Dernière Exécution",
+      "noPreviousRuns": "Aucune exécution précédente",
+      "noWarnings": "Aucun avertissement",
+      "noMatches": "Aucune correspondance trouvée",
+      "duration": "Durée",
+      "status": "Statut",
+      "completed": "Terminé",
+      "failed": "Échoué"
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher",
+    "language": "Langue",
+    "noData": "Aucune donnée disponible",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "yes": "Oui",
+    "no": "Non",
+    "days": "jours",
+    "hours": "heures",
+    "minutes": "minutes",
+    "seconds": "secondes"
+  }
+}

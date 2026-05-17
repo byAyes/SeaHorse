@@ -1,0 +1,286 @@
+{
+  "app": {
+    "name": "Seahorse"
+  },
+  "header": {
+    "dashboard": "Dashboard",
+    "upload": "Upload CV",
+    "jobs": "Matching Results",
+    "pipeline": "Pipeline",
+    "settings": "Settings"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "upload": "Upload CV",
+    "jobs": "Results",
+    "pipeline": "Pipeline",
+    "settings": "Settings",
+    "collapse": "Collapse"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Job pipeline overview",
+    "lastUpdated": "Last updated",
+    "refreshing": "Refreshing...",
+    "refresh": "Refresh",
+    "uploadCv": "Upload CV",
+    "runPipeline": "Run Pipeline",
+    "viewJobs": "View Jobs",
+    "configure": "Configure",
+    "actions": {
+      "uploadCv": "Upload CV",
+      "uploadCvDesc": "Extract your profile with AI",
+      "runPipeline": "Run Pipeline",
+      "runPipelineDesc": "Scraping + matching",
+      "viewJobs": "View Jobs",
+      "viewJobsDesc": "Detailed results",
+      "configure": "Configure",
+      "configureDesc": "Profile & preferences"
+    },
+    "topSkills": "Top Skills",
+    "noSkills": "No skills registered",
+    "noSkillsDesc": "Skills will appear when jobs are scraped",
+    "lastRun": "Last Pipeline Run",
+    "successful": "Successful",
+    "error": "Error",
+    "scraped": "scraped",
+    "jobs30d": "jobs (30d)",
+    "matched": "matched",
+    "noRuns": "No previous runs",
+    "noRunsDesc": "Run the pipeline to see results here",
+    "execute": "Run"
+  },
+  "jobs": {
+    "title": "Matching Results",
+    "subtitle": "Jobs scored against your CV profile",
+    "search": "Search jobs...",
+    "evaluated": "evaluated",
+    "match": "match",
+    "matches": "matches",
+    "noResults": "No matching jobs found",
+    "noResultsDesc": "Try adjusting the score filter or search term",
+    "table": {
+      "title": "Title",
+      "company": "Company",
+      "location": "Location",
+      "score": "Score",
+      "salary": "Salary",
+      "date": "Date",
+      "source": "Source"
+    },
+    "modal": {
+      "scoreBreakdown": "Score Breakdown",
+      "skills": "Skills",
+      "interests": "Interests",
+      "location": "Location",
+      "salary": "Salary",
+      "matchedSkills": "Matched Skills",
+      "jobDescription": "Job Description",
+      "viewJob": "View Job",
+      "close": "Close",
+      "salaryNotSpecified": "Not specified",
+      "noDescription": "No description available"
+    },
+    "score": {
+      "all": "All",
+      "excellent": "Excellent",
+      "good": "Good",
+      "potential": "Potential"
+    },
+    "loading": "Loading jobs..."
+  },
+  "upload": {
+    "title": "Upload CV",
+    "subtitle": "Upload your CV or PDF to extract your professional profile",
+    "dropzone": {
+      "title": "Drop your CV here",
+      "subtitle": "or click to browse files",
+      "formats": "PDF, DOCX, TXT — Max 10MB",
+      "uploading": "Uploading...",
+      "drop": "Drop file here..."
+    },
+    "processing": {
+      "title": "Processing your CV",
+      "subtitle": "Analyzing and extracting your professional profile",
+      "extracting": "Extracting information...",
+      "analyzing": "Analyzing skills and experience...",
+      "building": "Building your profile..."
+    },
+    "preview": {
+      "title": "Extracted Profile",
+      "edit": "Edit",
+      "confirm": "Confirm Profile",
+      "reupload": "Upload Different CV"
+    },
+    "results": {
+      "skills": "Skills",
+      "experience": "Experience",
+      "education": "Education",
+      "languages": "Languages",
+      "locations": "Preferred Locations",
+      "jobTitles": "Target Roles",
+      "level": "Experience Level"
+    },
+    "done": {
+      "title": "Profile Complete!",
+      "subtitle": "Your CV has been processed and your profile is ready",
+      "viewJobs": "View Matching Jobs",
+      "runPipeline": "Run Pipeline",
+      "uploadAnother": "Upload Another"
+    },
+    "error": {
+      "title": "Upload Error",
+      "noFile": "No file selected",
+      "invalidFormat": "Invalid file format. Use PDF, DOCX, or TXT",
+      "tooLarge": "File exceeds 10MB limit",
+      "processingFailed": "Failed to process CV. Try again."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Configure your profile, email, and API keys",
+    "saved": "Settings saved successfully",
+    "saveError": "Error saving settings",
+    "profile": {
+      "title": "Professional Profile",
+      "description": "Your job preferences and professional information",
+      "skills": "Skills (comma separated)",
+      "skillsPlaceholder": "e.g. JavaScript, Python, React",
+      "jobTitles": "Desired Job Titles",
+      "jobTitlesPlaceholder": "e.g. Software Engineer, Full Stack Dev",
+      "locations": "Preferred Locations",
+      "locationsPlaceholder": "e.g. Remote, New York, Madrid",
+      "level": "Experience Level",
+      "junior": "Junior",
+      "mid": "Mid-level",
+      "senior": "Senior",
+      "lead": "Lead / Manager",
+      "languages": "Languages",
+      "languagesPlaceholder": "e.g. English, Spanish",
+      "salary": "Salary Range (USD)",
+      "salaryMin": "Minimum",
+      "salaryMax": "Maximum",
+      "remote": "Remote Work",
+      "remoteYes": "Yes",
+      "remoteNo": "No",
+      "save": "Save Profile",
+      "saving": "Saving..."
+    },
+    "email": {
+      "title": "Email Configuration",
+      "description": "SMTP settings for job digest emails",
+      "host": "SMTP Host",
+      "port": "Port",
+      "user": "User",
+      "password": "Password",
+      "from": "From Email",
+      "recipient": "Recipient Email",
+      "cc": "CC Email (optional)",
+      "save": "Save Email Config",
+      "saving": "Saving..."
+    },
+    "apiKeys": {
+      "title": "API Keys",
+      "description": "Configure third-party API keys for AI and job search",
+      "jsearch": "JSearch API Key",
+      "jsearchDesc": "Required for job scraping",
+      "gemini": "Gemini API Key",
+      "geminiDesc": "Required for AI profile extraction",
+      "openrouter": "OpenRouter API Key",
+      "openrouterDesc": "Alternative AI provider",
+      "nim": "NVIDIA NIM API Key",
+      "nimDesc": "Alternative AI provider",
+      "save": "Save API Keys",
+      "saving": "Saving...",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Choose your preferred color scheme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "subtitle": "Run the job scraping and matching pipeline",
+    "apiKeyRequired": "AI API Key Required",
+    "apiKeyRequiredDesc": "You need at least one AI API key (Gemini, OpenRouter, or NVIDIA NIM) to run the pipeline.",
+    "goToSettings": "Go to Settings",
+    "run": "Run Pipeline",
+    "running": "Running...",
+    "reset": "Reset",
+    "steps": {
+      "scraping": "Scraping",
+      "matching": "Matching",
+      "completion": "Completion"
+    },
+    "progress": "Progress",
+    "starting": "Starting...",
+    "steps": {
+      "scraping": "Scraping",
+      "scrapingDesc": "Searching jobs from multiple sources",
+      "matching": "Matching",
+      "matchingDesc": "Evaluating matches against your profile",
+      "completion": "Completion",
+      "completionDesc": "Processing results and cleaning data"
+    },
+    "status": {
+      "completed": "Completed",
+      "error": "Error",
+      "pending": "Pending"
+    },
+    "logs": {
+      "title": "Logs",
+      "live": "Live",
+      "ready": "Pipeline ready to run.",
+      "configureKey": "Configure an AI API Key in Settings first.",
+      "running": "Pipeline running, please wait..."
+    },
+    "results": {
+      "title": "Results",
+      "jobsFound": "Jobs Found",
+      "jobsScraped": "Jobs Scraped",
+      "matchScores": "Match Scores",
+      "savedInDb": "Saved to DB",
+      "jobsCleaned": "Jobs Cleaned",
+      "topMatches": "Top Matches",
+      "matched": "matches",
+      "warnings": "Warnings",
+      "sources": "Sources",
+      "lastExecution": "Last Execution (stats)",
+      "noPreviousRuns": "No previous runs",
+      "noWarnings": "No warnings",
+      "noMatches": "No matches found",
+      "duration": "Duration",
+      "status": "Status",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "language": "Language",
+    "noData": "No data available",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "yes": "Yes",
+    "no": "No",
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  }
+}

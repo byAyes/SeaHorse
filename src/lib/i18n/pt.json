@@ -1,0 +1,281 @@
+{
+  "app": {
+    "name": "Seahorse"
+  },
+  "header": {
+    "dashboard": "Painel",
+    "upload": "Enviar CV",
+    "jobs": "Resultados",
+    "pipeline": "Pipeline",
+    "settings": "Configurações"
+  },
+  "sidebar": {
+    "dashboard": "Painel",
+    "upload": "Enviar CV",
+    "jobs": "Resultados",
+    "pipeline": "Pipeline",
+    "settings": "Configurações",
+    "collapse": "Recolher"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "subtitle": "Visão geral do pipeline de vagas",
+    "lastUpdated": "Última atualização",
+    "refreshing": "Atualizando...",
+    "refresh": "Atualizar",
+    "uploadCv": "Enviar CV",
+    "runPipeline": "Executar Pipeline",
+    "viewJobs": "Ver Vagas",
+    "configure": "Configurar",
+    "actions": {
+      "uploadCv": "Enviar CV",
+      "uploadCvDesc": "Extraia seu perfil com IA",
+      "runPipeline": "Executar Pipeline",
+      "runPipelineDesc": "Coleta + matching",
+      "viewJobs": "Ver Vagas",
+      "viewJobsDesc": "Resultados detalhados",
+      "configure": "Configurar",
+      "configureDesc": "Perfil e preferências"
+    },
+    "topSkills": "Principais Habilidades",
+    "noSkills": "Nenhuma habilidade registrada",
+    "noSkillsDesc": "As habilidades aparecerão quando as vagas forem coletadas",
+    "lastRun": "Última Execução do Pipeline",
+    "successful": "Sucesso",
+    "error": "Erro",
+    "scraped": "coletadas",
+    "jobs30d": "vagas (30d)",
+    "matched": "correspondentes",
+    "noRuns": "Nenhuma execução anterior",
+    "noRunsDesc": "Execute o pipeline para ver os resultados aqui",
+    "execute": "Executar"
+  },
+  "jobs": {
+    "title": "Resultados de Matching",
+    "subtitle": "Vagas pontuadas contra seu perfil de CV",
+    "search": "Buscar vagas...",
+    "evaluated": "avaliadas",
+    "match": "correspondência",
+    "matches": "correspondências",
+    "noResults": "Nenhuma vaga correspondente encontrada",
+    "noResultsDesc": "Tente ajustar o filtro de pontuação ou termo de busca",
+    "table": {
+      "title": "Título",
+      "company": "Empresa",
+      "location": "Localização",
+      "score": "Pontuação",
+      "salary": "Salário",
+      "date": "Data",
+      "source": "Fonte"
+    },
+    "modal": {
+      "scoreBreakdown": "Detalhamento da Pontuação",
+      "skills": "Habilidades",
+      "interests": "Interesses",
+      "location": "Localização",
+      "salary": "Salário",
+      "matchedSkills": "Habilidades Correspondentes",
+      "jobDescription": "Descrição da Vaga",
+      "viewJob": "Ver Vaga",
+      "close": "Fechar",
+      "salaryNotSpecified": "Não especificado",
+      "noDescription": "Nenhuma descrição disponível"
+    },
+    "score": {
+      "all": "Todos",
+      "excellent": "Excelente",
+      "good": "Bom",
+      "potential": "Potencial"
+    },
+    "loading": "Carregando vagas..."
+  },
+  "upload": {
+    "title": "Enviar CV",
+    "subtitle": "Envie seu CV ou PDF para extrair seu perfil profissional",
+    "dropzone": {
+      "title": "Solte seu CV aqui",
+      "subtitle": "ou clique para procurar arquivos",
+      "formats": "PDF, DOCX, TXT — Máx 10MB",
+      "uploading": "Enviando...",
+      "drop": "Solte o arquivo aqui..."
+    },
+    "processing": {
+      "title": "Processando seu CV",
+      "subtitle": "Analisando e extraindo seu perfil profissional",
+      "extracting": "Extraindo informações...",
+      "analyzing": "Analisando habilidades e experiência...",
+      "building": "Construindo seu perfil..."
+    },
+    "preview": {
+      "title": "Perfil Extraído",
+      "edit": "Editar",
+      "confirm": "Confirmar Perfil",
+      "reupload": "Enviar CV Diferente"
+    },
+    "results": {
+      "skills": "Habilidades",
+      "experience": "Experiência",
+      "education": "Formação",
+      "languages": "Idiomas",
+      "locations": "Localizações Preferidas",
+      "jobTitles": "Cargos-Alvo",
+      "level": "Nível de Experiência"
+    },
+    "done": {
+      "title": "Perfil Completo!",
+      "subtitle": "Seu CV foi processado e seu perfil está pronto",
+      "viewJobs": "Ver Vagas Correspondentes",
+      "runPipeline": "Executar Pipeline",
+      "uploadAnother": "Enviar Outro"
+    },
+    "error": {
+      "title": "Erro ao Enviar",
+      "noFile": "Nenhum arquivo selecionado",
+      "invalidFormat": "Formato de arquivo inválido. Use PDF, DOCX ou TXT",
+      "tooLarge": "Arquivo excede o limite de 10MB",
+      "processingFailed": "Falha ao processar o CV. Tente novamente."
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Configure seu perfil, e-mail e chaves de API",
+    "saved": "Configurações salvas com sucesso",
+    "saveError": "Erro ao salvar configurações",
+    "profile": {
+      "title": "Perfil Profissional",
+      "description": "Suas preferências de trabalho e informações profissionais",
+      "skills": "Habilidades (separadas por vírgula)",
+      "skillsPlaceholder": "ex: JavaScript, Python, React",
+      "jobTitles": "Cargos Desejados",
+      "jobTitlesPlaceholder": "ex: Engenheiro de Software, Desenvolvedor Full Stack",
+      "locations": "Localizações Preferidas",
+      "locationsPlaceholder": "ex: Remoto, São Paulo, Rio de Janeiro",
+      "level": "Nível de Experiência",
+      "junior": "Júnior",
+      "mid": "Pleno",
+      "senior": "Sênior",
+      "lead": "Líder / Gerente",
+      "languages": "Idiomas",
+      "languagesPlaceholder": "ex: Português, Inglês",
+      "salary": "Faixa Salarial (USD)",
+      "salaryMin": "Mínimo",
+      "salaryMax": "Máximo",
+      "remote": "Trabalho Remoto",
+      "remoteYes": "Sim",
+      "remoteNo": "Não",
+      "save": "Salvar Perfil",
+      "saving": "Salvando..."
+    },
+    "email": {
+      "title": "Configuração de E-mail",
+      "description": "Configurações SMTP para e-mails de resumo de vagas",
+      "host": "Servidor SMTP",
+      "port": "Porta",
+      "user": "Usuário",
+      "password": "Senha",
+      "from": "E-mail de Origem",
+      "recipient": "E-mail de Destino",
+      "cc": "E-mail em Cópia (opcional)",
+      "save": "Salvar Configuração",
+      "saving": "Salvando..."
+    },
+    "apiKeys": {
+      "title": "Chaves de API",
+      "description": "Configure chaves de API para IA e busca de vagas",
+      "jsearch": "Chave da API JSearch",
+      "jsearchDesc": "Necessária para coleta de vagas",
+      "gemini": "Chave da API Gemini",
+      "geminiDesc": "Necessária para extração de perfil com IA",
+      "openrouter": "Chave da API OpenRouter",
+      "openrouterDesc": "Provedor de IA alternativo",
+      "nim": "Chave da API NVIDIA NIM",
+      "nimDesc": "Provedor de IA alternativo",
+      "save": "Salvar Chaves",
+      "saving": "Salvando...",
+      "show": "Mostrar",
+      "hide": "Ocultar"
+    },
+    "theme": {
+      "title": "Aparência",
+      "description": "Escolha seu esquema de cores preferido",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema"
+    }
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "subtitle": "Execute o pipeline de coleta e matching de vagas",
+    "apiKeyRequired": "Chave de API de IA Necessária",
+    "apiKeyRequiredDesc": "Você precisa de pelo menos uma chave de API de IA (Gemini, OpenRouter ou NVIDIA NIM) para executar o pipeline.",
+    "goToSettings": "Ir para Configurações",
+    "run": "Executar Pipeline",
+    "running": "Executando...",
+    "reset": "Redefinir",
+    "progress": "Progresso",
+    "starting": "Iniciando...",
+    "steps": {
+      "scraping": "Coleta",
+      "scrapingDesc": "Buscando vagas de múltiplas fontes",
+      "matching": "Matching",
+      "matchingDesc": "Avaliando correspondências com seu perfil",
+      "completion": "Conclusão",
+      "completionDesc": "Processando resultados e limpando dados"
+    },
+    "status": {
+      "completed": "Concluído",
+      "error": "Erro",
+      "pending": "Pendente"
+    },
+    "logs": {
+      "title": "Registros",
+      "live": "Ao Vivo",
+      "ready": "Pipeline pronto para executar.",
+      "configureKey": "Configure uma chave de API de IA nas Configurações primeiro.",
+      "running": "Pipeline em execução, aguarde..."
+    },
+    "results": {
+      "title": "Resultados",
+      "jobsFound": "Vagas Encontradas",
+      "jobsScraped": "Vagas Coletadas",
+      "matchScores": "Pontuações",
+      "savedInDb": "Salvas no BD",
+      "jobsCleaned": "Vagas Limpas",
+      "topMatches": "Melhores Correspondências",
+      "matched": "correspondentes",
+      "warnings": "Avisos",
+      "sources": "Fontes",
+      "lastExecution": "Última Execução",
+      "noPreviousRuns": "Nenhuma execução anterior",
+      "noWarnings": "Sem avisos",
+      "noMatches": "Nenhuma correspondência encontrada",
+      "duration": "Duração",
+      "status": "Status",
+      "completed": "Concluído",
+      "failed": "Falhou"
+    }
+  },
+  "common": {
+    "loading": "Carregando...",
+    "saving": "Salvando...",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "save": "Salvar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "search": "Buscar",
+    "language": "Idioma",
+    "noData": "Nenhum dado disponível",
+    "error": "Ocorreu um erro",
+    "retry": "Tentar novamente",
+    "yes": "Sim",
+    "no": "Não",
+    "days": "dias",
+    "hours": "horas",
+    "minutes": "minutos",
+    "seconds": "segundos"
+  }
+}

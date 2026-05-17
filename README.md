@@ -34,7 +34,7 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Match → Email
 
 - **Node.js 20+** and **Python 3.12+**
 - **Gmail account** with App Password (for SMTP) — or Resend/Gmail API key
-- **(Optional)** PostgreSQL database (pipeline works without it via mock proxy)
+- **No database needed** (almacenamiento local en JSON)
 
 ### Installation
 
@@ -53,7 +53,7 @@ pip install -r scrapers/requirements.txt
 playwright install chromium
 patchright install chromium
 
-# Copy environment
+# ¡Listo! No necesitas base de datos — los datos se guardan localmente en data/
 cp .env.example .env
 ```
 
@@ -89,17 +89,12 @@ Get a free API key from [RapidAPI/JSearch](https://rapidapi.com/letscrape-6bRBa3
 JSEARCH_API_KEY=your-key-here
 ```
 
-**3. Database (optional — pipeline works without it):**
+**3. Almacenamiento local (no requiere DB externa):**
 
-The pipeline uses a **mock database proxy** by default — all jobs pass through, no persistence needed.
+Todo se guarda en archivos JSON dentro de `data/` — sin PostgreSQL, sin Docker, sin servicios cloud.
 
 ```env
-# No DATABASE_URL needed — works with mock
-```
-
-To enable real storage later:
-```env
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
+# No DATABASE_URL needed — almacenamiento local en JSON
 ```
 
 ### First Run
@@ -383,11 +378,11 @@ npx prisma studio        # GUI viewer
 | `GOOGLE_CLIENT_SECRET` | Gmail OAuth client secret | Gmail API |
 | `GMAIL_REFRESH_TOKEN` | Gmail refresh token | Gmail API |
 
-### Database
+### Almacenamiento Local
 
 | Variable | Description | Required |
 |----------|-------------|:--------:|
-| `DATABASE_URL` | PostgreSQL connection | Optional (mock by default) |
+| `data/` | Directorio con archivos JSON | Creado automáticamente |
 
 ---
 
@@ -432,15 +427,19 @@ npx tsx scripts/test-matching.ts
 | 3 | Email Notifications (HTML + emojis + scores) | ✅ **Complete** | — |
 | 4 | Automation & Scheduling (SMTP in CI) | ✅ **Complete** | — |
 | 5 | AI PDF Profile Extraction | ✅ **Complete** | [#7](https://github.com/byAyes/SeaHorse/issues/7) ✅ |
-| 6 | Supabase Database Integration | 🔜 **In Progress** | [#9](https://github.com/byAyes/SeaHorse/issues/9) |
-| 7 | Frontend UI Dashboard (React) | 🔜 **Planned** | [#8](https://github.com/byAyes/SeaHorse/issues/8) |
+| 6 | ~~Supabase Database Integration~~ (bloqueado por IPv6) | 🔴 **Cancelado** | [#9](https://github.com/byAyes/SeaHorse/issues/9) |
+| 7 | Frontend UI Dashboard (React) | ✅ **Completado** | [#8](https://github.com/byAyes/SeaHorse/issues/8) |
+| 8 | Refactor: Base de datos local (JSON) — reemplazar Prisma + Supabase por archivos JSON | 🔜 **Planificado** | Ver `.planning/REFACTOR-local-database.md` |
 
 ### Open Issues
 
 | # | Title | State |
 |---|-------|-------|
-| [#9](https://github.com/byAyes/SeaHorse/issues/9) | Integración Supabase — reemplazar mock Prisma | 🟢 Open |
-| [#8](https://github.com/byAyes/SeaHorse/issues/8) | Frontend UI — Dashboard React | 🟢 Open |
+| # | Title | State |
+|---|-------|-------|
+| [#10](https://github.com/byAyes/SeaHorse/issues/10) | Refactor: Almacenamiento local JSON en vez de DB externa | 🟢 Open |
+| [#8](https://github.com/byAyes/SeaHorse/issues/8) | Frontend UI — Dashboard React | 🔵 Closed ✅ |
+| [#9](https://github.com/byAyes/SeaHorse/issues/9) | Integración Supabase — reemplazar mock Prisma | 🔵 Closed (reemplazado por #10) |
 
 ### Closed Issues
 
@@ -448,6 +447,7 @@ npx tsx scripts/test-matching.ts
 |---|-------|-------|
 | [#7](https://github.com/byAyes/SeaHorse/issues/7) | AI PDF profile extraction | 🔵 Closed ✅ |
 | [#6](https://github.com/byAyes/SeaHorse/issues/6) | process-cv pipeline (absorbed) | 🔵 Closed |
+| [#9](https://github.com/byAyes/SeaHorse/issues/9) | Integración Supabase (reemplazado por #10) | 🔵 Closed
 
 ---
 
@@ -497,7 +497,7 @@ on:
 | **Matching** | TypeScript — weighted scoring (40/30/20/10), Levenshtein |
 | **Email** | SMTP (primary), Resend, Gmail OAuth2, SendGrid |
 | **HTML Email** | Premium template with emojis, SVG icons, score badges |
-| **Database** | PostgreSQL via Prisma — **deferred** (mock proxy) |
+| **Storage** | Local JSON files (`data/`) — 0 config, 0 dependencias externas | 🔜 #10
 | **API** | Next.js App Router |
 | **CI/CD** | GitHub Actions (push + weekly cron) |
 | **Planning** | GSD (Get Shit Done) — 7 phases completed |

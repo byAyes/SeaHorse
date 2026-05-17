@@ -75,6 +75,19 @@ user UserProfile @relation(fields: [userId], references: [userId])
 @@index([userId])
 }
 
+model PipelineRun {
+  id          String   @id
+  status      String   // "running" | "completed" | "error"
+  logs        Json     @default("[]")
+  result      Json?
+  error       String?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([startedAt])
+  @@index([status])
+}
+
 model ProfileChangeLog {
 id String @id @default(uuid())
 userId String

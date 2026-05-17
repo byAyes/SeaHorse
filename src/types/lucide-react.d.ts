@@ -1,0 +1,102 @@
+declare module 'lucide-react' {
+  import { FC, SVGProps } from 'react';
+
+  export interface IconProps extends SVGProps<SVGSVGElement> {
+    size?: number | string;
+    color?: string;
+    strokeWidth?: number | string;
+    absoluteStrokeWidth?: boolean;
+  }
+
+  export type Icon = FC<IconProps>;
+
+  export const Activity: Icon;
+  export const AlertCircle: Icon;
+  export const AlertTriangle: Icon;
+  export const Archive: Icon;
+  export const ArrowDown: Icon;
+  export const ArrowUp: Icon;
+  export const ArrowRight: Icon;
+  export const BarChart3: Icon;
+  export const Bell: Icon;
+  export const Brain: Icon;
+  export const Briefcase: Icon;
+  export const Check: Icon;
+  export const CheckCircle: Icon;
+  export const ChevronDown: Icon;
+  export const ChevronLeft: Icon;
+  export const ChevronRight: Icon;
+  export const ChevronUp: Icon;
+  export const ChevronsUpDown: Icon;
+  export const Clock: Icon;
+  export const Cloud: Icon;
+  export const Code: Icon;
+  export const Command: Icon;
+  export const Copy: Icon;
+  export const Database: Icon;
+  export const Download: Icon;
+  export const Eye: Icon;
+  export const EyeOff: Icon;
+  export const ExternalLink: Icon;
+  export const File: Icon;
+  export const FileText: Icon;
+  export const Filter: Icon;
+  export const Github: Icon;
+  export const Globe: Icon;
+  export const Heart: Icon;
+  export const Home: Icon;
+  export const Image: Icon;
+  export const Info: Icon;
+  export const Layers: Icon;
+  export const LayoutDashboard: Icon;
+  export const Link: Icon;
+  export const Linkedin: Icon;
+  export const Loader2: Icon;
+  export const LogOut: Icon;
+  export const Mail: Icon;
+  export const MapPin: Icon;
+  export const Menu: Icon;
+  export const Moon: Icon;
+  export const MoreHorizontal: Icon;
+  export const PanelLeft: Icon;
+  export const Play: Icon;
+  export const Plus: Icon;
+  export const RefreshCw: Icon;
+  export const Search: Icon;
+  export const Send: Icon;
+  export const Settings: Icon;
+  export const Share2: Icon;
+  export const Shield: Icon;
+  export const SlidersHorizontal: Icon;
+  export const Sparkles: Icon;
+  export const SquarePen: Icon;
+  export const Star: Icon;
+  export const Sun: Icon;
+  export const Target: Icon;
+  export const Terminal: Icon;
+  export const Trash2: Icon;
+  export const TrendingUp: Icon;
+  export const TrendingDown: Icon;
+  export const Upload: Icon;
+  export const User: Icon;
+  export const Users: Icon;
+  export const X: Icon;
+  export const XCircle: Icon;
+  export const Zap: Icon;
+
+  // Additional icons used in the frontend
+  export const ArrowUpDown: Icon;
+  export const Building2: Icon;
+  export const Calendar: Icon;
+  export const Camera: Icon;
+  export const CheckCircle2: Icon;
+  export const Circle: Icon;
+  export const DollarSign: Icon;
+  export const GraduationCap: Icon;
+  export const Key: Icon;
+  export const Monitor: Icon;
+  export const PlayCircle: Icon;
+  export const Save: Icon;
+  export const Ship: Icon;
+  export const Wrench: Icon;
+}

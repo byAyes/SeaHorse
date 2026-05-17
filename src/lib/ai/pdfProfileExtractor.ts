@@ -15,11 +15,7 @@ import {
   ProfileExtractionOptions,
 } from '../../types/ai-profile';
 import { extractSkills, extractExperience, extractEducation, inferExperienceLevel, calculateYearsOfExperience } from '../cv/skillExtractor';
-
-// ─── Gemini API Constants ───────────────────────────────────────────────────
-
-const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+import { detectProvider, callAI, type AIProvider } from './provider';
 
 const EXTRACTION_PROMPT = `You are a CV/resume parser. Extract structured information from the following CV text.
 Return ONLY a valid JSON object with this exact structure (no markdown, no code fences):
@@ -42,8 +38,6 @@ Rules:
 - If no languages mentioned, use empty array
 - Be thorough but accurate - don't invent information`;
 
-const GEMINI_TEMPERATURE = 0.1;
-const GEMINI_MAX_TOKENS = 4096;
 const API_TIMEOUT_MS = 30000;
 
 // ─── Public API ─────────────────────────────────────────────────────────────
@@ -84,12 +78,18 @@ export async function extractProfileFromText(
   startTime?: number
 ): Promise<ProfileExtractionResult> {
   const start = startTime ?? Date.now();
-  const provider = options?.provider || 'gemini';
 
-  // Try AI extraction first (unless explicitly set to keyword)
-  if (provider !== 'keyword') {
+  // Detect AI provider: explicit config from request → env vars
+  const aiConfig = detectProvider(
+    options?.aiProvider
+      ? { provider: options.aiProvider, apiKey: options.aiApiKey || '' }
+      : undefined
+  );
+
+  // Try AI extraction first (if we have a configured provider)
+  if (aiConfig) {
     try {
-      const aiProfile = await queryGeminiForProfile(text);
+      const aiProfile = await queryAIForProfile(text, aiConfig.provider, aiConfig.apiKey);
       if (aiProfile) {
         return {
           success: true,
@@ -111,65 +111,32 @@ export async function extractProfileFromText(
   };
 }
 
-// ─── Gemini AI Extraction ───────────────────────────────────────────────────
+// ─── AI Provider Extraction ────────────────────────────────────────────
 
 /**
- * Send CV text to Gemini and parse structured profile response.
- * Returns null if API key is missing or request fails.
+ * Send CV text to the configured AI provider and parse structured profile.
+ * Returns null if the provider is unavailable or the request fails.
  */
-async function queryGeminiForProfile(text: string): Promise<ExtractedProfile | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.warn('[ProfileExtractor] GEMINI_API_KEY not set — falling back to keyword extraction');
-    return null;
-  }
-
+async function queryAIForProfile(
+  text: string,
+  provider: AIProvider,
+  apiKey: string
+): Promise<ExtractedProfile | null> {
   // Truncate text to avoid hitting token limits
   const truncatedText = text.length > 15000 ? text.slice(0, 15000) + '...' : text;
 
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              { text: EXTRACTION_PROMPT },
-              { text: `\n\nCV TEXT:\n${truncatedText}` },
-            ],
-          },
-        ],
-        generationConfig: {
-          temperature: GEMINI_TEMPERATURE,
-          maxOutputTokens: GEMINI_MAX_TOKENS,
-        },
-      }),
-      signal: AbortSignal.timeout(API_TIMEOUT_MS),
-    });
+    const fullPrompt = `${EXTRACTION_PROMPT}\n\nCV TEXT:\n${truncatedText}`;
+    const rawText = await callAI(fullPrompt, { provider, apiKey });
 
-    if (!response.ok) {
-      console.warn(`[ProfileExtractor] Gemini API returned HTTP ${response.status} — falling back to keyword extraction`);
-      return null;
-    }
-
-    const data = await response.json() as {
-      candidates?: Array<{
-        content?: {
-          parts?: Array<{ text?: string }>;
-        };
-      }>;
-    };
-
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!rawText) {
-      console.warn('[ProfileExtractor] Gemini response missing text content — falling back to keyword extraction');
+      console.warn(`[ProfileExtractor] ${provider} response missing text content — falling back to keyword extraction`);
       return null;
     }
 
     return parseAIResponse(rawText);
   } catch (err) {
-    console.warn('[ProfileExtractor] Gemini request failed:', err instanceof Error ? err.message : String(err));
+    console.warn(`[ProfileExtractor] ${provider} request failed:`, err instanceof Error ? err.message : String(err));
     return null;
   }
 }
@@ -391,7 +358,7 @@ function keywordFallback(text: string): ExtractedProfile {
     skills,
     industries,
     locations,
-    experienceLevel: adjustedLevel,
+    experienceLevel: (adjustedLevel || 'mid') as 'junior' | 'mid' | 'senior' | 'lead',
     salaryRange,
     languages,
     summary,

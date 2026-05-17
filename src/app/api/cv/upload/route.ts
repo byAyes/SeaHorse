@@ -80,8 +80,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create CV record
+    const cvId = `cv-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     const cv = await prisma.cV.create({
       data: {
+        id: cvId,
         userId,
         version: nextVersion,
         fileUrl,

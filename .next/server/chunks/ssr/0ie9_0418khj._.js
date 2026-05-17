@@ -1,3 +1,0 @@
-module.exports=[89104,(a,b,c)=>{"use strict";c._=function(a){return a&&a.__esModule?a:{default:a}}},85553,(a,b,c)=>{"use strict";Object.defineProperty(c,"__esModule",{value:!0}),Object.defineProperty(c,"default",{enumerable:!0,get:function(){return e}}),a.r(89104);let d=a.r(98728);function e({children:a}){return(0,d.jsx)("html",{children:(0,d.jsx)("body",{children:a})})}a.r(51949),("function"==typeof c.default||"object"==typeof c.default&&null!==c.default)&&void 0===c.default.__esModule&&(Object.defineProperty(c.default,"__esModule",{value:!0}),Object.assign(c.default,c),b.exports=c.default)},48768,a=>{a.n(a.i(85553))}];
-
-//# sourceMappingURL=0ie9_0418khj._.js.map

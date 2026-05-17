@@ -6,17 +6,18 @@ Expand existing job-email-automation to add CV web portal while keeping weekly e
 ## Requirements
 
 ### P0 (MUST)
-- [ ] Frontend HTML page for CV upload/form
-- [ ] CV parsing (extract name, email, skills from PDF/DOCX)
-- [ ] Manual job filtering UI (search/filters)
-- [ ] Keep existing weekly email automation
-- [ ] Gmail OAuth2 configured and working
+- [x] Frontend HTML page for CV upload/form
+- [x] CV parsing (extract name, email, skills from PDF/DOCX)
+- [x] Manual job filtering UI (search/filters)
+- [x] Keep existing weekly email automation
+- [x] Gmail OAuth2 configured and working
+- [x] Pipeline ejecutable sin base de datos externa (almacenamiento local JSON)
 
 ### P1 (SHOULD)
-- [ ] Display scraped jobs in web UI
-- [ ] Edit job matching criteria (skills, location, salary)
-- [ ] Manual trigger for immediate scrape
-- [ ] Log view/email history in portal
+- [x] Display scraped jobs in web UI
+- [x] Edit job matching criteria (skills, location, salary)
+- [x] Manual trigger for immediate scrape
+- [x] Log view/email history in portal
 
 ### P2 (COULD)
 - [ ] Multiple CV versions
@@ -30,7 +31,8 @@ Expand existing job-email-automation to add CV web portal while keeping weekly e
 - Transactional application system
 
 ## Success criteria
-- User can upload CV and see matched jobs
-- Weekly emails continue sending
-- Manual actions work (filter, search)
-- No crashes or data loss
+- User can upload CV and see matched jobs ✅
+- Weekly emails continue sending ✅
+- Manual actions work (filter, search) ✅
+- No crashes or data loss ✅
+- Cero config de base de datos para correr el proyecto ✅
