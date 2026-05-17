@@ -13,6 +13,7 @@ import {
   Moon,
   Sun,
   Camera,
+  Globe,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import { useTranslation } from "@/lib/i18n";
 import { createToast, ToastContainer } from "@/components/ui/toast";
 
 export default function SettingsPage() {
-  const { t } = useTranslation();
+  const { t, locale, setLocale } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { data: profile } = useProfile();
   const updateProfile = useUpdateProfile();
@@ -103,6 +104,14 @@ export default function SettingsPage() {
     localStorage.setItem("EMAIL_CONFIG", JSON.stringify(config));
     showToast("success", t("settings.saved"));
   };
+
+  const languages = [
+    { value: "en" as const, label: "English", native: "English", short: "EN" },
+    { value: "es" as const, label: "Español", native: "Español", short: "ES" },
+    { value: "pt" as const, label: "Português", native: "Português", short: "PT" },
+    { value: "fr" as const, label: "Français", native: "Français", short: "FR" },
+    { value: "de" as const, label: "Deutsch", native: "Deutsch", short: "DE" },
+  ];
 
   const themeOptions = [
     {
@@ -399,6 +408,56 @@ export default function SettingsPage() {
                   </span>
                 </motion.button>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+        </motion.div>
+
+        {/* Language */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, type: "spring", stiffness: 200, damping: 20 }}
+        >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Globe size={16} className="text-primary" />
+              {t("common.language")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-5 gap-2">
+              {languages.map((lang) => {
+                const active = lang.value === locale;
+                return (
+                  <motion.button
+                    key={lang.value}
+                    onClick={() => setLocale(lang.value)}
+                    whileHover={{ scale: 1.03, y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 transition-colors ${
+                      active
+                        ? "border-primary bg-primary-50 dark:bg-primary-50/5 shadow-sm"
+                        : "border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600"
+                    }`}
+                  >
+                    <motion.div
+                      layoutId={`lang-icon-${lang.value}`}
+                      className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold ${
+                        active
+                          ? "bg-primary text-white"
+                          : "bg-slate-100 text-slate-500 dark:bg-dark-surface-tertiary"
+                      }`}
+                    >
+                      {lang.short}
+                    </motion.div>
+                    <span className="text-xs font-medium truncate w-full text-center">
+                      {lang.native}
+                    </span>
+                  </motion.button>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
