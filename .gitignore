@@ -3,7 +3,8 @@ node_modules
 # Keep environment variables out of version control
 .env
 
-/src/generated/prisma
+# Local JSON data store (replaces Prisma/Supabase)
+.data/
 __pycache__/
 *.pyc
 .swarm/

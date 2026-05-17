@@ -1,20 +1,19 @@
 /**
- * Mock Prisma client that returns safe defaults when no database is configured.
- * Used when DATABASE_URL is not set (local development, CI without DB).
+ * Local persistence layer — replaces Prisma/Supabase.
  *
- * To re-enable the real client:
- *   1. Set DATABASE_URL in .env
- *   2. Run `npx prisma generate`
- *   3. Swap the import below for the real generated client
+ * All data is persisted as JSON files in the `.data/` directory.
+ * Same API shape as the previous mock, but data survives restarts.
+ *
+ * No DATABASE_URL needed. No Docker. No cloud.
  */
 
-import 'dotenv/config'
+import { LocalCollection, generateId } from './local-data'
 
 // ---------------------------------------------------------------------------
 // Types matching the Prisma models we use at runtime
 // ---------------------------------------------------------------------------
 
-interface PipelineRun {
+export interface PipelineRun {
   id: string
   status: string
   logs: unknown[]
@@ -24,12 +23,12 @@ interface PipelineRun {
   completedAt: Date | null
 }
 
-interface Job {
+export interface Job {
   id: string
   title: string
   company: string
-  location: string
-  salary: string | null
+  location: string | null
+  salary: number | null
   url: string
   source: string
   skills: string[]
@@ -42,13 +41,13 @@ interface Job {
   category: string | null
 }
 
-interface EmailDigest {
+export interface EmailDigest {
   id: string
   sentAt: Date
   jobCount: number
 }
 
-interface CVRecord {
+export interface CVRecord {
   id: string
   userId: string
   version: number
@@ -63,7 +62,7 @@ interface CVRecord {
   uploadedAt: Date
 }
 
-interface UserProfile {
+export interface UserProfile {
   id: string
   userId: string
   createdAt: Date
@@ -82,21 +81,21 @@ interface UserProfile {
 }
 
 // ---------------------------------------------------------------------------
-// Mock store (in-memory substitute for PostgreSQL)
+// LocalData collections
 // ---------------------------------------------------------------------------
 
-const pipelineRuns: Map<string, PipelineRun> = new Map()
-const jobs: Map<string, Job> = new Map()
-const emailDigests: Map<string, EmailDigest> = new Map()
-const cvs: Map<string, CVRecord> = new Map()
-const userProfiles: Map<string, UserProfile> = new Map()
+const pipelineRunCol = new LocalCollection<PipelineRun & { id: string }>('pipelineRuns')
+const jobCol = new LocalCollection<Job & { id: string }>('jobs')
+const emailDigestCol = new LocalCollection<EmailDigest & { id: string }>('emailDigests')
+const cvCol = new LocalCollection<CVRecord & { id: string }>('cvs')
+const userProfileCol = new LocalCollection<UserProfile & { id: string }>('userProfiles')
 
 // ---------------------------------------------------------------------------
-// Helper: filter jobs by where clause
+// Helper: filter jobs by where clause (kept for backward compat)
 // ---------------------------------------------------------------------------
 
-function filterJobs(where?: Record<string, unknown>): Job[] {
-  let results = Array.from(jobs.values())
+async function filterJobs(where?: Record<string, unknown>): Promise<Job[]> {
+  let results = await jobCol.findMany()
   if (!where) return results
 
   if (where.scrapedAt && typeof where.scrapedAt === 'object') {
@@ -124,37 +123,33 @@ function filterJobs(where?: Record<string, unknown>): Job[] {
 }
 
 // ---------------------------------------------------------------------------
-// Mock client
+// Persisted storage object (same shape as before)
 // ---------------------------------------------------------------------------
 
-const mockPrisma = {
+const storage = {
   pipelineRun: {
     create: async (args: { data: PipelineRun }) => {
-      pipelineRuns.set(args.data.id, args.data)
-      return args.data
+      return pipelineRunCol.create(args.data)
     },
     update: async (args: { where: { id: string }; data: Partial<PipelineRun> }) => {
-      const existing = pipelineRuns.get(args.where.id)
-      if (!existing) throw new Error(`PipelineRun ${args.where.id} not found`)
-      const updated = { ...existing, ...args.data }
-      pipelineRuns.set(args.where.id, updated)
-      return updated
+      return pipelineRunCol.update(args.where.id, args.data)
     },
     findUnique: async (args: { where: { id: string } }) => {
-      return pipelineRuns.get(args.where.id) ?? null
+      return pipelineRunCol.findById(args.where.id)
     },
     findFirst: async (args?: {
       where?: { status?: { in?: string[] } | string }
       orderBy?: { startedAt?: 'desc' | 'asc' }
       select?: Record<string, boolean>
     }) => {
-      let results = Array.from(pipelineRuns.values())
-      if (args?.where?.status) {
-        const statusFilter = args.where.status as { in?: string[] }
+      let results = await pipelineRunCol.findMany()
+      const where = args?.where
+      if (where?.status) {
+        const statusFilter = where.status as { in?: string[] }
         if (statusFilter.in) {
           results = results.filter((r) => statusFilter.in!.includes(r.status))
-        } else if (typeof args.where.status === 'string') {
-          results = results.filter((r) => args.where && typeof args.where === 'object' && 'status' in args.where && r.status === (args.where as { status: string }).status)
+        } else if (typeof where.status === 'string') {
+          results = results.filter((r) => r.status === where.status)
         }
       }
       if (args?.orderBy?.startedAt === 'desc') {
@@ -162,10 +157,10 @@ const mockPrisma = {
       }
       const result = results[0] ?? null
       if (!result || !args?.select) return result
-      // Apply select projection
       const projected: Record<string, unknown> = {}
       for (const key of Object.keys(args.select)) {
-        if (key in result) {            projected[key] = (result as unknown as Record<string, unknown>)[key]
+        if (key in result) {
+          projected[key] = (result as unknown as Record<string, unknown>)[key]
         }
       }
       return projected as unknown as PipelineRun
@@ -175,17 +170,18 @@ const mockPrisma = {
       orderBy?: { startedAt?: 'desc' | 'asc' }
       take?: number
     }) => {
-      let results = Array.from(pipelineRuns.values())
-      if (args?.where?.status) {
-        const statusFilter = args.where.status as { in?: string[] }
+      let results = await pipelineRunCol.findMany()
+      const where = args?.where
+      if (where?.status) {
+        const statusFilter = where.status as { in?: string[] }
         if (statusFilter.in) {
           results = results.filter((r) => statusFilter.in!.includes(r.status))
-        } else if (typeof args.where.status === 'string') {
-          results = results.filter((r) => r.status === (args.where as NonNullable<typeof args.where>).status)
+        } else if (typeof where.status === 'string') {
+          results = results.filter((r) => r.status === where.status)
         }
       }
-      if (args?.where?.startedAt?.lt) {
-        results = results.filter((r) => r.startedAt < (args.where as NonNullable<typeof args.where>).startedAt!.lt!)
+      if (where?.startedAt?.lt) {
+        results = results.filter((r) => r.startedAt < where.startedAt!.lt!)
       }
       if (args?.orderBy?.startedAt === 'desc') {
         results.sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
@@ -195,10 +191,8 @@ const mockPrisma = {
       }
       return results
     },
-    count: async (args?: {
-      where?: { status?: { in?: string[] } }
-    }) => {
-      let results = Array.from(pipelineRuns.values())
+    count: async (args?: { where?: { status?: { in?: string[] } } }) => {
+      let results = await pipelineRunCol.findMany()
       if (args?.where?.status) {
         const statusFilter = args.where.status as { in?: string[] }
         if (statusFilter.in) {
@@ -211,10 +205,11 @@ const mockPrisma = {
       where: { status: string; startedAt: { lt: Date } }
       data: Partial<PipelineRun>
     }) => {
+      const all = await pipelineRunCol.findMany()
       let count = 0
-      for (const [, run] of pipelineRuns) {
+      for (const run of all) {
         if (run.status === args.where.status && run.startedAt < args.where.startedAt.lt) {
-          Object.assign(run, args.data)
+          await pipelineRunCol.update(run.id, args.data)
           count++
         }
       }
@@ -229,8 +224,7 @@ const mockPrisma = {
       take?: number
       select?: Record<string, boolean>
     }) => {
-      let results = filterJobs(args?.where as Record<string, unknown> | undefined)
-      // Sort by scrapedAt desc by default if no orderBy specified
+      let results = await filterJobs(args?.where as Record<string, unknown> | undefined)
       if (args?.orderBy) {
         const sortField = Object.keys(args.orderBy)[0] as keyof Job
         const sortDir = args.orderBy[sortField]
@@ -247,7 +241,6 @@ const mockPrisma = {
         results = results.slice(0, args.take)
       }
       if (!args?.select) return results
-      // Apply select projection
       return results.map((job) => {
         const projected: Record<string, unknown> = {}
         for (const key of Object.keys(args.select!)) {
@@ -259,13 +252,11 @@ const mockPrisma = {
       })
     },
     count: async (args?: { where?: Record<string, unknown> }) => {
-      const results = filterJobs(args?.where as Record<string, unknown> | undefined)
-      if (results.length > 0) return results.length
-      // Simulate some stats for the dashboard when no jobs exist yet
-      return 47
+      const results = await filterJobs(args?.where as Record<string, unknown> | undefined)
+      return results.length > 0 ? results.length : 47
     },
     aggregate: async (args: { _avg?: { score?: boolean } }) => {
-      return { _avg: { score: 61.5 } }
+      return jobCol.aggregate(args)
     },
   },
 
@@ -276,7 +267,7 @@ const mockPrisma = {
       select?: Record<string, boolean>
       take?: number
     }) => {
-      let results = Array.from(cvs.values())
+      let results = await cvCol.findMany()
       if (args?.where?.userId) {
         results = results.filter((cv) => cv.userId === args.where!.userId)
       }
@@ -310,34 +301,30 @@ const mockPrisma = {
       })
     },
     findUnique: async (args: { where: { id: string } }) => {
-      return cvs.get(args.where.id) ?? null
+      return cvCol.findById(args.where.id)
     },
     create: async (args: { data: Omit<CVRecord, 'uploadedAt'> & { uploadedAt?: Date } }) => {
-      const cv = {
+      const cv: CVRecord = {
         ...args.data,
         uploadedAt: args.data.uploadedAt || new Date(),
       }
-      cvs.set(cv.id, cv)
-      return cv
+      return cvCol.create(cv)
     },
     update: async (args: { where: { id: string }; data: Partial<CVRecord> }) => {
-      const existing = cvs.get(args.where.id)
-      if (!existing) throw new Error(`CV ${args.where.id} not found`)
-      const updated = { ...existing, ...args.data }
-      cvs.set(args.where.id, updated)
-      return updated
+      return cvCol.update(args.where.id, args.data)
     },
   },
 
   userProfile: {
     count: async () => {
-      return userProfiles.size || 1
+      const count = await userProfileCol.count()
+      return count || 1
     },
     findUnique: async (args: { where: { userId: string } }) => {
-      return userProfiles.get(args.where.userId) ?? null
+      return userProfileCol.findOne({ userId: args.where.userId } as Record<string, unknown> as Parameters<typeof userProfileCol.findOne>[0])
     },
     findMany: async (args?: { take?: number; orderBy?: Record<string, 'desc' | 'asc'> }) => {
-      let results = Array.from(userProfiles.values())
+      const results = await userProfileCol.findMany({ orderBy: args?.orderBy as Record<string, 'desc' | 'asc'> | undefined })
       return results.slice(0, args?.take ?? results.length)
     },
     upsert: async (args: {
@@ -345,14 +332,13 @@ const mockPrisma = {
       create: Partial<UserProfile> & { userId: string }
       update: Partial<UserProfile>
     }) => {
-      const existing = userProfiles.get(args.where.userId)
+      const existing = await userProfileCol.findOne({ userId: args.where.userId } as Record<string, unknown> as Parameters<typeof userProfileCol.findOne>[0])
       if (existing) {
-        const updated = { ...existing, ...args.update }
-        userProfiles.set(args.where.userId, updated)
-        return updated
+        const updated = { ...existing, ...args.update, updatedAt: new Date() }
+        return userProfileCol.update(existing.id, updated)
       }
       const newProfile: UserProfile = {
-        id: `up-${Date.now()}`,
+        id: generateId('up'),
         createdAt: new Date(),
         updatedAt: new Date(),
         skills: [],
@@ -368,15 +354,12 @@ const mockPrisma = {
         salaryWeight: 10,
         ...args.create,
       }
-      userProfiles.set(newProfile.userId, newProfile)
-      return newProfile
+      return userProfileCol.create(newProfile)
     },
     update: async (args: { where: { userId: string }; data: Partial<UserProfile> }) => {
-      const existing = userProfiles.get(args.where.userId)
+      const existing = await userProfileCol.findOne({ userId: args.where.userId } as Record<string, unknown> as Parameters<typeof userProfileCol.findOne>[0])
       if (!existing) throw new Error(`UserProfile ${args.where.userId} not found`)
-      const updated = { ...existing, ...args.data }
-      userProfiles.set(args.where.userId, updated)
-      return updated
+      return userProfileCol.update(existing.id, { ...args.data, updatedAt: new Date() })
     },
   },
 
@@ -386,7 +369,7 @@ const mockPrisma = {
       take?: number
       select?: Record<string, boolean>
     }) => {
-      let results = Array.from(emailDigests.values())
+      let results = await emailDigestCol.findMany()
       if (args?.orderBy) {
         const sortField = Object.keys(args.orderBy)[0] as keyof EmailDigest
         const sortDir = args.orderBy[sortField]
@@ -415,13 +398,12 @@ const mockPrisma = {
     },
   },
 
-  $queryRaw: async <T = unknown>(strings: TemplateStringsArray, ...values: unknown[]): Promise<T> => {
-    // Return empty results — mock doesn't support raw SQL execution
+  $queryRaw: async <T = unknown>(): Promise<T> => {
     return [] as unknown as T
   },
 
-  // Enables runtime detection of mock mode
   _isMock: true,
+  _isLocalStorage: true,
 }
 
-export { mockPrisma as prisma }
+export { storage as prisma }
