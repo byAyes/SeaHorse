@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 
@@ -91,7 +92,7 @@ export async function sendEmail(
     let email: string;
 
     if (html) {
-      const boundary = '----=_Part_' + Date.now() + '_' + Math.random().toString(36).substring(2);
+      const boundary = '----=_Part_' + Date.now() + '_' + randomUUID().replace(/-/g, '');
       const headers = [
         `From: ${sender}`,
         `To: ${to}`,

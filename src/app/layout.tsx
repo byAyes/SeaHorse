@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Providers } from "./providers";
+import Script from "next/script";
 import "./globals.css";export const metadata: Metadata = {
 	  title: "Seahorse — Dashboard de Pipeline de Jobs",
 	  description: "Dashboard interactivo para el pipeline de scraping, matching y envío de jobs",
@@ -22,8 +23,10 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        {/* Prevent FOUC for dark mode */}
-        <script
+        {/* Prevent FOUC for dark mode — runs before first paint to avoid flash */}
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -31,7 +34,9 @@ export default function RootLayout({
                   var theme = localStorage.getItem('theme');
                   var isDark = theme === 'dark' || (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
                   if (isDark) document.documentElement.classList.add('dark');
-                } catch(e) {}
+                } catch(e) {
+                  /* localStorage may be blocked in some environments; default to light mode */
+                }
               })();
             `,
           }}

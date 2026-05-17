@@ -1,11 +1,13 @@
 export const dynamic = 'force-dynamic';
 
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ScraperRunner } from "@/scrapers/index";
 import { scoreAndSortJobs } from "@/matching/scorer";
 import { saveNewJobs, cleanupEmailedJobs, cleanupOldJobs } from "@/lib/automation/job-history";
 import { authenticate } from "@/lib/auth/middleware";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limiter";
 import type { UserProfile } from "@/types/user-profile";
 import type { Job } from "@/types/job";
 import type { MatchedJob } from "@/types/job-match";
@@ -280,11 +282,27 @@ export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (auth instanceof NextResponse) return auth;
 
+  // Rate limit: max 5 pipeline runs per minute per IP
+  const ip = getClientIp(request);
+  const rateLimit = checkRateLimit(ip, { maxRequests: 5, windowMs: 60_000 });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes. Espera antes de iniciar otro pipeline.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': '60',
+          'X-RateLimit-Remaining': String(rateLimit.remaining),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json().catch(() => ({}));
     const profile = body.profile || null;
 
-    const runId = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const runId = `run_${Date.now()}_${randomUUID().slice(0, 8)}`;
 
     // Create DB record first
     const now = new Date();

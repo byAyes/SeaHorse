@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { promises as fs } from 'fs';
@@ -5,6 +6,7 @@ import { join } from 'path';
 import { parsePDF } from '@/lib/pdf/pdfParser';
 import type { CVUploadResult } from '@/types/cv';
 import { authenticate } from '@/lib/auth/middleware';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
 
 /**
  * POST /api/cv/upload
@@ -13,6 +15,16 @@ import { authenticate } from '@/lib/auth/middleware';
 export async function POST(request: NextRequest) {
   const auth = await authenticate(request);
   if (auth instanceof NextResponse) return auth;
+
+  // Rate limit: max 10 uploads per minute per IP
+  const ip = getClientIp(request);
+  const rateLimit = checkRateLimit(ip, { maxRequests: 10, windowMs: 60_000 });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { success: false, error: 'Demasiadas solicitudes. Intenta de nuevo en un minuto.' },
+      { status: 429 }
+    );
+  }
 
   try {
     const formData = await request.formData();
@@ -84,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create CV record
-    const cvId = `cv-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const cvId = `cv-${Date.now()}-${randomUUID().slice(0, 8)}`;
     const cv = await prisma.cV.create({
       data: {
         id: cvId,
