@@ -79,7 +79,7 @@ jobs:
           cache-dependency-path: 'scrapers/requirements.txt'
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Generate Prisma client
         run: npx prisma generate
@@ -125,7 +125,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run unit tests
         run: npm test
@@ -149,7 +149,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Node dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Cypress E2E tests
         uses: cypress-io/github-action@v6
