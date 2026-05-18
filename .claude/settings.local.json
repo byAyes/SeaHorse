@@ -14,7 +14,9 @@
       "Skill(gsd:review)",
       "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
       "Skill(gsd:plan-phase)",
-      "mcp__plugin_episodic-memory_episodic-memory__search"
+      "mcp__plugin_episodic-memory_episodic-memory__search",
+      "Bash(gh issue create --title 'chore: remove DB dead code from pipeline and workflows' --body ' *)",
+      "PowerShell(Get-Command *)"
     ]
   }
 }

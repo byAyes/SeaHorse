@@ -33,7 +33,7 @@ export async function processPDFJobs(jobs: PDFJob[]): Promise<MatchedJob[]> {
 
   if (!userProfile) {
     logger.warning('No user profile found for PDF job matching');
-    return jobs.map(job => ({
+    return jobs.map((job) => ({
       job: {
         id: job.id,
         title: job.title,
@@ -57,18 +57,17 @@ export async function processPDFJobs(jobs: PDFJob[]): Promise<MatchedJob[]> {
   }
 
   // Match each job against user profile
-  const matchedJobs: MatchedJob[] = jobs.map(job => {
+  const matchedJobs: MatchedJob[] = jobs.map((job) => {
     const jobSkills = extractSkills(job);
-    const matchedSkills = userProfile.skills.filter(s =>
-      jobSkills.some(js => js.toLowerCase().includes(s.toLowerCase()))
+    const matchedSkills = userProfile.skills.filter((s) =>
+      jobSkills.some((js) => js.toLowerCase().includes(s.toLowerCase())),
     );
-    const missingSkills = userProfile.skills.filter(s =>
-      !jobSkills.some(js => js.toLowerCase().includes(s.toLowerCase()))
+    const missingSkills = userProfile.skills.filter(
+      (s) => !jobSkills.some((js) => js.toLowerCase().includes(s.toLowerCase())),
     );
 
-    const skillScore = userProfile.skills.length > 0
-      ? (matchedSkills.length / userProfile.skills.length) * 100
-      : 0;
+    const skillScore =
+      userProfile.skills.length > 0 ? (matchedSkills.length / userProfile.skills.length) * 100 : 0;
 
     const overall = Math.round(skillScore * (userProfile.skillWeight || 0.4));
 
@@ -109,17 +108,17 @@ export async function processPDFJobs(jobs: PDFJob[]): Promise<MatchedJob[]> {
  * @returns Formatted email digest object with html and text
  */
 export async function preparePDFJobsForEmail(
-  jobs: MatchedJob[]
+  jobs: MatchedJob[],
 ): Promise<{ html: string; text: string }> {
   if (!jobs || jobs.length === 0) {
     return formatJobDigest([], new Date().toISOString());
   }
 
   // Convert MatchedJob[] to format expected by formatJobDigest
-  const digestJobs = jobs.map(matched => ({
+  const digestJobs = jobs.map((matched) => ({
     job: matched.job,
     score: matched.score.overall,
-    matchedSkills: matched.score.matchedSkills
+    matchedSkills: matched.score.matchedSkills,
   }));
 
   // Format using existing email template
@@ -136,11 +135,31 @@ export async function preparePDFJobsForEmail(
 function extractSkills(job: PDFJob): string[] {
   const text = [job.title, job.description || ''].join(' ').toLowerCase();
   const commonSkills = [
-    'javascript', 'typescript', 'python', 'java', 'go', 'rust',
-    'react', 'angular', 'vue', 'node', 'express',
-    'aws', 'azure', 'gcp', 'docker', 'kubernetes',
-    'sql', 'nosql', 'mongodb', 'postgresql', 'redis',
-    'git', 'ci/cd', 'agile', 'scrum',
+    'javascript',
+    'typescript',
+    'python',
+    'java',
+    'go',
+    'rust',
+    'react',
+    'angular',
+    'vue',
+    'node',
+    'express',
+    'aws',
+    'azure',
+    'gcp',
+    'docker',
+    'kubernetes',
+    'sql',
+    'nosql',
+    'mongodb',
+    'postgresql',
+    'redis',
+    'git',
+    'ci/cd',
+    'agile',
+    'scrum',
   ];
-  return commonSkills.filter(skill => text.includes(skill));
+  return commonSkills.filter((skill) => text.includes(skill));
 }

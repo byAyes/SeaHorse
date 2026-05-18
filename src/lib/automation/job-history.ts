@@ -11,7 +11,7 @@ export async function saveNewJobs(jobs: Job[]): Promise<string[]> {
     if (jobs.length === 0) return [];
 
     await prisma.job.createMany({
-      data: jobs.map(j => ({
+      data: jobs.map((j) => ({
         title: j.title,
         company: j.company,
         location: j.location ?? null,
@@ -28,11 +28,11 @@ export async function saveNewJobs(jobs: Job[]): Promise<string[]> {
 
     // Query back to get the DB-generated UUIDs
     const created = await prisma.job.findMany({
-      where: { url: { in: jobs.map(j => j.url) } },
+      where: { url: { in: jobs.map((j) => j.url) } },
       select: { id: true },
     });
 
-    return created.map(j => j.id);
+    return created.map((j) => j.id);
   } catch (error) {
     console.error('Error saving new jobs:', error);
     return [];
@@ -50,17 +50,17 @@ export async function filterNewJobs(jobs: Job[]): Promise<Job[]> {
 
     const existingUrls = await prisma.job.findMany({
       where: {
-        url: { in: jobs.map(j => j.url) },
+        url: { in: jobs.map((j) => j.url) },
       },
       select: { url: true, emailedAt: true },
     });
 
     const emailedUrlSet = new Set(
-      existingUrls.filter(j => j.emailedAt !== null).map(j => j.url)
+      existingUrls.filter((j) => j.emailedAt !== null).map((j) => j.url),
     );
-    const existingUrlSet = new Set(existingUrls.map(j => j.url));
+    const existingUrlSet = new Set(existingUrls.map((j) => j.url));
 
-    return jobs.filter(job => {
+    return jobs.filter((job) => {
       if (existingUrlSet.has(job.url)) {
         return !emailedUrlSet.has(job.url);
       }

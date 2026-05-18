@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import * as React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ModalProps {
   open: boolean;
@@ -12,14 +12,14 @@ interface ModalProps {
   description?: string;
   children: React.ReactNode;
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const sizeClasses = {
-  sm: "max-w-sm",
-  md: "max-w-md",
-  lg: "max-w-lg",
-  xl: "max-w-xl",
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
 };
 
 export function Modal({
@@ -29,15 +29,15 @@ export function Modal({
   description,
   children,
   className,
-  size = "md",
+  size = 'md',
 }: ModalProps) {
   // Close on Escape
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    if (open) document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    if (open) document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onClose]);
 
   return (
@@ -59,11 +59,11 @@ export function Modal({
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className={cn(
-              "relative w-full rounded-[--radius-modal] glass-strong shadow-modal border border-slate-200/50 dark:border-slate-700/50",
+              'relative w-full rounded-[--radius-modal] glass-strong shadow-modal border border-slate-200/50 dark:border-slate-700/50',
               sizeClasses[size],
-              className
+              className,
             )}
             role="dialog"
             aria-modal="true"
@@ -82,9 +82,7 @@ export function Modal({
               <div className="px-6 pt-6 pr-12">
                 <h2 className="text-lg font-semibold">{title}</h2>
                 {description && (
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    {description}
-                  </p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
                 )}
               </div>
             )}

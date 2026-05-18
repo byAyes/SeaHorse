@@ -5,8 +5,8 @@ scrapers:
     class: LinkedInScraper
     max_jobs: 10
     rate_limit_ms: 5000
-    base_url: "https://www.linkedin.com/jobs/search"
-    location: ""
+    base_url: 'https://www.linkedin.com/jobs/search'
+    location: ''
 
   glassdoor:
     enabled: true
@@ -14,7 +14,7 @@ scrapers:
     class: GlassdoorScraper
     max_jobs: 10
     rate_limit_ms: 5000
-    base_url: "https://www.glassdoor.com/Job/jobs.htm"
+    base_url: 'https://www.glassdoor.com/Job/jobs.htm'
 
   computrabajo:
     enabled: true
@@ -22,8 +22,8 @@ scrapers:
     class: ComputrabajoScraper
     max_jobs: 10
     rate_limit_ms: 5000
-    base_url: "https://co.computrabajo.com"
-    country: "co"
+    base_url: 'https://co.computrabajo.com'
+    country: 'co'
 
   indeed:
     enabled: true
@@ -31,4 +31,4 @@ scrapers:
     class: IndeedScraper
     max_jobs: 10
     rate_limit_ms: 5000
-    base_url: "https://www.indeed.com"
+    base_url: 'https://www.indeed.com'

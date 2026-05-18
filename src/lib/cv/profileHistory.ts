@@ -5,7 +5,7 @@
 
 import { prisma } from '../prisma';
 
-function safeJsonParse(value: string, context: string): any {
+function safeJsonParse(value: string, context: string): unknown {
   try {
     return JSON.parse(value);
   } catch (error) {
@@ -20,8 +20,8 @@ function safeJsonParse(value: string, context: string): any {
 export interface ProfileChangeInput {
   userId: string;
   changeType: string;
-  previousValue?: any;
-  newValue: any;
+  previousValue?: unknown;
+  newValue: unknown;
   source: 'cv_upload' | 'manual' | 'system';
   cvId?: string;
 }
@@ -54,7 +54,7 @@ export async function trackProfileChange(input: ProfileChangeInput): Promise<voi
  */
 export async function getProfileHistory(
   userId: string,
-  limit: number = 50
+  limit: number = 50,
 ): Promise<ProfileChangeLog[]> {
   try {
     const changes = await prisma.profileChangeLog.findMany({
@@ -63,13 +63,13 @@ export async function getProfileHistory(
       take: limit,
     });
 
-  return changes.map((change) => ({
-    ...change,
-    previousValue: change.previousValue
-      ? safeJsonParse(change.previousValue, `profileChange:${change.id}:previousValue`)
-      : null,
-    newValue: safeJsonParse(change.newValue, `profileChange:${change.id}:newValue`),
-  }));
+    return changes.map((change) => ({
+      ...change,
+      previousValue: change.previousValue
+        ? safeJsonParse(change.previousValue, `profileChange:${change.id}:previousValue`)
+        : null,
+      newValue: safeJsonParse(change.newValue, `profileChange:${change.id}:newValue`),
+    }));
   } catch (error) {
     console.error('Error fetching profile history:', error);
     return [];
@@ -83,8 +83,8 @@ export interface ProfileChangeLog {
   id: string;
   userId: string;
   changeType: string;
-  previousValue: any;
-  newValue: any;
+  previousValue: unknown;
+  newValue: unknown;
   source: string;
   cvId: string | null;
   createdAt: Date;

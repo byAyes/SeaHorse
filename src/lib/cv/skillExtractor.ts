@@ -18,7 +18,7 @@ export function extractSkills(text: string): string[] {
   const skills = new Set<string>();
 
   // Split by common delimiters
-  const delimiters = /[,\n•\-\*▪▸→◆|;]/;
+  const delimiters = /[,\n•\-*▪▸→◆|;]/;
   const tokens = text.split(delimiters);
 
   for (const token of tokens) {
@@ -50,7 +50,7 @@ function normalizeSkill(skill: string): string {
   return skill
     .toLowerCase()
     .trim()
-    .replace(/[•\-\*▪▸→◆]/g, '')
+    .replace(/[•\-*▪▸→◆]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -60,14 +60,50 @@ function normalizeSkill(skill: string): string {
  */
 function isFalsePositive(token: string): boolean {
   const falsePositives = [
-    'and', 'the', 'with', 'from', 'that', 'this',
-    'for', 'are', 'was', 'were', 'been', 'have',
-    'has', 'had', 'will', 'would', 'could', 'should',
-    'may', 'might', 'must', 'can', 'to', 'of', 'in',
-    'on', 'at', 'by', 'an', 'as', 'or', 'is', 'it',
-    'proficient', 'familiar', 'experience', 'working',
-    'knowledge', 'skill', 'skills', 'technical',
-    'experience:', 'skills:', 'technical skills',
+    'and',
+    'the',
+    'with',
+    'from',
+    'that',
+    'this',
+    'for',
+    'are',
+    'was',
+    'were',
+    'been',
+    'have',
+    'has',
+    'had',
+    'will',
+    'would',
+    'could',
+    'should',
+    'may',
+    'might',
+    'must',
+    'can',
+    'to',
+    'of',
+    'in',
+    'on',
+    'at',
+    'by',
+    'an',
+    'as',
+    'or',
+    'is',
+    'it',
+    'proficient',
+    'familiar',
+    'experience',
+    'working',
+    'knowledge',
+    'skill',
+    'skills',
+    'technical',
+    'experience:',
+    'skills:',
+    'technical skills',
   ];
 
   return falsePositives.includes(token.toLowerCase());

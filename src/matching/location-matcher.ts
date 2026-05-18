@@ -13,7 +13,7 @@
 export function calculateLocationMatch(
   userLocation: string | null,
   jobLocation: string,
-  remoteOnly: boolean
+  remoteOnly: boolean,
 ): number {
   const jobLower = jobLocation.toLowerCase();
   const isRemoteJob = jobLower.includes('remote') || jobLower.includes('remoto');

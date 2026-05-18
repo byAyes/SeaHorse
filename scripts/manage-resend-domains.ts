@@ -23,17 +23,21 @@ async function manageResendDomains() {
 
     if (listResult.success && listResult.domains) {
       console.log(`Found ${listResult.domains.length} domains:\n`);
-      listResult.domains.forEach(domain => {
+      listResult.domains.forEach((domain) => {
         const status = domain.status === 'verified' ? '✅' : '⏳';
         console.log(`${status} ${domain.name} (${domain.status})`);
         console.log(`   Created: ${new Date(domain.created_at).toLocaleDateString()}`);
         if (domain.dns_records) {
           console.log('   DNS Records:');
           if (domain.dns_records.spf) {
-            console.log(`   - SPF: ${domain.dns_records.spf.name} = ${domain.dns_records.spf.value}`);
+            console.log(
+              `   - SPF: ${domain.dns_records.spf.name} = ${domain.dns_records.spf.value}`,
+            );
           }
           if (domain.dns_records.dkim) {
-            console.log(`   - DKIM: ${domain.dns_records.dkim.name} = ${domain.dns_records.dkim.value}`);
+            console.log(
+              `   - DKIM: ${domain.dns_records.dkim.name} = ${domain.dns_records.dkim.value}`,
+            );
           }
         }
         console.log(`   ID: ${domain.id}\n`);
@@ -49,7 +53,7 @@ async function manageResendDomains() {
     // This follows Resend best practices from their documentation
     const newDomainRequest = {
       name: 'updates.example.com', // Using subdomain for email
-      customReturnPath: 'outbound' // Custom return path for bounce handling
+      customReturnPath: 'outbound', // Custom return path for bounce handling
     };
 
     const createResult = await resend.createDomain(newDomainRequest);
@@ -125,18 +129,15 @@ async function manageResendDomains() {
     console.log('3. Verify domain status using this script again');
     console.log('4. Update ENV variables with verified domain/email');
     console.log('5. Send test emails from your verified domain');
-
   } catch (error) {
     console.error('Error managing domains:', error);
     process.exit(1);
   }
 }
 
-// Run the domain management tool if called directly
-import { fileURLToPath } from 'node:url';
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  manageResendDomains().catch(console.error);
-}
-
 export { manageResendDomains };
+
+// Run directly: npx tsx scripts/manage-resend-domains.ts
+// The auto-execution with import.meta.url is not used here to maintain
+// compatibility with CommonJS transforms in test environments.
+// Callers should invoke manageResendDomains() directly.

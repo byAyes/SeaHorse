@@ -16,7 +16,7 @@ on:
 jobs:
   process-cv:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15

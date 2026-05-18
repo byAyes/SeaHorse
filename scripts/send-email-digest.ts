@@ -6,7 +6,9 @@ async function sendEmailDigest() {
   try {
     const RECIPIENT_EMAIL = process.env.DIGEST_RECIPIENT_EMAIL || process.env.GMAIL_RECIPIENT;
     if (!RECIPIENT_EMAIL) {
-      throw new Error('No recipient email configured. Set DIGEST_RECIPIENT_EMAIL or GMAIL_RECIPIENT env var');
+      throw new Error(
+        'No recipient email configured. Set DIGEST_RECIPIENT_EMAIL or GMAIL_RECIPIENT env var',
+      );
     }
 
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -22,14 +24,14 @@ async function sendEmailDigest() {
 
     console.log(`Found ${digests.length} digests from the past week`);
 
-    const allJobs = digests.flatMap(d => d.jobs);
+    const allJobs = digests.flatMap((d) => d.jobs);
 
     if (allJobs.length === 0) {
       console.log('No jobs found in recent digests');
       return;
     }
 
-    const jobEntries = allJobs.map(j => ({
+    const jobEntries = allJobs.map((j) => ({
       job: {
         id: j.id,
         title: j.title,
@@ -54,7 +56,7 @@ async function sendEmailDigest() {
       `Weekly Job Digest - ${allJobs.length} new matches`,
       text,
       undefined,
-      html
+      html,
     );
 
     if (result.success) {

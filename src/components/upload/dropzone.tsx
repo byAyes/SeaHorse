@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, X, CheckCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Upload, FileText, X, CheckCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DropzoneProps {
   onFileSelect: (file: File) => void;
@@ -13,7 +13,7 @@ interface DropzoneProps {
 
 export function Dropzone({
   onFileSelect,
-  accept = ".pdf,.doc,.docx",
+  accept = '.pdf,.doc,.docx',
   maxSizeMB = 10,
 }: DropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -31,7 +31,7 @@ export function Dropzone({
       setFile(f);
       onFileSelect(f);
     },
-    [maxSizeMB, onFileSelect]
+    [maxSizeMB, onFileSelect],
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -54,7 +54,7 @@ export function Dropzone({
       const f = e.dataTransfer.files[0];
       if (f) validateAndSet(f);
     },
-    [validateAndSet]
+    [validateAndSet],
   );
 
   const handleInputChange = useCallback(
@@ -62,13 +62,13 @@ export function Dropzone({
       const f = e.target.files?.[0];
       if (f) validateAndSet(f);
     },
-    [validateAndSet]
+    [validateAndSet],
   );
 
   const removeFile = useCallback(() => {
     setFile(null);
     setError(null);
-    if (inputRef.current) inputRef.current.value = "";
+    if (inputRef.current) inputRef.current.value = '';
   }, []);
 
   return (
@@ -78,12 +78,12 @@ export function Dropzone({
       onDrop={handleDrop}
       onClick={() => !file && inputRef.current?.click()}
       className={cn(
-        "relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all duration-200",
+        'relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 transition-all duration-200',
         isDragging
-          ? "border-primary bg-primary-50 dark:bg-primary-50/5"
+          ? 'border-primary bg-primary-50 dark:bg-primary-50/5'
           : file
-          ? "border-emerald-300 bg-emerald-50/50 dark:bg-emerald-500/5"
-          : "border-slate-300 bg-slate-50/50 hover:border-slate-400 hover:bg-slate-100/50 dark:border-slate-600 dark:bg-dark-surface/50 dark:hover:border-slate-500 dark:hover:bg-dark-surface"
+            ? 'border-emerald-300 bg-emerald-50/50 dark:bg-emerald-500/5'
+            : 'border-slate-300 bg-slate-50/50 hover:border-slate-400 hover:bg-slate-100/50 dark:border-slate-600 dark:bg-dark-surface/50 dark:hover:border-slate-500 dark:hover:bg-dark-surface',
       )}
     >
       <input
@@ -107,12 +107,8 @@ export function Dropzone({
               <CheckCircle size={28} className="text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="text-center">
-              <p className="font-medium text-emerald-700 dark:text-emerald-400">
-                {file.name}
-              </p>
-              <p className="text-sm text-slate-500">
-                {(file.size / 1024 / 1024).toFixed(1)} MB
-              </p>
+              <p className="font-medium text-emerald-700 dark:text-emerald-400">{file.name}</p>
+              <p className="text-sm text-slate-500">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
             </div>
             <button
               onClick={(e) => {
@@ -135,30 +131,20 @@ export function Dropzone({
           >
             <div
               className={cn(
-                "flex h-14 w-14 items-center justify-center rounded-full transition-colors",
+                'flex h-14 w-14 items-center justify-center rounded-full transition-colors',
                 isDragging
-                  ? "bg-primary text-white"
-                  : "bg-slate-100 text-slate-400 dark:bg-dark-surface-tertiary"
+                  ? 'bg-primary text-white'
+                  : 'bg-slate-100 text-slate-400 dark:bg-dark-surface-tertiary',
               )}
             >
-              {isDragging ? (
-                <Upload size={24} />
-              ) : (
-                <FileText size={24} />
-              )}
+              {isDragging ? <Upload size={24} /> : <FileText size={24} />}
             </div>
             <div className="text-center">
               <p className="font-medium text-slate-700 dark:text-slate-300">
-                {isDragging
-                  ? "Suelta tu archivo aquí"
-                  : "Arrastra y suelta tu CV aquí"}
+                {isDragging ? 'Suelta tu archivo aquí' : 'Arrastra y suelta tu CV aquí'}
               </p>
-              <p className="mt-1 text-sm text-slate-500">
-                o haz clic para seleccionar un archivo
-              </p>
-              <p className="mt-0.5 text-xs text-slate-400">
-                PDF, DOC, DOCX — Máx {maxSizeMB}MB
-              </p>
+              <p className="mt-1 text-sm text-slate-500">o haz clic para seleccionar un archivo</p>
+              <p className="mt-0.5 text-xs text-slate-400">PDF, DOC, DOCX — Máx {maxSizeMB}MB</p>
             </div>
           </motion.div>
         )}

@@ -50,7 +50,7 @@ export function buildScrapeStrategy(profile: ExtractedProfile): ScrapeStrategy {
 export function generateSearchQueries(
   titles: string[],
   skills: string[],
-  locations: string[]
+  locations: string[],
 ): string[] {
   const queries: string[] = [];
   const topSkills = skills.slice(0, 5);
@@ -75,7 +75,7 @@ export function generateSearchQueries(
   }
 
   // 4. First title + "remote" (for remote seekers)
-  if (titles.length > 0 && !topLocations.some(l => l.toLowerCase() === 'remote')) {
+  if (titles.length > 0 && !topLocations.some((l) => l.toLowerCase() === 'remote')) {
     queries.push(`${titles[0]} remote`);
   }
 
@@ -125,7 +125,7 @@ export function prioritizeSources(industries: string[]): string[] {
   }
 
   // Return prioritized sources with defaults as fallback
-  return [...prioritySources, ...DEFAULT_SOURCES.filter(s => !prioritySources.has(s))];
+  return [...prioritySources, ...DEFAULT_SOURCES.filter((s) => !prioritySources.has(s))];
 }
 
 /**

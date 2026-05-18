@@ -125,7 +125,11 @@ export class IndeedScraper extends HttpScraper {
           }
 
           // Description snippet
-          const description = $el.find('.job-snippet, [class*="snippet"], [class*="description"]').first().text().trim();
+          const description = $el
+            .find('.job-snippet, [class*="snippet"], [class*="description"]')
+            .first()
+            .text()
+            .trim();
 
           const fullLink = link ? this.normalizeUrl(link, this.baseUrl) : '';
 
@@ -142,7 +146,9 @@ export class IndeedScraper extends HttpScraper {
             jobs.push(this.createJob(job));
           }
         } catch (error) {
-          this.logger.warn(`Error parsing job card: ${error instanceof Error ? error.message : 'Unknown'}`);
+          this.logger.warn(
+            `Error parsing job card: ${error instanceof Error ? error.message : 'Unknown'}`,
+          );
         }
       });
 

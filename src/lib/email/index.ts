@@ -23,7 +23,12 @@ function getSendGridProvider(): SendGridProviderType | null {
 }
 
 function getSmtpProvider(): SMTPProviderType | null {
-  if (!_smtpProvider && process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+  if (
+    !_smtpProvider &&
+    process.env.SMTP_HOST &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASSWORD
+  ) {
     _smtpProvider = new SMTPProvider({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '587'),
@@ -61,7 +66,7 @@ export async function sendEmail(
   body: string,
   from?: string,
   html?: string,
-  cc?: string | string[]
+  cc?: string | string[],
 ): Promise<SendResult> {
   try {
     const provider = (process.env.EMAIL_PROVIDER || 'gmail').toLowerCase();

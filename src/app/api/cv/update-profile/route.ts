@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
-import { calculateYearsOfExperience, inferExperienceLevel } from '../../../../lib/cv/skillExtractor';
+import {
+  calculateYearsOfExperience,
+  inferExperienceLevel,
+} from '../../../../lib/cv/skillExtractor';
 import { trackProfileChange } from '../../../../lib/cv/profileHistory';
 import { authenticate } from '../../../../lib/auth/middleware';
 
@@ -19,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!userId || !cvId) {
       return NextResponse.json(
         { success: false, error: 'userId and cvId are required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,16 +32,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!cv) {
-      return NextResponse.json(
-        { success: false, error: 'CV not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'CV not found' }, { status: 404 });
     }
 
     if (cv.status !== 'processed') {
       return NextResponse.json(
         { success: false, error: 'CV must be processed before updating profile' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       // Case-insensitive deduplication
       const existingSkillsLower = existingSkills.map((s) => s.toLowerCase());
       const newSkills = cv.skills.filter(
-        (skill) => !existingSkillsLower.includes(skill.toLowerCase())
+        (skill) => !existingSkillsLower.includes(skill.toLowerCase()),
       );
       const mergedSkills = [...existingSkills, ...newSkills];
 
@@ -97,50 +97,52 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse experience entries and calculate years
-    const experienceEntries = cv.experience.map((exp) => {
-      try {
-        return JSON.parse(exp);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    const experienceEntries = cv.experience
+      .map((exp) => {
+        try {
+          return JSON.parse(exp);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     const yearsOfExperience = calculateYearsOfExperience(experienceEntries);
     const experienceLevel = inferExperienceLevel(yearsOfExperience);
 
-// Update experience level if different
-if (profile.experienceLevel !== experienceLevel) {
-updatedFields.push('experienceLevel');
-profile = await prisma.userProfile.update({
-where: { userId },
-data: { experienceLevel },
-});
+    // Update experience level if different
+    if (profile.experienceLevel !== experienceLevel) {
+      updatedFields.push('experienceLevel');
+      profile = await prisma.userProfile.update({
+        where: { userId },
+        data: { experienceLevel },
+      });
 
-// Track experience level change
-await trackProfileChange({
-userId,
-changeType: 'experience_level_updated',
-previousValue: profile.experienceLevel,
-newValue: experienceLevel,
-source: 'cv_upload',
-cvId,
-});
-}
+      // Track experience level change
+      await trackProfileChange({
+        userId,
+        changeType: 'experience_level_updated',
+        previousValue: profile.experienceLevel,
+        newValue: experienceLevel,
+        source: 'cv_upload',
+        cvId,
+      });
+    }
 
-// Track skills change
-if (cv.skills.length > 0 && updatedFields.includes('skills')) {
-await trackProfileChange({
-userId,
-changeType: 'skills_added',
-previousValue: profile.skills,
-newValue: cv.skills,
-source: 'cv_upload',
-cvId,
-});
-}
+    // Track skills change
+    if (cv.skills.length > 0 && updatedFields.includes('skills')) {
+      await trackProfileChange({
+        userId,
+        changeType: 'skills_added',
+        previousValue: profile.skills,
+        newValue: cv.skills,
+        source: 'cv_upload',
+        cvId,
+      });
+    }
 
-// Extract location from most recent experience if available
-// (This would require more sophisticated parsing - simplified for now)
+    // Extract location from most recent experience if available
+    // (This would require more sophisticated parsing - simplified for now)
 
     return NextResponse.json({
       success: true,
@@ -161,7 +163,7 @@ cvId,
         error: 'Failed to update profile',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

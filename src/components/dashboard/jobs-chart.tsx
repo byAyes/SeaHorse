@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 import {
   AreaChart,
   Area,
@@ -9,17 +9,12 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-} from "recharts";
-import { motion } from "framer-motion";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+} from 'recharts';
+import { motion } from 'framer-motion';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface JobsChartProps {
   data?: Array<{ date: string; count: number }>;
@@ -27,29 +22,26 @@ interface JobsChartProps {
   trend?: number;
 }
 
-type RangeKey = "7d" | "30d" | "90d";
+type RangeKey = '7d' | '30d' | '90d';
 
 const RANGES: { key: RangeKey; label: string }[] = [
-  { key: "7d", label: "7 días" },
-  { key: "30d", label: "30 días" },
-  { key: "90d", label: "90 días" },
+  { key: '7d', label: '7 días' },
+  { key: '30d', label: '30 días' },
+  { key: '90d', label: '90 días' },
 ];
 
-function filterDataByRange(
-  data: Array<{ date: string; count: number }>,
-  range: RangeKey
-) {
-  const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
+function filterDataByRange(data: Array<{ date: string; count: number }>, range: RangeKey) {
+  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
   const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   return data.filter((d) => new Date(d.date) >= cutoff);
 }
 
 function formatDateLabel(dateStr: string, range: RangeKey) {
   const d = new Date(dateStr);
-  if (range === "7d") {
-    return d.toLocaleDateString("es-ES", { weekday: "short", day: "numeric" });
+  if (range === '7d') {
+    return d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
   }
-  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
 function CustomTooltip({
@@ -69,10 +61,10 @@ function CustomTooltip({
       className="rounded-xl border bg-white p-3 shadow-xl dark:bg-slate-900 dark:border-slate-700"
     >
       <p className="text-xs text-slate-500 mb-1">
-        {new Date(label || "").toLocaleDateString("es-ES", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
+        {new Date(label || '').toLocaleDateString('es-ES', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
         })}
       </p>
       <p className="text-lg font-bold text-primary">{payload[0].value} jobs</p>
@@ -81,18 +73,12 @@ function CustomTooltip({
 }
 
 export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
-  const [range, setRange] = useState<RangeKey>("30d");
+  const [range, setRange] = useState<RangeKey>('30d');
 
-  const filteredData = useMemo(
-    () => filterDataByRange(data || [], range),
-    [data, range]
-  );
+  const filteredData = useMemo(() => filterDataByRange(data || [], range), [data, range]);
 
   const totalInRange = filteredData.reduce((sum, d) => sum + d.count, 0);
-  const avgPerDay =
-    filteredData.length > 0
-      ? Math.round(totalInRange / filteredData.length)
-      : 0;
+  const avgPerDay = filteredData.length > 0 ? Math.round(totalInRange / filteredData.length) : 0;
 
   return (
     <Card className="lg:col-span-2">
@@ -100,15 +86,10 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle>Tendencia de Jobs</CardTitle>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">
-              ~{avgPerDay} jobs/día
-            </span>
+            <span className="text-xs text-slate-400">~{avgPerDay} jobs/día</span>
             {trend !== undefined && trend !== 0 && (
-              <Badge
-                variant={trend > 0 ? "success" : "danger"}
-                className="text-[10px]"
-              >
-                {trend > 0 ? "↑" : "↓"} {Math.abs(trend)}%
+              <Badge variant={trend > 0 ? 'success' : 'danger'} className="text-[10px]">
+                {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
               </Badge>
             )}
           </div>
@@ -118,7 +99,7 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
           {RANGES.map((r) => (
             <Button
               key={r.key}
-              variant={range === r.key ? "default" : "ghost"}
+              variant={range === r.key ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setRange(r.key)}
               className="h-7 text-xs px-2.5"
@@ -150,9 +131,7 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
                 />
               </svg>
             </div>
-            <p className="text-sm font-medium text-slate-500">
-              No hay datos de tendencia
-            </p>
+            <p className="text-sm font-medium text-slate-500">No hay datos de tendencia</p>
             <p className="text-xs text-slate-400 mt-1">
               Los datos aparecerán después del primer scraping
             </p>
@@ -160,18 +139,9 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
         ) : (
           <div className="h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={filteredData}
-                margin={{ top: 5, right: 10, left: -10, bottom: 0 }}
-              >
+              <AreaChart data={filteredData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                 <defs>
-                  <linearGradient
-                    id="jobGradient"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
+                  <linearGradient id="jobGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2} />
                     <stop offset="95%" stopColor="#4f46e5" stopOpacity={0} />
                   </linearGradient>
@@ -183,20 +153,27 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
                 />
                 <XAxis
                   dataKey="date"
-                  tick={{ fontSize: 11, fill: "oklch(0.606 0.036 275.724)" }}
+                  tick={{ fontSize: 11, fill: 'oklch(0.606 0.036 275.724)' }}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(v) => formatDateLabel(v, range)}
                   minTickGap={20}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: "oklch(0.606 0.036 275.724)" }}
+                  tick={{ fontSize: 11, fill: 'oklch(0.606 0.036 275.724)' }}
                   tickLine={false}
                   axisLine={false}
                   allowDecimals={false}
                   width={30}
                 />
-                <Tooltip content={<CustomTooltip />} cursor={{ stroke: "oklch(0.606 0.036 275.724 / 0.3)", strokeWidth: 1, strokeDasharray: "4 4" }} />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{
+                    stroke: 'oklch(0.606 0.036 275.724 / 0.3)',
+                    strokeWidth: 1,
+                    strokeDasharray: '4 4',
+                  }}
+                />
                 <Area
                   type="monotone"
                   dataKey="count"
@@ -206,8 +183,8 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
                   animationDuration={800}
                   activeDot={{
                     r: 5,
-                    fill: "#4f46e5",
-                    stroke: "white",
+                    fill: '#4f46e5',
+                    stroke: 'white',
                     strokeWidth: 2,
                   }}
                 />

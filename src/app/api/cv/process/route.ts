@@ -3,7 +3,11 @@ import { prisma } from '../../../../lib/prisma';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { parseCV } from '../../../../lib/cv/cvParser';
-import { extractSkills, extractExperience, extractEducation } from '../../../../lib/cv/skillExtractor';
+import {
+  extractSkills,
+  extractExperience,
+  extractEducation,
+} from '../../../../lib/cv/skillExtractor';
 import { extractProfileFromText } from '../../../../lib/ai/pdfProfileExtractor';
 import { authenticate } from '../../../../lib/auth/middleware';
 
@@ -23,10 +27,7 @@ export async function POST(request: NextRequest) {
     const { cvId, provider, apiKey } = body;
 
     if (!cvId) {
-      return NextResponse.json(
-        { success: false, error: 'cvId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'cvId is required' }, { status: 400 });
     }
 
     // Fetch CV record
@@ -35,10 +36,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!cv) {
-      return NextResponse.json(
-        { success: false, error: 'CV not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ success: false, error: 'CV not found' }, { status: 404 });
     }
 
     if (cv.status === 'processed') {
@@ -56,7 +54,7 @@ export async function POST(request: NextRequest) {
     let fileBuffer: Buffer;
     try {
       fileBuffer = await fs.readFile(filePath);
-    } catch (error) {
+    } catch {
       // If file not found in public, try alternate path
       const altPath = join(process.cwd(), 'public', 'cvs', cv.userId, cv.fileName);
       fileBuffer = await fs.readFile(altPath);
@@ -66,9 +64,7 @@ export async function POST(request: NextRequest) {
     const parsed = await parseCV(fileBuffer);
 
     // Extract skills from skills section
-    const skills = parsed.sections.skills
-      ? extractSkills(parsed.sections.skills)
-      : [];
+    const skills = parsed.sections.skills ? extractSkills(parsed.sections.skills) : [];
 
     // Extract experience from experience section
     const experienceEntries = parsed.sections.experience
@@ -91,14 +87,14 @@ export async function POST(request: NextRequest) {
             company: e.company,
             duration: e.duration,
             description: e.description,
-          })
+          }),
         ),
         education: educationEntries.map((e) =>
           JSON.stringify({
             degree: e.degree,
             institution: e.institution,
             graduationYear: e.graduationYear,
-          })
+          }),
         ),
         status: 'processed',
       },
@@ -133,14 +129,14 @@ export async function POST(request: NextRequest) {
               graduationYear: e.graduationYear,
             })),
             remoteOnly: false,
-            location: (aiResult.profile.locations && aiResult.profile.locations.length > 0)
-              ? aiResult.profile.locations[0]
-              : null,
+            location:
+              aiResult.profile.locations && aiResult.profile.locations.length > 0
+                ? aiResult.profile.locations[0]
+                : null,
           };
         }
-      } catch (err) {
+      } catch {
         // AI extraction failed — provide partial profile with CV-parsed data
-        console.warn('[CV Process] AI extraction optional, using partial profile:', err instanceof Error ? err.message : String(err));
       }
     }
 
@@ -161,7 +157,7 @@ export async function POST(request: NextRequest) {
         error: 'Failed to process CV',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

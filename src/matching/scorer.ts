@@ -17,32 +17,30 @@ import { MatchScore, MatchedJob } from '../types/job-match';
  * @param job - Job to score
  * @returns MatchScore with individual and overall scores
  */
-export function calculateMatchScore(
-  user: UserProfile,
-  job: Job
-): MatchScore {
+export function calculateMatchScore(user: UserProfile, job: Job): MatchScore {
   // Calculate individual scores
   const skillOverlap = calculateSkillOverlap(user.skills, job.skills);
   const skillMatch = skillOverlap.score / 100; // Normalize to 0-1
-  
+
   const interestMatchRaw = calculateInterestMatch(user.interests, job.category || '') / 100;
-  const locationMatchRaw = calculateLocationMatch(user.location, job.location || '', user.remoteOnly) / 100;
+  const locationMatchRaw =
+    calculateLocationMatch(user.location, job.location || '', user.remoteOnly) / 100;
   const salaryMatchRaw = calculateSalaryMatch(user.minSalary, user.maxSalary, job.salary) / 100;
-  
+
   // Weighted average using user's weights
   const overall =
     skillMatch * user.skillWeight +
     interestMatchRaw * user.interestWeight +
     locationMatchRaw * user.locationWeight +
     salaryMatchRaw * user.salaryWeight;
-  
+
   // Convert back to 0-100 scale
   const overallPercent = Math.round(overall * 100 * 100) / 100;
   const skillPercent = Math.round(skillMatch * 100 * 100) / 100;
   const interestPercent = Math.round(interestMatchRaw * 100 * 100) / 100;
   const locationPercent = Math.round(locationMatchRaw * 100 * 100) / 100;
   const salaryPercent = Math.round(salaryMatchRaw * 100 * 100) / 100;
-  
+
   return {
     overall: overallPercent,
     skillMatch: skillPercent,
@@ -50,7 +48,7 @@ export function calculateMatchScore(
     locationMatch: locationPercent,
     salaryMatch: salaryPercent,
     matchedSkills: skillOverlap.matchedSkills,
-    explanation: `Overall match: ${overallPercent}% (Skills: ${skillPercent}%, Interests: ${interestPercent}%, Location: ${locationPercent}%, Salary: ${salaryPercent}%)`
+    explanation: `Overall match: ${overallPercent}% (Skills: ${skillPercent}%, Interests: ${interestPercent}%, Location: ${locationPercent}%, Salary: ${salaryPercent}%)`,
   };
 }
 
@@ -64,15 +62,15 @@ export function calculateMatchScore(
 export function scoreAndSortJobs(
   jobs: Job[],
   user: UserProfile,
-  threshold: number = 70
+  threshold: number = 70,
 ): MatchedJob[] {
   const matchedJobs: MatchedJob[] = jobs
-    .map(job => ({
+    .map((job) => ({
       job,
-      score: calculateMatchScore(user, job)
+      score: calculateMatchScore(user, job),
     }))
     .filter(({ score }) => score.overall >= threshold)
     .sort((a, b) => b.score.overall - a.score.overall);
-  
+
   return matchedJobs;
 }

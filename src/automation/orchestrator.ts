@@ -1,5 +1,11 @@
 import { logger } from '../lib/automation/logger';
-import { filterNewJobs, saveNewJobs, markJobsAsEmailed, cleanupEmailedJobs, cleanupOldJobs } from '../lib/automation/job-history';
+import {
+  filterNewJobs,
+  saveNewJobs,
+  markJobsAsEmailed,
+  cleanupEmailedJobs,
+  cleanupOldJobs,
+} from '../lib/automation/job-history';
 import { formatJobDigest } from '../lib/email/template';
 import type { ProfileInfo } from '../lib/email/template';
 import { sendEmail } from '../lib/email';
@@ -13,10 +19,10 @@ import type { Job } from '../types/job';
  * Convert scraped job to database job format
  */
 function convertToDbJob(scraped: ScrapedJob) {
-  const scrapedSalary = (scraped as any).salary ?? null;
-  const scrapedSkills = (scraped as any).skills ?? [];
-  const scrapedCategory = (scraped as any).category ?? null;
-  const scrapedPostedAt = (scraped as any).postedAt ?? null;
+  const scrapedSalary = (scraped as ScrapedJob & Record<string, unknown>).salary ?? null;
+  const scrapedSkills = (scraped as ScrapedJob & Record<string, unknown>).skills ?? [];
+  const scrapedCategory = (scraped as ScrapedJob & Record<string, unknown>).category ?? null;
+  const scrapedPostedAt = (scraped as ScrapedJob & Record<string, unknown>).postedAt ?? null;
 
   return {
     id: scraped.id,
@@ -46,8 +52,8 @@ interface DbJob {
   location: string | null;
   description: string | null;
   url: string;
-  salary: any;
-  postedAt: any;
+  salary: unknown;
+  postedAt: unknown;
   scrapedAt: Date;
   skills: string[];
   category: string | null;
@@ -57,7 +63,7 @@ function filterByDate(jobs: DbJob[], days: number = 3): DbJob[] {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
 
-  return jobs.filter(job => {
+  return jobs.filter((job) => {
     // If job has postedAt, use it
     if (job.postedAt) {
       const postedDate = new Date(job.postedAt);
@@ -103,11 +109,11 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
   try {
     // Step 1: Scrape job boards
     logger.info('Starting job scraping...');
-    
+
     // Run scrapers from all job boards
     const query = process.env.JOB_QUERY || 'software engineer';
     const maxJobs = parseInt(process.env.MAX_JOBS_PER_SCRAPER || '10', 10);
-    
+
     logger.info(`Scraping job boards for: "${query}" (max ${maxJobs} jobs per board)`);
 
     const runner = new ScraperRunner({ query, maxJobs });
@@ -119,7 +125,7 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
 
     // Convert scraped jobs to database format
     const allJobs = scrapedJobs.map(convertToDbJob);
-    
+
     result.scraped = allJobs.length;
     logger.success(`Scraped ${allJobs.length} jobs from all boards`);
 
@@ -154,8 +160,11 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
         skills: profile.skills || [],
         interests: profile.jobTitles || [],
         location: profile.locations?.[0] || null,
-        remoteOnly: (profile.locations || []).some(l => l.toLowerCase().includes('remoto') || l.toLowerCase().includes('remote')) || false,
-        experienceLevel: (profile.experienceLevel as any) || null,
+        remoteOnly:
+          (profile.locations || []).some(
+            (l) => l.toLowerCase().includes('remoto') || l.toLowerCase().includes('remote'),
+          ) || false,
+        experienceLevel: (profile.experienceLevel as string) || null,
         minSalary: null,
         maxSalary: null,
         skillWeight: 0.4,
@@ -163,7 +172,9 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
         locationWeight: 0.2,
         salaryWeight: 0.1,
       };
-      logger.info(`Building profile for matching: ${profile.skills?.length || 0} skills, ${profile.jobTitles?.length || 0} target roles`);
+      logger.info(
+        `Building profile for matching: ${profile.skills?.length || 0} skills, ${profile.jobTitles?.length || 0} target roles`,
+      );
     }
 
     // Step 3: Send email digest if there are jobs
@@ -171,7 +182,7 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
       logger.info('Sending email digest...');
 
       // Calculate real match scores from profile
-      const scoredJobs = newJobs.map(job => {
+      const scoredJobs = newJobs.map((job) => {
         if (userProfile) {
           const matchScore = calculateMatchScore(userProfile, job as Job);
           return {
@@ -188,12 +199,14 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
         };
       });
 
-      logger.info(`Match scores calculated: ${scoredJobs.filter(j => j.score >= 80).length} excellent, ${scoredJobs.filter(j => j.score >= 60 && j.score < 80).length} good, ${scoredJobs.filter(j => j.score < 60).length} potential`);
+      logger.info(
+        `Match scores calculated: ${scoredJobs.filter((j) => j.score >= 80).length} excellent, ${scoredJobs.filter((j) => j.score >= 60 && j.score < 80).length} good, ${scoredJobs.filter((j) => j.score < 60).length} potential`,
+      );
 
       const { text, html } = formatJobDigest(
         scoredJobs,
         new Date().toISOString(),
-        profile // Pass profile for personalized email header
+        profile, // Pass profile for personalized email header
       );
 
       const emailResult = await sendEmail(
@@ -201,16 +214,18 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
         `Weekly Job Digest - ${new Date().toLocaleDateString()}`,
         text,
         undefined, // from (default)
-        html,      // html body
-        process.env.EMAIL_CC || undefined // CC (optional, via EMAIL_CC env var)
+        html, // html body
+        process.env.EMAIL_CC || undefined, // CC (optional, via EMAIL_CC env var)
       );
 
       if (emailResult.success) {
         result.sent = newJobs.length;
-        logger.success(`Sent email with ${result.sent} jobs${process.env.EMAIL_CC ? ` (CC: ${process.env.EMAIL_CC})` : ''}`);
-        
+        logger.success(
+          `Sent email with ${result.sent} jobs${process.env.EMAIL_CC ? ` (CC: ${process.env.EMAIL_CC})` : ''}`,
+        );
+
         // Step 4: Mark jobs as emailed (use DB UUIDs; fallback to scraper IDs if persist failed)
-        const idsToMark = savedIds.length > 0 ? savedIds : newJobs.map(job => job.id);
+        const idsToMark = savedIds.length > 0 ? savedIds : newJobs.map((job) => job.id);
         await markJobsAsEmailed(idsToMark);
       } else {
         logger.error('Failed to send email', new Error(emailResult.error));
@@ -226,7 +241,9 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
     // Safety net: clean up any jobs (emailed or not) older than 1 month
     const oldCleaned = await cleanupOldJobs(1);
     result.cleaned = cleaned + oldCleaned;
-    logger.info(`Cleaned up ${result.cleaned} old jobs (${cleaned} emailed, ${oldCleaned} orphaned)`);
+    logger.info(
+      `Cleaned up ${result.cleaned} old jobs (${cleaned} emailed, ${oldCleaned} orphaned)`,
+    );
 
     return result;
   } catch (error) {

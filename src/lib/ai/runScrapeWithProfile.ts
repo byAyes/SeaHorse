@@ -24,7 +24,7 @@ import { ExtractedProfile } from '../../types/ai-profile';
  * @returns The extracted profile if successful, null otherwise.
  */
 export async function extractAndConfigurePipeline(
-  pdfBuffer: Buffer
+  pdfBuffer: Buffer,
 ): Promise<ExtractedProfile | null> {
   const result = await extractProfileFromPDF(pdfBuffer);
 

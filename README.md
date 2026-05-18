@@ -18,13 +18,13 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Match → Email
 
 ### Pipeline Overview
 
-| Step | What | Details |
-|:----:|------|---------|
-| 1 | **Extract profile** from CV/PDF | Gemini AI extracts skills, titles, locations, level, languages |
-| 2 | **Scrape** job boards | JSearch API + Python Scrapling (Computrabajo, Indeed, Glassdoor, LinkedIn) |
-| 3 | **Match** against profile | Skills (40%), Interests (30%), Location (20%), Salary (10%) |
-| 4 | **Email** curated digest | Premium HTML with emojis, scores, stats, CC support |
-| 5 | **Cleanup** old jobs | 3-month retention policy |
+| Step | What                            | Details                                                                    |
+| :--: | ------------------------------- | -------------------------------------------------------------------------- |
+|  1   | **Extract profile** from CV/PDF | Gemini AI extracts skills, titles, locations, level, languages             |
+|  2   | **Scrape** job boards           | JSearch API + Python Scrapling (Computrabajo, Indeed, Glassdoor, LinkedIn) |
+|  3   | **Match** against profile       | Skills (40%), Interests (30%), Location (20%), Salary (10%)                |
+|  4   | **Email** curated digest        | Premium HTML with emojis, scores, stats, CC support                        |
+|  5   | **Cleanup** old jobs            | 3-month retention policy                                                   |
 
 ---
 
@@ -65,12 +65,12 @@ SMTP_FROM=your.email@gmail.com
 GMAIL_RECIPIENT=you@email.com
 ```
 
-| Provider | Setup | Free Tier |
-|----------|-------|:---------:|
-| **SMTP (Gmail)** | App Password from Google | 500/day |
-| **Resend** | `RESEND_API_KEY` | 100/day |
-| **Gmail API** | OAuth2 via Google Cloud Console | 500/day |
-| **SendGrid** | `SENDGRID_API_KEY` | 100/day |
+| Provider         | Setup                           | Free Tier |
+| ---------------- | ------------------------------- | :-------: |
+| **SMTP (Gmail)** | App Password from Google        |  500/day  |
+| **Resend**       | `RESEND_API_KEY`                |  100/day  |
+| **Gmail API**    | OAuth2 via Google Cloud Console |  500/day  |
+| **SendGrid**     | `SENDGRID_API_KEY`              |  100/day  |
 
 **API Keys:**
 
@@ -93,44 +93,44 @@ In ~60-90 seconds you'll get an HTML email with jobs matched to your profile.
 
 ### AI PDF Profile Extraction
 
-| Feature | Method | File |
-|---------|--------|------|
+| Feature                     | Method                         | File                                |
+| --------------------------- | ------------------------------ | ----------------------------------- |
 | Extract profile from CV/PDF | Gemini AI (`gemini-2.0-flash`) | `src/lib/ai/pdfProfileExtractor.ts` |
-| Keyword fallback | Regex + keyword matching | `src/lib/ai/pdfProfileExtractor.ts` |
-| Build scrape strategy | Queries from extracted profile | `src/lib/ai/scrapeStrategy.ts` |
-| Pipeline integration | Full end-to-end | `scripts/run-profile-pipeline.ts` |
+| Keyword fallback            | Regex + keyword matching       | `src/lib/ai/pdfProfileExtractor.ts` |
+| Build scrape strategy       | Queries from extracted profile | `src/lib/ai/scrapeStrategy.ts`      |
+| Pipeline integration        | Full end-to-end                | `scripts/run-profile-pipeline.ts`   |
 
 ### Scrapers (5 sources)
 
-| Source | Method | Status | Jobs/Run |
-|--------|--------|:------:|:--------:|
-| **JSearch** (RapidAPI) | REST API | Always works | ~10 |
-| **Computrabajo** | Python Scrapling | Stealth browser | ~10 |
-| **Indeed** | Python Scrapling | Intermittent | 0-10 |
-| **Glassdoor** | Python Scrapling | Intermittent | 0-10 |
-| **LinkedIn** | Python Scrapling | Blocked | 0 |
+| Source                 | Method           |     Status      | Jobs/Run |
+| ---------------------- | ---------------- | :-------------: | :------: |
+| **JSearch** (RapidAPI) | REST API         |  Always works   |   ~10    |
+| **Computrabajo**       | Python Scrapling | Stealth browser |   ~10    |
+| **Indeed**             | Python Scrapling |  Intermittent   |   0-10   |
+| **Glassdoor**          | Python Scrapling |  Intermittent   |   0-10   |
+| **LinkedIn**           | Python Scrapling |     Blocked     |    0     |
 
 **Total per run:** ~15-20 jobs (failed scrapers don't crash pipeline)
 
 ### Matching Engine
 
-| Factor | Weight | How it works |
-|--------|:------:|--------------|
-| Skills | **40%** | Fuzzy matching (Levenshtein) against CV skills |
-| Interests | **30%** | Job title/industry vs career interests |
-| Location | **20%** | Exact city, remote hybrid, partial matches |
-| Salary | **10%** | Range overlap, penalizes over-max budgets |
+| Factor    | Weight  | How it works                                   |
+| --------- | :-----: | ---------------------------------------------- |
+| Skills    | **40%** | Fuzzy matching (Levenshtein) against CV skills |
+| Interests | **30%** | Job title/industry vs career interests         |
+| Location  | **20%** | Exact city, remote hybrid, partial matches     |
+| Salary    | **10%** | Range overlap, penalizes over-max budgets      |
 
 Color-coded badges: Excellent (>=80%), Good (>=60%), Potential (<60%)
 
 ### Email Providers
 
-| Provider | Method | HTML | CC | Status |
-|----------|--------|:----:|:--:|:------:|
-| **SMTP (Gmail)** | App Password | Yes | Yes | **Default** |
-| **Resend** | API | Yes | Partial | Available |
-| **Gmail API** | OAuth2 | Yes | Yes | Available |
-| **SendGrid** | API | Yes | Yes | Available |
+| Provider         | Method       | HTML |   CC    |   Status    |
+| ---------------- | ------------ | :--: | :-----: | :---------: |
+| **SMTP (Gmail)** | App Password | Yes  |   Yes   | **Default** |
+| **Resend**       | API          | Yes  | Partial |  Available  |
+| **Gmail API**    | OAuth2       | Yes  |   Yes   |  Available  |
+| **SendGrid**     | API          | Yes  |   Yes   |  Available  |
 
 ### Dashboard UI
 
@@ -282,50 +282,86 @@ python -m scrapers.indeed --query "software engineer" --max 5
 
 ---
 
+## Testing
+
+```bash
+# Run all test suites
+npm test
+
+# Run tests in watch mode (re-runs on changes)
+npm run test:watch
+
+# Run a specific test file
+npx jest tests/rate-limiter.test.ts
+npx jest tests/auth-middleware.test.ts
+npx jest tests/config-store.test.ts
+npx jest tests/resend-provider.test.ts
+npx jest tests/manage-resend-domains.test.ts
+npx jest tests/pdfProfileExtractor.test.ts
+
+# Run with verbose output
+npx jest --verbose
+```
+
+### Test Suites (68 tests, 6 suites)
+
+| Suite                   | Tests | What it covers                                                                                                                                         |
+| ----------------------- | :---: | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rate-limiter`          |  12   | RateLimiter class — `getClientIp` (4 headers) + `checkRateLimit` (allow, block, remaining, custom window, IP isolation)                                |
+| `auth-middleware`       |   9   | `authenticate` — no token, valid token, whitespace, missing/empty/wrong header/wrong scheme, empty Bearer, wrong token                                 |
+| `config-store`          |  15   | ConfigStore — `loadConfig` (existing/missing/parse error), `saveConfig` (merge/new file/strip undefined/ensureDir), `getApiKey`, `getActiveAiProvider` |
+| `resend-provider`       |   —   | Resend email provider — send email, create/list/get domains, network errors, auth, custom return path                                                  |
+| `manage-resend-domains` |   —   | Domain management script — add/list/verify domains via CLI                                                                                             |
+| `pdfProfileExtractor`   |   —   | Gemini AI profile extraction from PDF                                                                                                                  |
+
+**Setup:** Jest + ts-jest with a separate `tsconfig.test.json` (CommonJS) — the project's `tsconfig.json` is unaffected. All tests run cleanly with no external services or database required.
+
+---
+
 ## Environment Variables
 
 ### Email (SMTP — recommended)
 
-| Variable | Description | Required |
-|----------|-------------|:--------:|
-| `EMAIL_PROVIDER` | `smtp` (recommended) | Yes |
-| `SMTP_HOST` | `smtp.gmail.com` | For SMTP |
-| `SMTP_PORT` | `587` | For SMTP |
-| `SMTP_USER` | Your Gmail address | For SMTP |
-| `SMTP_PASSWORD` | Gmail App Password | For SMTP |
-| `SMTP_FROM` | Sender email | For SMTP |
-| `GMAIL_RECIPIENT` | Email address for digests | Yes |
-| `EMAIL_CC` | CC address on digests | Optional |
+| Variable          | Description               | Required |
+| ----------------- | ------------------------- | :------: |
+| `EMAIL_PROVIDER`  | `smtp` (recommended)      |   Yes    |
+| `SMTP_HOST`       | `smtp.gmail.com`          | For SMTP |
+| `SMTP_PORT`       | `587`                     | For SMTP |
+| `SMTP_USER`       | Your Gmail address        | For SMTP |
+| `SMTP_PASSWORD`   | Gmail App Password        | For SMTP |
+| `SMTP_FROM`       | Sender email              | For SMTP |
+| `GMAIL_RECIPIENT` | Email address for digests |   Yes    |
+| `EMAIL_CC`        | CC address on digests     | Optional |
 
 ### API Keys
 
-| Variable | Description | Required |
-|----------|-------------|:--------:|
-| `JSEARCH_API_KEY` | RapidAPI JSearch key | For JSearch scraper |
-| `GEMINI_API_KEY` | Google Gemini API key | For AI profile extraction |
+| Variable          | Description           |         Required          |
+| ----------------- | --------------------- | :-----------------------: |
+| `JSEARCH_API_KEY` | RapidAPI JSearch key  |    For JSearch scraper    |
+| `GEMINI_API_KEY`  | Google Gemini API key | For AI profile extraction |
 
 ### Alternative Email Providers
 
-| Variable | Description | For |
-|----------|-------------|-----|
-| `RESEND_API_KEY` | Resend API key | Resend |
-| `RESEND_FROM_EMAIL` | Resend sender | Resend |
-| `SENDGRID_API_KEY` | SendGrid API key | SendGrid |
-| `GOOGLE_CLIENT_ID` | Gmail OAuth client ID | Gmail API |
+| Variable               | Description               | For       |
+| ---------------------- | ------------------------- | --------- |
+| `RESEND_API_KEY`       | Resend API key            | Resend    |
+| `RESEND_FROM_EMAIL`    | Resend sender             | Resend    |
+| `SENDGRID_API_KEY`     | SendGrid API key          | SendGrid  |
+| `GOOGLE_CLIENT_ID`     | Gmail OAuth client ID     | Gmail API |
 | `GOOGLE_CLIENT_SECRET` | Gmail OAuth client secret | Gmail API |
-| `GMAIL_REFRESH_TOKEN` | Gmail refresh token | Gmail API |
+| `GMAIL_REFRESH_TOKEN`  | Gmail refresh token       | Gmail API |
 
 ---
 
 ## Pipeline Performance
 
-| Source | Avg Jobs | Reliability | Method |
-|--------|:--------:|:-----------:|--------|
-| JSearch | ~10 | High | REST API |
-| Computrabajo | ~10 | High | Python Scrapling |
-| Indeed | 0-10 | Medium | Python Scrapling |
-| Glassdoor | 0-10 | Medium | Python Scrapling |
-| LinkedIn | 0 | Low | Anti-bot (blocked) |
+| Source       | Avg Jobs | Reliability | Method             |
+| ------------ | :------: | :---------: | ------------------ |
+| JSearch      |   ~10    |    High     | REST API           |
+| Computrabajo |   ~10    |    High     | Python Scrapling   |
+| Indeed       |   0-10   |   Medium    | Python Scrapling   |
+| Glassdoor    |   0-10   |   Medium    | Python Scrapling   |
+| LinkedIn     |    0     |     Low     | Anti-bot (blocked) |
 
 **Total:** ~15-20 jobs per run, delivered in ~60-90s.
 
@@ -333,19 +369,19 @@ python -m scrapers.indeed --query "software engineer" --max 5
 
 ## Tech Stack
 
-| Layer | Tech |
-|-------|------|
-| **Runtime** | Node.js 20+ (ESM) + tsx |
-| **Framework** | Next.js 16 (App Router) + React 19 |
-| **AI Extraction** | Gemini Flash (`gemini-2.0-flash`) |
-| **Scraping** | Python 3.12 + Scrapling StealthyFetcher |
-| **Matching** | TypeScript — weighted scoring (40/30/20/10) |
-| **Email** | SMTP (default), Resend, Gmail API, SendGrid |
-| **Dashboard** | Tailwind CSS 4 + Framer Motion + Recharts + TanStack Query |
-| **State** | Zustand |
-| **Storage** | Local JSON (`data/`) — zero config, zero external deps |
-| **i18n** | EN, ES, PT, FR, DE |
-| **CI/CD** | GitHub Actions (push + weekly cron) |
+| Layer             | Tech                                                       |
+| ----------------- | ---------------------------------------------------------- |
+| **Runtime**       | Node.js 20+ (ESM) + tsx                                    |
+| **Framework**     | Next.js 16 (App Router) + React 19                         |
+| **AI Extraction** | Gemini Flash (`gemini-2.0-flash`)                          |
+| **Scraping**      | Python 3.12 + Scrapling StealthyFetcher                    |
+| **Matching**      | TypeScript — weighted scoring (40/30/20/10)                |
+| **Email**         | SMTP (default), Resend, Gmail API, SendGrid                |
+| **Dashboard**     | Tailwind CSS 4 + Framer Motion + Recharts + TanStack Query |
+| **State**         | Zustand                                                    |
+| **Storage**       | Local JSON (`data/`) — zero config, zero external deps     |
+| **i18n**          | EN, ES, PT, FR, DE                                         |
+| **CI/CD**         | GitHub Actions (push + weekly cron)                        |
 
 ---
 
@@ -364,30 +400,30 @@ on:
 
 **Required secrets for CI:**
 
-| Secret | Value |
-|--------|-------|
-| `SMTP_HOST` | `smtp.gmail.com` |
-| `SMTP_PORT` | `587` |
-| `SMTP_USER` | Your Gmail |
-| `SMTP_PASSWORD` | Gmail App Password |
-| `SMTP_FROM` | Your Gmail |
-| `GMAIL_RECIPIENT` | Destination email |
-| `JSEARCH_API_KEY` | RapidAPI key |
+| Secret            | Value              |
+| ----------------- | ------------------ |
+| `SMTP_HOST`       | `smtp.gmail.com`   |
+| `SMTP_PORT`       | `587`              |
+| `SMTP_USER`       | Your Gmail         |
+| `SMTP_PASSWORD`   | Gmail App Password |
+| `SMTP_FROM`       | Your Gmail         |
+| `GMAIL_RECIPIENT` | Destination email  |
+| `JSEARCH_API_KEY` | RapidAPI key       |
 
 ---
 
 ## Roadmap
 
-| # | Phase | Status |
-|---|-------|--------|
-| 1 | Job Board Scraper | Complete |
-| 2 | AI Job Matching | Complete |
-| 3 | Email Notifications (HTML + scores) | Complete |
-| 4 | Automation & Scheduling | Complete |
-| 5 | AI PDF Profile Extraction | Complete |
-| 6 | ~~Supabase Database~~ | Cancelled (IPv6 block) |
-| 7 | Frontend UI Dashboard | Complete |
-| 8 | Remove DB dead code + local JSON storage | Planned |
+| #   | Phase                                    | Status                 |
+| --- | ---------------------------------------- | ---------------------- |
+| 1   | Job Board Scraper                        | Complete               |
+| 2   | AI Job Matching                          | Complete               |
+| 3   | Email Notifications (HTML + scores)      | Complete               |
+| 4   | Automation & Scheduling                  | Complete               |
+| 5   | AI PDF Profile Extraction                | Complete               |
+| 6   | ~~Supabase Database~~                    | Cancelled (IPv6 block) |
+| 7   | Frontend UI Dashboard                    | Complete               |
+| 8   | Remove DB dead code + local JSON storage | Planned                |
 
 ---
 

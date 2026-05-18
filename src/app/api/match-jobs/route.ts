@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { scoreAndSortJobs } from '@/matching/scorer';
 import { Job } from '@/types/job';
-import { UserProfile } from '@/types/user-profile';
+import { UserProfile, ExperienceLevel } from '@/types/user-profile';
 import { authenticate } from '@/lib/auth/middleware';
 
 /**
@@ -25,22 +25,16 @@ export async function GET(request: NextRequest) {
 
     // Validate required params
     if (!userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
     // Fetch user profile
     const userProfile = await prisma.userProfile.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!userProfile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
     // Fetch jobs (only recent ones from last 30 days)
@@ -48,13 +42,13 @@ export async function GET(request: NextRequest) {
     const jobs = await prisma.job.findMany({
       where: {
         scrapedAt: {
-          gte: thirtyDaysAgo
-        }
-      }
+          gte: thirtyDaysAgo,
+        },
+      },
     });
 
     // Convert Prisma jobs to Job type
-    const jobList: Job[] = jobs.map(job => ({
+    const jobList: Job[] = jobs.map((job) => ({
       id: job.id,
       title: job.title,
       company: job.company,
@@ -65,7 +59,7 @@ export async function GET(request: NextRequest) {
       postedAt: job.postedAt,
       scrapedAt: job.scrapedAt,
       skills: job.skills,
-      category: job.category
+      category: job.category,
     }));
 
     // Convert Prisma user profile to UserProfile type
@@ -78,13 +72,13 @@ export async function GET(request: NextRequest) {
       interests: userProfile.interests,
       location: userProfile.location,
       remoteOnly: userProfile.remoteOnly,
-      experienceLevel: userProfile.experienceLevel as any,
+      experienceLevel: userProfile.experienceLevel as ExperienceLevel | null,
       minSalary: userProfile.minSalary,
       maxSalary: userProfile.maxSalary,
       skillWeight: userProfile.skillWeight,
       interestWeight: userProfile.interestWeight,
       locationWeight: userProfile.locationWeight,
-      salaryWeight: userProfile.salaryWeight
+      salaryWeight: userProfile.salaryWeight,
     };
 
     // Score and sort jobs
@@ -97,14 +91,10 @@ export async function GET(request: NextRequest) {
       matches: limitedMatches,
       total: limitedMatches.length,
       threshold,
-      userId
+      userId,
     });
-
   } catch (error) {
     console.error('Error matching jobs:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -44,7 +44,7 @@ const DEFAULT_OPTIONS: Required<RateLimitOptions> = {
  */
 export function checkRateLimit(
   ip: string,
-  options: RateLimitOptions = {}
+  options: RateLimitOptions = {},
 ): { allowed: boolean; remaining: number; resetMs: number } {
   const { maxRequests, windowMs } = { ...DEFAULT_OPTIONS, ...options };
   const now = Date.now();
@@ -77,8 +77,8 @@ export function checkRateLimit(
  */
 export function getClientIp(request: Request): string {
   return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "127.0.0.1"
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    '127.0.0.1'
   );
 }

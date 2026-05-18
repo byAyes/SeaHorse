@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import * as cheerio from 'cheerio';
 import { Job, ScraperConfig, ScraperResult } from '../types';
 import { BaseScraper } from '../base/BaseScraper';
@@ -19,17 +19,18 @@ const USER_AGENTS = [
  * Modern browser headers to reduce bot detection
  */
 const BROWSER_HEADERS = {
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+  Accept:
+    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
   'Accept-Language': 'en-US,en;q=0.9,es;q=0.8',
   'Accept-Encoding': 'gzip, deflate, br',
   'Cache-Control': 'no-cache',
-  'Pragma': 'no-cache',
+  Pragma: 'no-cache',
   'Sec-Fetch-Dest': 'document',
   'Sec-Fetch-Mode': 'navigate',
   'Sec-Fetch-Site': 'none',
   'Sec-Fetch-User': '?1',
   'Upgrade-Insecure-Requests': '1',
-  'Connection': 'keep-alive',
+  Connection: 'keep-alive',
 };
 
 /**
@@ -52,10 +53,10 @@ export abstract class HttpScraper extends BaseScraper {
       timeout: 10000, // 10 second timeout
       headers: {
         'User-Agent': getRandomUserAgent(),
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.5',
         'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
       },
     });
@@ -83,7 +84,7 @@ export abstract class HttpScraper extends BaseScraper {
     const requestHeaders = {
       ...BROWSER_HEADERS,
       'User-Agent': getRandomUserAgent(),
-      'Referer': 'https://www.google.com/',
+      Referer: 'https://www.google.com/',
     };
 
     const response = await this.client.get(url, { headers: requestHeaders });

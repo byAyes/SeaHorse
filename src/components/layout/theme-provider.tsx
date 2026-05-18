@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 
-type Theme = "light" | "dark" | "system";
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextValue {
   theme: Theme;
-  resolved: "light" | "dark";
+  resolved: 'light' | 'dark';
   setTheme: (theme: Theme) => void;
   toggle: () => void;
   mounted: boolean;
@@ -14,15 +14,13 @@ interface ThemeContextValue {
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
-function getSystemTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-function resolveTheme(theme: Theme): "light" | "dark" {
-  if (theme === "system") return getSystemTheme();
+function resolveTheme(theme: Theme): 'light' | 'dark' {
+  if (theme === 'system') return getSystemTheme();
   return theme;
 }
 
@@ -31,44 +29,45 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // The FOUC script in layout.tsx already sets the correct dark class on <html>.
   // After mount, we read localStorage and sync the React state.
   const [mounted, setMounted] = React.useState(false);
-  const [theme, setThemeState] = React.useState<Theme>("system");
-  const [resolved, setResolved] = React.useState<"light" | "dark">("light");
+  const [theme, setThemeState] = React.useState<Theme>('system');
+  const [resolved, setResolved] = React.useState<'light' | 'dark'>('light');
 
   // Hydration-safe init: read localStorage and apply stored theme
   React.useEffect(() => {
-    const stored = (localStorage.getItem("theme") as Theme) || "system";
+    const stored = (localStorage.getItem('theme') as Theme) || 'system';
     const resolvedTheme = resolveTheme(stored);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(stored);
     setResolved(resolvedTheme);
-    document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
+    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
     setMounted(true);
   }, []);
 
   // Listen for system theme changes (only after mount)
   React.useEffect(() => {
     if (!mounted) return;
-    if (theme === "system") {
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (theme === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
       const handler = () => {
-        const sys = mq.matches ? "dark" : "light";
+        const sys = mq.matches ? 'dark' : 'light';
         setResolved(sys);
-        document.documentElement.classList.toggle("dark", sys === "dark");
+        document.documentElement.classList.toggle('dark', sys === 'dark');
       };
-      mq.addEventListener("change", handler);
-      return () => mq.removeEventListener("change", handler);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
     }
   }, [theme, mounted]);
 
   const setTheme = React.useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
+    localStorage.setItem('theme', newTheme);
     const resolvedTheme = resolveTheme(newTheme);
     setResolved(resolvedTheme);
-    document.documentElement.classList.toggle("dark", resolvedTheme === "dark");
+    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
   }, []);
 
   const toggle = React.useCallback(() => {
-    const next = resolved === "dark" ? "light" : "dark";
+    const next = resolved === 'dark' ? 'light' : 'dark';
     setTheme(next);
   }, [resolved, setTheme]);
 
@@ -81,6 +80,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const ctx = React.useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used within ThemeProvider");
+  if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
   return ctx;
 }

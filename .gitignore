@@ -12,3 +12,6 @@ __pycache__/
 nul
 skills/
 tsconfig.tsbuildinfo
+
+# Husky internal binaries (not committed)
+.husky/_

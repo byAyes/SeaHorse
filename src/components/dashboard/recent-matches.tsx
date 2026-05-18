@@ -1,17 +1,12 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { ExternalLink, MapPin, DollarSign, Briefcase } from "lucide-react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-import { Badge, ScoreBadge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate, formatSalary } from "@/lib/utils";
-import type { MatchedJob } from "@/types/job-match";
+import { motion } from 'framer-motion';
+import { MapPin, DollarSign, Briefcase } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge, ScoreBadge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { formatDate, formatSalary } from '@/lib/utils';
+import type { MatchedJob } from '@/types/job-match';
 
 interface RecentMatchesProps {
   data?: MatchedJob[];
@@ -70,7 +65,7 @@ export function RecentMatches({ data, isLoading }: RecentMatchesProps) {
               >
                 {/* Company initial avatar */}
                 <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-sm font-bold text-slate-500 dark:text-slate-400">
-                  {match.job.company?.charAt(0)?.toUpperCase() || "?"}
+                  {match.job.company?.charAt(0)?.toUpperCase() || '?'}
                 </div>
 
                 <div className="flex-1 min-w-0">

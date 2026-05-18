@@ -22,7 +22,7 @@ async function testEmail() {
       },
       score: 85,
       matchedSkills: ['JavaScript', 'React', 'Node.js'],
-    }
+    },
   ];
 
   const emailBody = formatJobDigest(mockJobs);
@@ -34,7 +34,7 @@ async function testEmail() {
     'Test Job Digest - Software Engineer Jobs',
     emailBody.text,
     undefined,
-    emailBody.html
+    emailBody.html,
   );
 
   if (result.success) {

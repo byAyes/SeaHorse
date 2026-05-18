@@ -5,23 +5,22 @@
 
 import { prisma } from '../src/lib/prisma';
 import { parsePDF } from '../src/lib/pdf/pdfParser';
-import { extractJobsFromText } from '../src/lib/pdf/jobExtractor';
 import * as fs from 'fs';
 import * as path from 'path';
 
 async function processCVUploads() {
   console.log('🔄 Processing CV uploads...');
-  
+
   try {
     // Buscar CVs pendientes de procesar
-  const pendingCVs = await prisma.cV.findMany({
-    where: {
-      status: 'pending'
-    },
-    include: {
-      user: true
-    }
-  });
+    const pendingCVs = await prisma.cV.findMany({
+      where: {
+        status: 'pending',
+      },
+      include: {
+        user: true,
+      },
+    });
 
     if (pendingCVs.length === 0) {
       console.log('✅ No pending CVs to process');
@@ -42,7 +41,7 @@ async function processCVUploads() {
         }
 
         const pdfBuffer = fs.readFileSync(pdfPath);
-        
+
         // Extraer texto del PDF
         const { text, success } = await parsePDF(pdfBuffer);
         if (!success || !text) {
@@ -52,13 +51,13 @@ async function processCVUploads() {
 
         console.log(`✅ Extracted ${text.length} characters from CV`);
 
-      // Actualizar CV como procesado
-      await prisma.cV.update({
-        where: { id: cv.id },
-        data: { status: 'processed' }
-      });
+        // Actualizar CV como procesado
+        await prisma.cV.update({
+          where: { id: cv.id },
+          data: { status: 'processed' },
+        });
 
-      console.log(`✅ CV ${cv.id} marked as processed`);
+        console.log(`✅ CV ${cv.id} marked as processed`);
       } catch (error) {
         console.error(`❌ Error processing CV ${cv.id}:`, error);
       }

@@ -4,7 +4,6 @@
  */
 
 import { ExtractedJob, PDFProcessingOptions } from '../../types/pdf.js';
-import { Job } from '../../types/job.js';
 
 /**
  * Extract job postings from plain text
@@ -15,7 +14,7 @@ import { Job } from '../../types/job.js';
  */
 export async function extractJobsFromText(
   text: string,
-  options?: PDFProcessingOptions
+  options?: PDFProcessingOptions,
 ): Promise<ExtractedJob[]> {
   const jobs: ExtractedJob[] = [];
 
@@ -44,7 +43,7 @@ function splitIntoJobSections(text: string): string[] {
     /\n(?=\b(?:Company|Employer)[:\s])/i,
     /\n(?=\b(?:We are|Looking for|Seeking)\b)/i,
     /\n(?=\b(?:Requirements|Qualifications|Skills)\b)/i,
-    /\n{3,}/ // Multiple newlines as fallback
+    /\n{3,}/, // Multiple newlines as fallback
   ];
 
   let sections = [text];
@@ -53,7 +52,7 @@ function splitIntoJobSections(text: string): string[] {
     const newSections: string[] = [];
     for (const section of sections) {
       const parts = section.split(separator);
-      newSections.push(...parts.filter(part => part.trim().length > 0));
+      newSections.push(...parts.filter((part) => part.trim().length > 0));
     }
     if (newSections.length > sections.length) {
       sections = newSections;
@@ -68,14 +67,12 @@ function splitIntoJobSections(text: string): string[] {
  */
 function extractJobFromSection(
   section: string,
-  options?: PDFProcessingOptions
+  options?: PDFProcessingOptions,
 ): ExtractedJob | null {
   const title = extractJobTitle(section);
   const company = extractCompany(section);
   const description = extractDescription(section);
-  const requirements = options?.extractRequirements === false
-    ? []
-    : extractRequirements(section);
+  const requirements = options?.extractRequirements === false ? [] : extractRequirements(section);
   const location = extractLocation(section);
 
   // Only return job if we have at least a title or company
@@ -100,7 +97,7 @@ function extractJobTitle(text: string): string {
     /(?:job\s+)?title[:\s]+(.+?)(?:\n|$)/i,
     /(?:position|role)[:\s]+(.+?)(?:\n|$)/i,
     /(?:we are (?:looking for|seeking|hiring)[\s\S]*?)(?:for a|to join as)\s+(.+?)(?:\n|$)/i,
-    /^(.+?)(?:\s+(?:-|—|:)\s+.*)?$/m // First line as fallback
+    /^(.+?)(?:\s+(?:-|—|:)\s+.*)?$/m, // First line as fallback
   ];
 
   for (const pattern of patterns) {
@@ -121,7 +118,7 @@ function extractCompany(text: string): string {
     /company[:\s]+(.+?)(?:\n|$)/i,
     /employer[:\s]+(.+?)(?:\n|$)/i,
     /(?:at|with|for)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/i,
-    /(?:we are|looking for|seeking)[\s\S]*?(?:at|from|with)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/i
+    /(?:we are|looking for|seeking)[\s\S]*?(?:at|from|with)\s+([A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*)/i,
   ];
 
   for (const pattern of patterns) {
@@ -140,7 +137,7 @@ function extractCompany(text: string): string {
 function extractDescription(text: string): string {
   const patterns = [
     /description[:\s]([\s\S]*?)(?:(?:requirements?|qualifications?|skills?|responsibilities?)[:\s]|$)/i,
-    /about\s+(?:the\s+)?(?:role|position)[:\s]([\s\S]*?)(?:(?:requirements?|qualifications?|skills?)[:\s]|$)/i
+    /about\s+(?:the\s+)?(?:role|position)[:\s]([\s\S]*?)(?:(?:requirements?|qualifications?|skills?)[:\s]|$)/i,
   ];
 
   for (const pattern of patterns) {
@@ -151,7 +148,7 @@ function extractDescription(text: string): string {
   }
 
   // Fallback: return first paragraph after title/company
-  const lines = text.split('\n').filter(line => line.trim().length > 0);
+  const lines = text.split('\n').filter((line) => line.trim().length > 0);
   const descriptionLines: string[] = [];
   let inDescription = false;
 
@@ -177,7 +174,9 @@ function extractRequirements(text: string): string[] {
   const requirements: string[] = [];
 
   // Look for requirements section
-  const reqSectionMatch = text.match(/(?:requirements?|qualifications?|skills?|responsibilities?)[:\s]([\s\S]*?)(?:(?:benefits?|compensation|salary|how to apply|application)[:\s]|$)/i);
+  const reqSectionMatch = text.match(
+    /(?:requirements?|qualifications?|skills?|responsibilities?)[:\s]([\s\S]*?)(?:(?:benefits?|compensation|salary|how to apply|application)[:\s]|$)/i,
+  );
 
   if (reqSectionMatch && reqSectionMatch[1]) {
     const reqText = reqSectionMatch[1];
@@ -185,7 +184,7 @@ function extractRequirements(text: string): string[] {
     // Extract bullet points
     const bulletPoints = reqText.match(/(?:^|\n)\s*[-*•]\s*(.+)/g);
     if (bulletPoints) {
-      bulletPoints.forEach(point => {
+      bulletPoints.forEach((point) => {
         const clean = point.replace(/^[\s\n]*[-*•]\s*/, '').trim();
         if (clean.length > 0) {
           requirements.push(clean);
@@ -215,7 +214,7 @@ function extractLocation(text: string): string | undefined {
   const patterns = [
     /location[:\s]+(.+?)(?:\n|$)/i,
     /(?:based in|located in|office in)[:\s]+(.+?)(?:\n|$)/i,
-    /(?:remote|onsite|hybrid)[:\s]?[-]?\s*(.+?)(?:\n|$)/i
+    /(?:remote|onsite|hybrid)[:\s]?[-]?\s*(.+?)(?:\n|$)/i,
   ];
 
   for (const pattern of patterns) {

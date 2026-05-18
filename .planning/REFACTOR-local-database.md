@@ -8,14 +8,14 @@
 
 ## 📋 Resumen del Cambio
 
-| Actual | Nuevo |
-|--------|-------|
-| Prisma ORM + PrismaClient (mock actual) | `LocalDataStore` — clase singleton que lee/escribe JSON |
-| PostgreSQL en Supabase/Neon (deferred) | Archivos JSON en `data/` (`.gitignore`-do) |
-| `prisma/schema.prisma` con 5 modelos | 5+ archivos JSON tipados con TypeScript interfaces |
-| `DATABASE_URL` env var requerida | **0 config de DB** |
-| `npx prisma generate`, `npx prisma db push` | **0 comandos de DB** |
-| Mock PrismaClient retorna defaults vacíos | Implementación real que persiste datos localmente |
+| Actual                                      | Nuevo                                                   |
+| ------------------------------------------- | ------------------------------------------------------- |
+| Prisma ORM + PrismaClient (mock actual)     | `LocalDataStore` — clase singleton que lee/escribe JSON |
+| PostgreSQL en Supabase/Neon (deferred)      | Archivos JSON en `data/` (`.gitignore`-do)              |
+| `prisma/schema.prisma` con 5 modelos        | 5+ archivos JSON tipados con TypeScript interfaces      |
+| `DATABASE_URL` env var requerida            | **0 config de DB**                                      |
+| `npx prisma generate`, `npx prisma db push` | **0 comandos de DB**                                    |
+| Mock PrismaClient retorna defaults vacíos   | Implementación real que persiste datos localmente       |
 
 ---
 
@@ -183,6 +183,7 @@ export interface LocalDatabase {
 Cada store exporta funciones que operan sobre su colección:
 
 **`user-profiles.ts`:**
+
 - `getAllProfiles(): StoredUserProfile[]`
 - `getProfileById(id: string): StoredUserProfile | undefined`
 - `createProfile(data: Partial<StoredUserProfile>): StoredUserProfile`
@@ -191,6 +192,7 @@ Cada store exporta funciones que operan sobre su colección:
 - `findProfileByEmail(email: string): StoredUserProfile | undefined`
 
 **`jobs.ts`:**
+
 - `getAllJobs(): StoredJob[]`
 - `getJobById(id: string): StoredJob | undefined`
 - `createJob(data: Partial<StoredJob>): StoredJob`
@@ -203,6 +205,7 @@ Cada store exporta funciones que operan sobre su colección:
 - `markJobsAsEmailed(ids: string[]): void`
 
 **`cvs.ts`:**
+
 - `getAllCVs(): StoredCV[]`
 - `getCVById(id: string): StoredCV | undefined`
 - `createCV(data: Partial<StoredCV>): StoredCV`
@@ -212,12 +215,14 @@ Cada store exporta funciones que operan sobre su colección:
 - `findDuplicate(fileName: string, fileSize: number): StoredCV | undefined`
 
 **`job-matches.ts`:**
+
 - `getMatchesByProfile(profileId: string): StoredJobMatch[]`
 - `createMatch(data: Partial<StoredJobMatch>): StoredJobMatch`
 - `createMatches(matches: Partial<StoredJobMatch>[]): StoredJobMatch[]`
 - `getMatchStats(profileId: string): { total: number; avgScore: number; bestScore: number }`
 
 **`pipeline-runs.ts`:**
+
 - `getAllRuns(): StoredPipelineRun[]`
 - `getRunById(id: string): StoredPipelineRun | undefined`
 - `createRun(data: Partial<StoredPipelineRun>): StoredPipelineRun`
@@ -226,11 +231,13 @@ Cada store exporta funciones que operan sobre su colección:
 - `getRunStats(): { total: number; succeeded: number; failed: number }`
 
 **`email-digests.ts`:**
+
 - `getAllDigests(): StoredEmailDigest[]`
 - `createDigest(data: Partial<StoredEmailDigest>): StoredEmailDigest`
 - `getRecentDigests(days: number): StoredEmailDigest[]`
 
 **`profile-changes.ts`:**
+
 - `getChangesByProfile(profileId: string): StoredProfileChange[]`
 - `logChange(data: Partial<StoredProfileChange>): StoredProfileChange`
 - `getAllChanges(): StoredProfileChange[]`
@@ -289,53 +296,123 @@ import { LocalData } from './local-data';
 // Objeto que imita la API de Prisma para compatibilidad backward
 export const prisma = {
   userProfile: {
-    findMany: (args?: any) => { /* mapear a LocalData.userProfiles */ },
-    findUnique: (args: any) => { /* ... */ },
-    findFirst: (args: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
-    update: (args: any) => { /* ... */ },
-    delete: (args: any) => { /* ... */ },
-    count: (args?: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* mapear a LocalData.userProfiles */
+    },
+    findUnique: (args: any) => {
+      /* ... */
+    },
+    findFirst: (args: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
+    update: (args: any) => {
+      /* ... */
+    },
+    delete: (args: any) => {
+      /* ... */
+    },
+    count: (args?: any) => {
+      /* ... */
+    },
   },
   cV: {
-    findMany: (args?: any) => { /* ... */ },
-    findUnique: (args: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
-    update: (args: any) => { /* ... */ },
-    delete: (args: any) => { /* ... */ },
-    count: (args?: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* ... */
+    },
+    findUnique: (args: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
+    update: (args: any) => {
+      /* ... */
+    },
+    delete: (args: any) => {
+      /* ... */
+    },
+    count: (args?: any) => {
+      /* ... */
+    },
   },
   job: {
-    findMany: (args?: any) => { /* ... */ },
-    findUnique: (args: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
-    createMany: (args: any) => { /* ... */ },
-    update: (args: any) => { /* ... */ },
-    delete: (args: any) => { /* ... */ },
-    count: (args?: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* ... */
+    },
+    findUnique: (args: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
+    createMany: (args: any) => {
+      /* ... */
+    },
+    update: (args: any) => {
+      /* ... */
+    },
+    delete: (args: any) => {
+      /* ... */
+    },
+    count: (args?: any) => {
+      /* ... */
+    },
   },
   jobMatch: {
-    findMany: (args?: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
-    createMany: (args: any) => { /* ... */ },
-    count: (args?: any) => { /* ... */ },
-    aggregate: (args: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
+    createMany: (args: any) => {
+      /* ... */
+    },
+    count: (args?: any) => {
+      /* ... */
+    },
+    aggregate: (args: any) => {
+      /* ... */
+    },
   },
   pipelineRun: {
-    findMany: (args?: any) => { /* ... */ },
-    findFirst: (args: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
-    update: (args: any) => { /* ... */ },
-    count: (args?: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* ... */
+    },
+    findFirst: (args: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
+    update: (args: any) => {
+      /* ... */
+    },
+    count: (args?: any) => {
+      /* ... */
+    },
   },
   emailDigest: {
-    findMany: (args?: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
-    count: (args?: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
+    count: (args?: any) => {
+      /* ... */
+    },
   },
   profileChangeLog: {
-    findMany: (args?: any) => { /* ... */ },
-    create: (args: any) => { /* ... */ },
+    findMany: (args?: any) => {
+      /* ... */
+    },
+    create: (args: any) => {
+      /* ... */
+    },
   },
   $queryRaw: (query: TemplateStringsArray, ...values: any[]) => {
     // Para stats que usan raw SQL, reemplazar con lógica JS
@@ -352,32 +429,41 @@ export const prisma = {
 ### Fase 3: Actualizar Scripts
 
 #### 7. `scripts/check-profile.ts`
+
 - **Cambio mínimo:** `prisma.userProfile.findMany()` → sigue funcionando si el wrapper es compatible
 - **Opción refactor:** Usar `LocalData.userProfiles.getAllProfiles()` directamente
 
 #### 8. `scripts/cleanup-old-cvs.ts`
+
 - `prisma.cV.findMany()` y `prisma.cV.delete()` → compatible con wrapper
 - O usar `LocalData.cvs.deleteOldCVs(before)` directamente
 
 #### 9. `scripts/scrape-jobs.ts`
+
 - `prisma.userProfile.findMany()` → compatible
 
 #### 10. `scripts/auto-update-profiles.ts`
+
 - `prisma.cV.findMany()`, `prisma.userProfile.update()`, `prisma.cV.update()` → compatible
 
 #### 11. `scripts/process-cv-uploads.ts`
+
 - `prisma.cV.findMany()`, `prisma.cV.update()` → compatible
 
 #### 12. `scripts/match-jobs.ts`
+
 - `prisma.userProfile.findMany()`, `prisma.job.findMany()` → compatible
 
 #### 13. `scripts/test-matching.ts`
+
 - `prisma.userProfile.findUnique()`, `prisma.userProfile.create()`, `prisma.job.findMany()` → compatible
 
 #### 14. `scripts/send-email-digest.ts`
+
 - `prisma.emailDigest.findMany()` → compatible
 
 #### 15. `scripts/run-profile-pipeline.ts`
+
 - **No toca prisma directamente** (usa `orchestrator.ts`) → sin cambios
 
 ---
@@ -385,6 +471,7 @@ export const prisma = {
 ### Fase 4: Actualizar API Routes
 
 #### 16. `src/app/api/stats/route.ts`
+
 - **Crítico:** Usa `prisma.$queryRaw` para consultas SQL raw → reemplazar con `LocalData` calls
 - Reemplazar:
   - `prisma.job.count(...)` → `LocalData.jobs.getAllJobs().length` con filtros
@@ -393,29 +480,37 @@ export const prisma = {
   - `prisma.pipelineRun.count/findFirst` → `LocalData.pipelineRuns.getRunStats/getLatestRun()`
 
 #### 17. `src/app/api/pipeline/run/route.ts`
+
 - `prisma.pipelineRun.create()` → compatible
 - `prisma.job.createMany()` → compatible
 - `prisma.jobMatch.createMany()` → compatible
 
 #### 18. `src/app/api/match-jobs/route.ts`
+
 - `prisma.jobMatch.create()` → compatible
 
 #### 19. `src/app/api/profile/history/route.ts`
+
 - `prisma.profileChangeLog.findMany()` → compatible
 
 #### 20. `src/app/api/cv/upload/route.ts`
+
 - `prisma.cV.create()` → compatible
 
 #### 21. `src/app/api/cv/process/route.ts`
+
 - `prisma.cV.update()` → compatible
 
 #### 22. `src/app/api/cv/update-profile/route.ts`
+
 - `prisma.userProfile.upsert()` → compatible (implementar upsert en wrapper)
 
 #### 23. `src/app/api/pdf/upload/route.ts`
+
 - `prisma.cV.create()` → compatible
 
 #### 24. `src/app/api/pdf/match/route.ts`
+
 - `prisma.jobMatch.create()` → compatible
 
 ---
@@ -423,6 +518,7 @@ export const prisma = {
 ### Fase 5: Actualizar Librerías de Automatización
 
 #### 25. `src/lib/automation/job-history.ts`
+
 - Reemplazar `prisma.job.findMany/createMany/update` con `LocalData.jobs.*`
 - Funciones a refactorizar:
   - `saveNewJobs(jobs, profileId)` → `LocalData.jobs.createJobs()`
@@ -432,14 +528,17 @@ export const prisma = {
   - `cleanupOldJobs()` → `LocalData.jobs.deleteOldJobs(before)`
 
 #### 26. `src/lib/cv/profileHistory.ts`
+
 - Reemplazar `prisma.profileChangeLog.create/findMany` con `LocalData.profileChanges.*`
 - `logProfileChange(profileId, field, oldValue, newValue, changeType)` → `LocalData.profileChanges.logChange()`
 - `getProfileHistory(profileId, days)` → `LocalData.profileChanges.getChangesByProfile()`
 
 #### 27. `src/lib/pdf/duplicateDetector.ts`
+
 - Reemplazar `prisma.cV.findFirst()` con `LocalData.cvs.findDuplicate()`
 
 #### 28. `src/lib/pdf/pdfIntegration.ts`
+
 - Reemplazar `prisma.cV.create/update/findUnique` con `LocalData.cvs.*`
 
 ---
@@ -447,6 +546,7 @@ export const prisma = {
 ### Fase 6: Matching
 
 #### 29. `src/matching/cvMatcher.ts`
+
 - Reemplazar `prisma.userProfile.findUnique/upsert`, `prisma.job.findMany`, `prisma.jobMatch.createMany` con `LocalData.*`
 
 ---
@@ -455,18 +555,18 @@ export const prisma = {
 
 #### 30. Eliminar archivos y dependencias no necesarias
 
-| Archivo | Acción |
-|---------|--------|
-| `prisma/schema.prisma` | 🗑️ Eliminar |
-| `prisma.config.ts` | 🗑️ Eliminar |
-| `prisma/migrations/` | 🗑️ Eliminar directorio |
-| `src/generated/prisma/` | 🗑️ Eliminar directorio |
-| `@prisma/client` | `npm uninstall @prisma/client` |
-| `prisma` | `npm uninstall prisma` |
-| `@prisma/adapter-pg` | `npm uninstall @prisma/adapter-pg` |
-| `pg` | `npm uninstall pg` |
-| `.env` | 🗑️ Eliminar línea `DATABASE_URL` |
-| `.env.example` | 🗑️ Eliminar sección de DB |
+| Archivo                 | Acción                             |
+| ----------------------- | ---------------------------------- |
+| `prisma/schema.prisma`  | 🗑️ Eliminar                        |
+| `prisma.config.ts`      | 🗑️ Eliminar                        |
+| `prisma/migrations/`    | 🗑️ Eliminar directorio             |
+| `src/generated/prisma/` | 🗑️ Eliminar directorio             |
+| `@prisma/client`        | `npm uninstall @prisma/client`     |
+| `prisma`                | `npm uninstall prisma`             |
+| `@prisma/adapter-pg`    | `npm uninstall @prisma/adapter-pg` |
+| `pg`                    | `npm uninstall pg`                 |
+| `.env`                  | 🗑️ Eliminar línea `DATABASE_URL`   |
+| `.env.example`          | 🗑️ Eliminar sección de DB          |
 
 #### 31. Agregar `data/` a `.gitignore`
 
@@ -482,14 +582,14 @@ data/
 
 Cada store debe tener tests unitarios:
 
-| Test | Descripción |
-|------|-------------|
-| `tests/local-data/user-profiles.test.ts` | CRUD completo, búsqueda por email |
-| `tests/local-data/jobs.test.ts` | CRUD, bulk create, filtros por source/fecha, stats, cleanup |
-| `tests/local-data/cvs.test.ts` | CRUD, detección de duplicados, cleanup |
-| `tests/local-data/pipeline-runs.test.ts` | CRUD, stats, latest |
-| `tests/local-data/stats-route.test.ts` | Que los stats devuelvan los mismos datos que antes |
-| `tests/local-data/compat.test.ts` | Que el wrapper de prisma retorne los mismos tipos que mock anterior |
+| Test                                     | Descripción                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------- |
+| `tests/local-data/user-profiles.test.ts` | CRUD completo, búsqueda por email                                   |
+| `tests/local-data/jobs.test.ts`          | CRUD, bulk create, filtros por source/fecha, stats, cleanup         |
+| `tests/local-data/cvs.test.ts`           | CRUD, detección de duplicados, cleanup                              |
+| `tests/local-data/pipeline-runs.test.ts` | CRUD, stats, latest                                                 |
+| `tests/local-data/stats-route.test.ts`   | Que los stats devuelvan los mismos datos que antes                  |
+| `tests/local-data/compat.test.ts`        | Que el wrapper de prisma retorne los mismos tipos que mock anterior |
 
 ---
 
@@ -505,14 +605,14 @@ npm uninstall @prisma/client prisma @prisma/adapter-pg pg
 
 ## 🚨 Riesgos y Mitigaciones
 
-| Riesgo | Mitigación |
-|--------|------------|
-| Race condition en escritura JSON | Implementar lock en memoria (cola de promesas) |
-| Archivo JSON corrupto | Backup automático antes de escribir; validación al cargar |
-| Pérdida de datos si crash en media escritura | Write a temp file → `fs.rename()` (atómico en mismo filesystem) |
-| Gran volumen de jobs (10k+) | Implementar paginación en memoria; dividir en chunks si es necesario |
-| API routes existentes esperan API de Prisma | Usar wrapper de compatibilidad primero, migrar gradualmente |
-| `$queryRaw` en stats route | Reemplazar con lógica JS equivalente que calcule stats desde los arrays |
+| Riesgo                                       | Mitigación                                                              |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| Race condition en escritura JSON             | Implementar lock en memoria (cola de promesas)                          |
+| Archivo JSON corrupto                        | Backup automático antes de escribir; validación al cargar               |
+| Pérdida de datos si crash en media escritura | Write a temp file → `fs.rename()` (atómico en mismo filesystem)         |
+| Gran volumen de jobs (10k+)                  | Implementar paginación en memoria; dividir en chunks si es necesario    |
+| API routes existentes esperan API de Prisma  | Usar wrapper de compatibilidad primero, migrar gradualmente             |
+| `$queryRaw` en stats route                   | Reemplazar con lógica JS equivalente que calcule stats desde los arrays |
 
 ---
 
@@ -589,6 +689,7 @@ Fase 7:   Documentación                         ← Día 4
 ## 🔗 Archivos Afectados (Lista Completa)
 
 ### Crear (nuevos)
+
 - `src/lib/local-data/types.ts`
 - `src/lib/local-data/utils.ts`
 - `src/lib/local-data/index.ts`
@@ -602,6 +703,7 @@ Fase 7:   Documentación                         ← Día 4
 - `src/types/local-data.ts`
 
 ### Modificar
+
 - `src/lib/prisma.ts` (reescribir wrapper de compatibilidad)
 - `src/lib/automation/job-history.ts`
 - `src/lib/cv/profileHistory.ts`
@@ -612,6 +714,7 @@ Fase 7:   Documentación                         ← Día 4
 - `.gitignore` (agregar `data/`)
 
 ### Posible modificación (solo si el wrapper no es suficiente)
+
 - `src/app/api/pipeline/run/route.ts`
 - `src/app/api/match-jobs/route.ts`
 - `src/app/api/profile/history/route.ts`
@@ -622,6 +725,7 @@ Fase 7:   Documentación                         ← Día 4
 - `src/app/api/pdf/match/route.ts`
 
 ### Sin cambios (el wrapper de compatibilidad los cubre)
+
 - `scripts/check-profile.ts`
 - `scripts/cleanup-old-cvs.ts`
 - `scripts/scrape-jobs.ts`
@@ -633,12 +737,14 @@ Fase 7:   Documentación                         ← Día 4
 - `scripts/run-profile-pipeline.ts`
 
 ### Eliminar
+
 - `prisma/schema.prisma`
 - `prisma.config.ts`
 - `prisma/migrations/` (directorio completo)
 - `src/generated/prisma/` (directorio completo)
 
 ### Dependencias npm a remover
+
 - `@prisma/client`
 - `prisma`
 - `@prisma/adapter-pg`
@@ -646,4 +752,4 @@ Fase 7:   Documentación                         ← Día 4
 
 ---
 
-*Documento creado como plan de refactor para migrar a almacenamiento 100% local.*
+_Documento creado como plan de refactor para migrar a almacenamiento 100% local._

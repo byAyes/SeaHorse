@@ -1,21 +1,17 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "text" | "circular" | "rectangular";
+  variant?: 'text' | 'circular' | 'rectangular';
 }
 
-export function Skeleton({
-  className,
-  variant = "text",
-  ...props
-}: SkeletonProps) {
+export function Skeleton({ className, variant = 'text', ...props }: SkeletonProps) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-md bg-slate-200 dark:bg-dark-surface-tertiary",
-        variant === "circular" && "rounded-full",
-        variant === "text" && "h-4 w-full",
-        className
+        'animate-pulse rounded-md bg-slate-200 dark:bg-dark-surface-tertiary',
+        variant === 'circular' && 'rounded-full',
+        variant === 'text' && 'h-4 w-full',
+        className,
       )}
       {...props}
     />

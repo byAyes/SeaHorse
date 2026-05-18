@@ -4,7 +4,7 @@ import { calculateMatchScore } from '../src/lib/automation/matcher';
 async function matchJobs() {
   try {
     const users = await prisma.userProfile.findMany({
-      include: { cvs: { where: { status: 'applied' }, take: 1 } }
+      include: { cvs: { where: { status: 'applied' }, take: 1 } },
     });
 
     console.log(`Matching jobs for ${users.length} users`);
@@ -12,11 +12,11 @@ async function matchJobs() {
     const recentJobs = await prisma.job.findMany({
       where: {
         scrapedAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-        }
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
       },
       take: 100,
-      orderBy: { scrapedAt: 'desc' }
+      orderBy: { scrapedAt: 'desc' },
     });
 
     console.log(`Found ${recentJobs.length} recent jobs to match`);

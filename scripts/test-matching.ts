@@ -6,7 +6,7 @@ import type { Job } from '../src/types/job';
 async function testMatching() {
   try {
     let dbProfile = await prisma.userProfile.findUnique({
-      where: { userId: 'test-user' }
+      where: { userId: 'test-user' },
     });
 
     if (!dbProfile) {
@@ -22,8 +22,8 @@ async function testMatching() {
           skillWeight: 0.4,
           interestWeight: 0.3,
           locationWeight: 0.2,
-          salaryWeight: 0.1
-        }
+          salaryWeight: 0.1,
+        },
       });
     }
 
@@ -47,7 +47,7 @@ async function testMatching() {
 
     const dbJobs = await prisma.job.findMany({ take: 10 });
 
-    const jobs: Job[] = dbJobs.map(j => ({
+    const jobs: Job[] = dbJobs.map((j) => ({
       id: j.id,
       title: j.title,
       company: j.company,
@@ -72,7 +72,6 @@ async function testMatching() {
       console.log(`  Score: ${match.score.overall}%`);
       console.log(`  Skills: ${match.score.skillMatch}%, Interests: ${match.score.interestMatch}%`);
     });
-
   } catch (error) {
     console.error('Error during test:', error);
   } finally {

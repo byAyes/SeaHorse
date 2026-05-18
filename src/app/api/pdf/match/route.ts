@@ -8,11 +8,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { scoreAndSortJobs } from '../../../../matching/scorer';
 import { Job } from '../../../../types/job';
-import { UserProfile } from '../../../../types/user-profile';
+import { UserProfile, ExperienceLevel } from '../../../../types/user-profile';
 import { MatchedJob } from '../../../../types/job-match';
 import { ExtractedJob } from '../../../../types/pdf';
 import { authenticate } from '../../../../lib/auth/middleware';
-import { matchPDFJobs, preparePDFJobsForEmail, savePDFMatches } from '../../../../lib/pdf/pdfIntegration';
+import { matchPDFJobs, savePDFMatches } from '../../../../lib/pdf/pdfIntegration';
 import { parsePDF } from '../../../../lib/pdf/pdfParser';
 import { extractJobsFromText } from '../../../../lib/pdf/jobExtractor';
 
@@ -36,22 +36,16 @@ export async function GET(request: NextRequest) {
 
     // Validate required params
     if (!userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
     // Fetch user profile
     const userProfile = await prisma.userProfile.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!userProfile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
     // Fetch PDF-sourced jobs from database
@@ -59,17 +53,17 @@ export async function GET(request: NextRequest) {
     const pdfJobsRaw = await prisma.job.findMany({
       where: {
         description: {
-          contains: 'PDF-extracted'
-        }
+          contains: 'PDF-extracted',
+        },
       },
       orderBy: {
-        scrapedAt: 'desc'
+        scrapedAt: 'desc',
       },
-      take: limit
+      take: limit,
     });
 
     // Convert Prisma jobs to Job type
-    const pdfJobs: Job[] = pdfJobsRaw.map((job: any) => ({
+    const pdfJobs: Job[] = pdfJobsRaw.map((job: Record<string, unknown>) => ({
       id: job.id,
       title: job.title,
       company: job.company,
@@ -80,7 +74,7 @@ export async function GET(request: NextRequest) {
       postedAt: job.postedAt,
       scrapedAt: job.scrapedAt,
       skills: job.skills,
-      category: job.category
+      category: job.category,
     }));
 
     // Convert user profile to UserProfile type
@@ -93,13 +87,13 @@ export async function GET(request: NextRequest) {
       interests: userProfile.interests,
       location: userProfile.location,
       remoteOnly: userProfile.remoteOnly,
-      experienceLevel: userProfile.experienceLevel as any,
+      experienceLevel: userProfile.experienceLevel as ExperienceLevel | null,
       minSalary: userProfile.minSalary,
       maxSalary: userProfile.maxSalary,
       skillWeight: userProfile.skillWeight,
       interestWeight: userProfile.interestWeight,
       locationWeight: userProfile.locationWeight,
-      salaryWeight: userProfile.salaryWeight
+      salaryWeight: userProfile.salaryWeight,
     };
 
     // Score and sort PDF jobs
@@ -113,15 +107,11 @@ export async function GET(request: NextRequest) {
       total: limitedMatches.length,
       threshold,
       userId,
-      source: 'pdf'
+      source: 'pdf',
     });
-
   } catch (error) {
     console.error('Error matching PDF jobs:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -150,7 +140,7 @@ export async function POST(request: NextRequest) {
       if (!jsonBody || !jsonBody.pdfText || !userId) {
         return NextResponse.json(
           { error: 'PDF file or pdfText and userId are required' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -161,10 +151,7 @@ export async function POST(request: NextRequest) {
 
     // Validate userId
     if (!userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
     // Read PDF file
@@ -178,19 +165,18 @@ export async function POST(request: NextRequest) {
     const extractedJobs = await extractJobsFromText(text);
 
     if (extractedJobs.length === 0) {
-      return NextResponse.json(
-        { error: 'No jobs found in PDF', pageCount },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'No jobs found in PDF', pageCount }, { status: 404 });
     }
 
     return await processExtractedJobs(extractedJobs, userId, threshold, saveToDb);
-
   } catch (error) {
     console.error('Error processing PDF upload:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
     );
   }
 }
@@ -202,15 +188,17 @@ async function processExtractedJobs(
   extractedJobs: ExtractedJob[],
   userId: string,
   threshold: number,
-  saveToDb: boolean
-): Promise<NextResponse<{
-  matches?: MatchedJob[];
-  total?: number;
-  threshold?: number;
-  userId?: string;
-  extracted?: number;
-  error?: string;
-}>> {
+  saveToDb: boolean,
+): Promise<
+  NextResponse<{
+    matches?: MatchedJob[];
+    total?: number;
+    threshold?: number;
+    userId?: string;
+    extracted?: number;
+    error?: string;
+  }>
+> {
   // Match jobs against user profile
   const matchedJobs = await matchPDFJobs(extractedJobs, userId, threshold);
 
@@ -224,6 +212,6 @@ async function processExtractedJobs(
     total: matchedJobs.length,
     threshold,
     userId,
-    extracted: extractedJobs.length
+    extracted: extractedJobs.length,
   });
 }

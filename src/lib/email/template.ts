@@ -19,7 +19,7 @@ function escapeHtml(text: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/\"/g, '&quot;')
+    .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
 
@@ -60,35 +60,35 @@ export interface ProfileInfo {
 
 const TOKENS = {
   // Backgrounds
-  bgPage:       '#f8fafc',
-  bgHeader:     '#0b1120',
-  bgCard:       '#ffffff',
-  bgEmpty:      '#fef9e7',
+  bgPage: '#f8fafc',
+  bgHeader: '#0b1120',
+  bgCard: '#ffffff',
+  bgEmpty: '#fef9e7',
   // Text
-  textPrimary:  '#0f172a',
-  textSecondary:'#475569',
-  textMuted:    '#94a3b8',
-  textInverse:  '#f1f5f9',
+  textPrimary: '#0f172a',
+  textSecondary: '#475569',
+  textMuted: '#94a3b8',
+  textInverse: '#f1f5f9',
   // Borders
-  borderCard:   '#e9edf2',
-  borderLight:  '#f1f5f9',
+  borderCard: '#e9edf2',
+  borderLight: '#f1f5f9',
   // Semantic
-  accent:       '#f59e0b',
-  accentDark:   '#d97706',
-  success:      '#059669',
-  successBg:    '#ecfdf5',
-  info:         '#2563eb',
-  infoBg:       '#eff6ff',
-  warning:      '#d97706',
-  warningBg:    '#fffbeb',
-  danger:       '#dc2626',
-  dangerBg:     '#fef2f2',
-  profile:      '#7c3aed',
-  profileBg:    '#f5f3ff',
-  profileBorder:'#e9d5ff',
+  accent: '#f59e0b',
+  accentDark: '#d97706',
+  success: '#059669',
+  successBg: '#ecfdf5',
+  info: '#2563eb',
+  infoBg: '#eff6ff',
+  warning: '#d97706',
+  warningBg: '#fffbeb',
+  danger: '#dc2626',
+  dangerBg: '#fef2f2',
+  profile: '#7c3aed',
+  profileBg: '#f5f3ff',
+  profileBorder: '#e9d5ff',
   // Effects
-  shadow:       'rgba(15,23,42,0.06)',
-  overlay:      'rgba(255,255,255,0.06)',
+  shadow: 'rgba(15,23,42,0.06)',
+  overlay: 'rgba(255,255,255,0.06)',
 } as const;
 
 // ── SVG Icons (inline, email-safe, no emojis) ──────────────────────────
@@ -128,8 +128,10 @@ const FONT = {
 
 const STYLES = {
   card: `background:${TOKENS.bgCard};border:1px solid ${TOKENS.borderCard};border-radius:12px;`,
-  pill: (bg: string, color: string) => `background:${bg};color:${color};font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;margin:0 6px 6px 0;display:inline-block;font-family:${FONT.ui};`,
-  badge: (bg: string, color: string) => `background:${bg};color:${color};font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px;font-family:${FONT.ui};display:inline-block;`,
+  pill: (bg: string, color: string) =>
+    `background:${bg};color:${color};font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;margin:0 6px 6px 0;display:inline-block;font-family:${FONT.ui};`,
+  badge: (bg: string, color: string) =>
+    `background:${bg};color:${color};font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px;font-family:${FONT.ui};display:inline-block;`,
 };
 
 /**
@@ -142,7 +144,7 @@ const STYLES = {
 export function formatJobDigest(
   jobs: JobDigestItem[],
   date: string = new Date().toISOString(),
-  profile?: ProfileInfo
+  profile?: ProfileInfo,
 ): { html: string; text: string } {
   const displayDate = new Date(date).toLocaleDateString('en-US', {
     weekday: 'long',
@@ -236,7 +238,8 @@ ${headerClose}`,
   const topScore = Math.round(sortedJobs[0].score);
 
   // ── Profile section HTML ──────────────────────────────────────────────
-  const profileHtml = profile ? `
+  const profileHtml = profile
+    ? `
           <!-- ═══ PROFILE SECTION ═══ -->
           <tr>
             <td style="padding:0 24px;">
@@ -259,7 +262,9 @@ ${headerClose}`,
                           </table>
                         </td>
                       </tr>
-                      ${profile.jobTitles && profile.jobTitles.length > 0 ? `
+                      ${
+                        profile.jobTitles && profile.jobTitles.length > 0
+                          ? `
                       <!-- Roles -->
                       <tr>
                         <td style="padding-bottom:10px;">
@@ -270,8 +275,12 @@ ${headerClose}`,
                             </tr>
                           </table>
                         </td>
-                      </tr>` : ''}
-                      ${profile.experienceLevel ? `
+                      </tr>`
+                          : ''
+                      }
+                      ${
+                        profile.experienceLevel
+                          ? `
                       <!-- Level -->
                       <tr>
                         <td style="padding-bottom:10px;">
@@ -282,8 +291,12 @@ ${headerClose}`,
                             </tr>
                           </table>
                         </td>
-                      </tr>` : ''}
-                      ${profile.locations && profile.locations.length > 0 ? `
+                      </tr>`
+                          : ''
+                      }
+                      ${
+                        profile.locations && profile.locations.length > 0
+                          ? `
                       <!-- Locations -->
                       <tr>
                         <td style="padding-bottom:10px;">
@@ -294,8 +307,12 @@ ${headerClose}`,
                             </tr>
                           </table>
                         </td>
-                      </tr>` : ''}
-                      ${profile.skills && profile.skills.length > 0 ? `
+                      </tr>`
+                          : ''
+                      }
+                      ${
+                        profile.skills && profile.skills.length > 0
+                          ? `
                       <!-- Skills -->
                       <tr>
                         <td style="padding-top:6px;">
@@ -306,32 +323,44 @@ ${headerClose}`,
                           </table>
                           <table cellpadding="0" cellspacing="0">
                             <tr>
-                              ${profile.skills.slice(0, 10).map(skill => `
+                              ${profile.skills
+                                .slice(0, 10)
+                                .map(
+                                  (skill) => `
                                 <td style="${STYLES.pill('#ede9fe', TOKENS.profile)}">${escapeHtml(skill)}</td>
-                              `).join('')}
+                              `,
+                                )
+                                .join('')}
                               ${profile.skills.length > 10 ? `<td style="color:${TOKENS.textSecondary};font-size:11px;padding-left:4px;font-family:${FONT.ui};">+${profile.skills.length - 10} more</td>` : ''}
                             </tr>
                           </table>
                         </td>
-                      </tr>` : ''}
-                      ${profile.languages && profile.languages.length > 0 ? `
+                      </tr>`
+                          : ''
+                      }
+                      ${
+                        profile.languages && profile.languages.length > 0
+                          ? `
                       <!-- Languages -->
                       <tr>
                         <td style="padding-top:14px;">
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                               <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">🗣️ Languages</td>
-                              <td style="color:${TOKENS.textSecondary};font-size:13px;font-family:${FONT.ui};">${profile.languages.map(l => `<span style="font-weight:500;color:${TOKENS.textPrimary};">${l.language}</span> (${l.level})`).join(' · ')}</td>
+                              <td style="color:${TOKENS.textSecondary};font-size:13px;font-family:${FONT.ui};">${profile.languages.map((l) => `<span style="font-weight:500;color:${TOKENS.textPrimary};">${l.language}</span> (${l.level})`).join(' · ')}</td>
                             </tr>
                           </table>
                         </td>
-                      </tr>` : ''}
+                      </tr>`
+                          : ''
+                      }
                     </table>
                   </td>
                 </tr>
               </table>
             </td>
-          </tr>` : '';
+          </tr>`
+    : '';
 
   // ── Profile text (for plain text version) ────────────────────────────
   const profileTextLines: string[] = [];
@@ -346,7 +375,9 @@ ${headerClose}`,
       profileTextLines.push(`Preferred Locations: ${profile.locations.join(', ')}`);
     }
     if (profile.experienceLevel) {
-      profileTextLines.push(`Experience Level: ${profile.experienceLevel.charAt(0).toUpperCase() + profile.experienceLevel.slice(1)}`);
+      profileTextLines.push(
+        `Experience Level: ${profile.experienceLevel.charAt(0).toUpperCase() + profile.experienceLevel.slice(1)}`,
+      );
     }
     if (profile.summary) {
       profileTextLines.push(`Summary: ${profile.summary}`);
@@ -358,7 +389,9 @@ ${headerClose}`,
   const textLines: string[] = [
     `Weekly Job Digest — ${displayDate}`,
     '',
-    ...(profileTextLines.length > 0 ? ['YOUR PROFILE', '─'.repeat(40), ...profileTextLines, '', '─'.repeat(40), ''] : []),
+    ...(profileTextLines.length > 0
+      ? ['YOUR PROFILE', '─'.repeat(40), ...profileTextLines, '', '─'.repeat(40), '']
+      : []),
     `We found ${totalJobs} matching jobs for you:`,
     '',
   ];
@@ -426,26 +459,39 @@ ${headerClose}`,
                         </td>
                       </tr>
                       <!-- Row 4: Matched Skills -->
-                      ${matchedSkills.length > 0 ? `
+                      ${
+                        matchedSkills.length > 0
+                          ? `
                       <tr>
                         <td style="padding-bottom:14px;">
                           <table cellpadding="0" cellspacing="0">
                             <tr>
-                              ${matchedSkills.slice(0, 6).map(skill => `
+                              ${matchedSkills
+                                .slice(0, 6)
+                                .map(
+                                  (skill) => `
                                 <td style="${STYLES.pill('#eef2ff', '#4f46e5')}">${escapeHtml(skill)}</td>
-                              `).join('')}
+                              `,
+                                )
+                                .join('')}
                               ${matchedSkills.length > 6 ? `<td style="color:${TOKENS.textMuted};font-size:11px;padding-left:4px;font-family:${FONT.ui};">+${matchedSkills.length - 6} more</td>` : ''}
                             </tr>
                           </table>
                         </td>
-                      </tr>` : ''}
+                      </tr>`
+                          : ''
+                      }
                       <!-- Row 5: Description -->
-                      ${job.description ? `
+                      ${
+                        job.description
+                          ? `
                       <tr>
                         <td style="padding-bottom:16px;">
                           <p style="color:${TOKENS.textSecondary};font-size:13px;line-height:1.6;margin:0;font-family:${FONT.ui};">${escapeHtml(truncate(job.description, 200))}</p>
                         </td>
-                      </tr>` : ''}
+                      </tr>`
+                          : ''
+                      }
                       <!-- Row 6: CTA -->
                       <tr>
                         <td>

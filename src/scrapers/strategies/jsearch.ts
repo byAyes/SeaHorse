@@ -5,14 +5,14 @@ import { Job, ScraperConfig, ScraperResult } from '../types';
  * JSearch API job scraper
  * Free API that aggregates jobs from Indeed, LinkedIn, Glassdoor, etc.
  * No API key required for basic usage (100 requests/day limit)
- * 
+ *
  * @see https://jsearchapi.com/
  */
 export class JSearchScraper {
   private readonly baseUrl = 'https://jsearch.p.rapidapi.com';
   private apiKey: string = '';
 
-  constructor(config: ScraperConfig) {
+  constructor(_config: ScraperConfig) {
     // Initialized lazily in search() from config store → env var
   }
 
@@ -38,7 +38,7 @@ export class JSearchScraper {
           this.apiKey = process.env.JSEARCH_API_KEY || '';
         }
       }
-      
+
       // Build search parameters
       const params = new URLSearchParams({
         query: query || 'software engineer',
@@ -47,11 +47,11 @@ export class JSearchScraper {
       });
 
       const url = `${this.baseUrl}/search?${params.toString()}`;
-      
+
       console.log(`[JSearch] Searching for: ${query}`);
 
       // API headers
-      const headers: any = {
+      const headers: Record<string, string | undefined> = {
         'X-RapidAPI-Key': this.apiKey,
         'X-RapidAPI-Host': 'jsearch.p.rapidapi.com',
       };
@@ -70,10 +70,12 @@ export class JSearchScraper {
         throw new Error(data.message || 'JSearch API error');
       }
 
-      const jobs: Job[] = (data.data || []).map((job: any) => this.convertJob(job));
-      
+      const jobs: Job[] = (((data as Record<string, unknown>).data as unknown[]) || []).map(
+        (job: Record<string, unknown>) => this.convertJob(job),
+      );
+
       console.log(`[JSearch] Found ${jobs.length} jobs`);
-      
+
       return {
         success: true,
         data: jobs,
@@ -91,7 +93,7 @@ export class JSearchScraper {
   /**
    * Convert JSearch job to our Job format
    */
-  private convertJob(job: any): Job {
+  private convertJob(job: Record<string, unknown>): Job {
     return {
       id: job.job_id || '',
       title: job.job_title || '',
@@ -111,11 +113,12 @@ const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
   const query = process.argv[2] || 'software engineer';
   const maxJobs = parseInt(process.argv[3] || '10', 10);
-  
+
   const scraper = new JSearchScraper({ query, maxJobs });
-  
-  scraper.search({ query, maxJobs })
-    .then(result => {
+
+  scraper
+    .search({ query, maxJobs })
+    .then((result) => {
       if (result.success && result.data) {
         console.log(`\n✅ Successfully found ${result.data.length} jobs:`);
         result.data.forEach((job, i) => {

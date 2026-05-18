@@ -16,10 +16,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
 
     if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'userId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'userId is required' }, { status: 400 });
     }
 
     const changes = await prisma.profileChangeLog.findMany({
@@ -48,7 +45,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching profile history:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch profile history' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

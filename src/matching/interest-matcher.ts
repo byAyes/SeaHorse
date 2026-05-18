@@ -9,10 +9,7 @@
  * @param jobCategory - Job's category
  * @returns Score from 0-100
  */
-export function calculateInterestMatch(
-  userInterests: string[],
-  jobCategory: string
-): number {
+export function calculateInterestMatch(userInterests: string[], jobCategory: string): number {
   if (!jobCategory || userInterests.length === 0) {
     return 100;
   }
@@ -28,7 +25,10 @@ export function calculateInterestMatch(
       return 100;
     }
 
-    if (normalizedInterest.includes(normalizedCategory) || normalizedCategory.includes(normalizedInterest)) {
+    if (
+      normalizedInterest.includes(normalizedCategory) ||
+      normalizedCategory.includes(normalizedInterest)
+    ) {
       const shorterLen = Math.min(normalizedInterest.length, normalizedCategory.length);
       const longerLen = Math.max(normalizedInterest.length, normalizedCategory.length);
       const overlapRatio = shorterLen / longerLen;

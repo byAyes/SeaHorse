@@ -2,7 +2,11 @@
  * AI Profile Extraction — Barrel Exports
  */
 
-export { extractProfileFromPDF, extractProfileFromText, parseAIResponse } from './pdfProfileExtractor';
+export {
+  extractProfileFromPDF,
+  extractProfileFromText,
+  parseAIResponse,
+} from './pdfProfileExtractor';
 export {
   buildScrapeStrategy,
   generateSearchQueries,

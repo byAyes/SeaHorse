@@ -5,6 +5,7 @@
 **Totalmente gratuito, ejecutas IA en tu propia PC**
 
 ### Ventajas
+
 - ✅ 100% gratis, sin costos por petición
 - ✅ Sin API keys, sin tarjetas de crédito
 - ✅ Privacidad total (datos no salen de tu PC)
@@ -79,6 +80,7 @@ OPENAI_MODEL=llama-3.1-8b-Instant
 ```
 
 **Ventajas:**
+
 - ✅ Gratis (con límites)
 - ✅ Sin instalar nada local
 - ✅ Velocidad extrema (Groq usa hardware especializado)
@@ -90,6 +92,7 @@ OPENAI_MODEL=llama-3.1-8b-Instant
 **Esto NO usa IA, solo keywords y fuzzy matching**
 
 ### Ventajas
+
 - ✅ 100% gratis, siempre
 - ✅ No requiere API keys
 - ✅ No internet necesario (funciona offline)
@@ -109,16 +112,16 @@ MATCHING_MODE=keyword
 // Ejemplo de matching simple
 function matchJobSimple(job, interests) {
   const jobText = (job.title + ' ' + job.description).toLowerCase();
-  
+
   let score = 0;
-  
+
   // Busca cada interés en el texto del job
-  interests.forEach(interest => {
+  interests.forEach((interest) => {
     if (jobText.includes(interest.toLowerCase())) {
       score += 25; // +25% por cada coincidencia
     }
   });
-  
+
   // Debe tener al menos 50% de coincidencia
   return score >= 50;
 }
@@ -130,15 +133,16 @@ function matchJobSimple(job, interests) {
 
 ## 📊 Comparación de Costos
 
-| Opción | Costo Mensual | Precisión | Setup | Velocidad | Requiere API Key |
-|--------|--------------|-----------|-------|-----------|-----------------|
-| **OpenAI** | $0.30-1.00 | 90% | Fácil | Medio | Sí |
-| **Ollama local** | $0.00 | 85% | Medio | Lento (local) | No |
-| **Gemini** | $0.00 | 88% | Fácil | Medio | Sí (gratis) |
-| **Groq** | $0.00 | 85% | Fácil | Muy rápido | Sí (gratis) |
-| **Keyword** | $0.00 | 65% | Muy fácil | Instantáneo | No |
+| Opción           | Costo Mensual | Precisión | Setup     | Velocidad     | Requiere API Key |
+| ---------------- | ------------- | --------- | --------- | ------------- | ---------------- |
+| **OpenAI**       | $0.30-1.00    | 90%       | Fácil     | Medio         | Sí               |
+| **Ollama local** | $0.00         | 85%       | Medio     | Lento (local) | No               |
+| **Gemini**       | $0.00         | 88%       | Fácil     | Medio         | Sí (gratis)      |
+| **Groq**         | $0.00         | 85%       | Fácil     | Muy rápido    | Sí (gratis)      |
+| **Keyword**      | $0.00         | 65%       | Muy fácil | Instantáneo   | No               |
 
 **Recomendación personal:**
+
 - **Prueba local**: Ollama (totalmente gratis)
 - **Prueba rápida**: Gemini (gratis, sin instalar)
 - **Producción sin costo**: Keyword matching (simple, confiable)
@@ -195,22 +199,27 @@ npm run automate
 ## 🎯 ¿Cuál Elegir?
 
 ### **Si quieres IA gratuita** → **Ollama**
+
 - Totalmente gratis, modelo local
 - Resultados casi tan buenos como OpenAI
 - Setup: 5 minutos (una vez)
 - No pagas nunca
 
 ### **Si quieres sin instalar** → **Gemini**
+
 - 15,000 peticiones/mes gratis
 - Setup: 2 minutos
 - Solo copiar API key
-2
+  2
+
 ### **Si quieres simple y confiable** → **Keyword**
+
 - No requiere setup
 - No depende de servicios externos
 - Funciona siempre, offline
 
 ### **Si quieres la mejor calidad y no te importa pagar $0.30/mes** → **OpenAI**
+
 - 90% de precisión
 - Setup existente ya funciona
 - Más costoso, pero mejor calidad
@@ -230,6 +239,7 @@ src/lib/automation/
 ```
 
 Y actualizaré:
+
 - `src/automation/orchestrator.ts` - Para usar el matcher configurado
 - `src/lib/email/template.ts` - Para mostrar scores de matching
 - `docs/FREE_MATCHING_OPTIONS.md` - Esta documentación

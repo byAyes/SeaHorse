@@ -1,4 +1,4 @@
-import { Job, ScraperConfig, ScraperResult, PythonScraperConfig, ScraperStats } from './types';
+import { Job, ScraperConfig, PythonScraperConfig, ScraperStats } from './types';
 import { rateLimiter } from './utils/rateLimiter';
 import { JSearchScraper } from './strategies/jsearch';
 import { IndeedScraper } from './strategies/indeed';
@@ -16,19 +16,22 @@ function loadPythonScraperConfigs(): PythonScraperConfig[] {
   }
 
   const raw = fs.readFileSync(yamlPath, 'utf-8');
-  const parsed = yaml.load(raw) as any;
+  const parsed = yaml.load(raw) as Record<string, unknown>;
 
   if (!parsed?.scrapers) return [];
 
-  return Object.entries(parsed.scrapers).map(([name, cfg]: [string, any]) => ({
-    name,
-    module: cfg.module || `scrapers.${name}`,
-    className: cfg.class || `${name.charAt(0).toUpperCase() + name.slice(1)}Scraper`,
-    enabled: cfg.enabled !== false,
-    maxJobs: cfg.max_jobs || 10,
-    rateLimitMs: cfg.rate_limit_ms || 5000,
-    extra: cfg,
-  }));
+  return Object.entries(parsed.scrapers as Record<string, unknown>).map(
+    ([name, cfg]: [string, Record<string, unknown>]) => ({
+      name,
+      module: (cfg.module as string) || `scrapers.${name}`,
+      className:
+        (cfg.className as string) || `${name.charAt(0).toUpperCase() + name.slice(1)}Scraper`,
+      enabled: (cfg.enabled as boolean) !== false,
+      maxJobs: (cfg.max_jobs as number) || 10,
+      rateLimitMs: (cfg.rate_limit_ms as number) || 5000,
+      extra: cfg as Record<string, unknown>,
+    }),
+  );
 }
 
 export class ScraperRunner {
@@ -48,7 +51,9 @@ export class ScraperRunner {
     this.allJobs = [];
     this.stats = [];
 
-    logger.info(`Starting job search — query: "${this.config.query}", max: ${this.config.maxJobs || 'unlimited'}`);
+    logger.info(
+      `Starting job search — query: "${this.config.query}", max: ${this.config.maxJobs || 'unlimited'}`,
+    );
 
     // Step 1: Try JSearch API
     const jsearchJobs = await this.tryJSearch();
@@ -58,9 +63,9 @@ export class ScraperRunner {
     }
 
     // Step 2: Run TS HTTP scrapers + Python scrapers in parallel
-  const pythonConfigs = loadPythonScraperConfigs().filter(c => c.enabled);
+    const pythonConfigs = loadPythonScraperConfigs().filter((c) => c.enabled);
 
-  const promises: Promise<ScraperStats>[] = [];
+    const promises: Promise<ScraperStats>[] = [];
 
     // Indeed (HTTP scraper — stays in TS)
     promises.push(this.runIndeedScraper());
@@ -90,7 +95,9 @@ export class ScraperRunner {
       }
     }
 
-    logger.info(`Scraping complete — total: ${this.allJobs.length} jobs from ${this.stats.length} scrapers`);
+    logger.info(
+      `Scraping complete — total: ${this.allJobs.length} jobs from ${this.stats.length} scrapers`,
+    );
     return this.allJobs;
   }
 
@@ -163,7 +170,7 @@ export class ScraperRunner {
         scraper: cfg.name,
         success: result.success,
         jobCount: result.jobCount,
-        duration: result.duration || (Date.now() - start),
+        duration: result.duration || Date.now() - start,
         error: result.error,
       };
     } catch (error) {
@@ -195,10 +202,7 @@ export class ScraperRunner {
   }
 }
 
-export async function runScrapers(
-  config: ScraperConfig,
-  outputPath?: string
-): Promise<Job[]> {
+export async function runScrapers(config: ScraperConfig, outputPath?: string): Promise<Job[]> {
   const runner = new ScraperRunner(config);
   const jobs = await runner.runAllScrapers();
 

@@ -37,4 +37,3 @@ const isMainModule = process.argv[1] && fileURLToPath(import.meta.url) === proce
 if (isMainModule) {
   runAutomation().catch(console.error);
 }
-

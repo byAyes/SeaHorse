@@ -35,7 +35,10 @@ export async function parseCV(pdfBuffer: Buffer): Promise<CVParsedResult> {
     };
   } catch (error) {
     console.error('Error parsing CV PDF:', error);
-    throw new Error(`Failed to parse CV: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to parse CV: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      { cause: error },
+    );
   }
 }
 
@@ -46,16 +49,18 @@ export async function parseCV(pdfBuffer: Buffer): Promise<CVParsedResult> {
  * - Fix common PDF extraction issues
  */
 function cleanText(text: string): string {
-  return text
-    // Replace multiple newlines with double newline
-    .replace(/\n\s*\n/g, '\n\n')
-    // Replace multiple spaces with single space
-    .replace(/[ \t]+/g, ' ')
-    // Remove special PDF characters
-    .replace(/[\x80-\xFF]/g, '-')
-    // Normalize line breaks
-    .replace(/\r\n/g, '\n')
-    .trim();
+  return (
+    text
+      // Replace multiple newlines with double newline
+      .replace(/\n\s*\n/g, '\n\n')
+      // Replace multiple spaces with single space
+      .replace(/[ \t]+/g, ' ')
+      // Remove special PDF characters
+      .replace(/[\x80-\xFF]/g, '-')
+      // Normalize line breaks
+      .replace(/\r\n/g, '\n')
+      .trim()
+  );
 }
 
 /**
@@ -106,7 +111,7 @@ function detectSections(text: string): CVParsedResult['sections'] {
  */
 export function extractSectionText(
   rawText: string,
-  section: 'skills' | 'experience' | 'education'
+  section: 'skills' | 'experience' | 'education',
 ): string {
   const sections = detectSections(rawText);
   return sections[section] || '';

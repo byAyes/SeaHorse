@@ -14,7 +14,12 @@ import {
   ProfileExtractionResult,
   ProfileExtractionOptions,
 } from '../../types/ai-profile';
-import { extractSkills, extractExperience, extractEducation, inferExperienceLevel, calculateYearsOfExperience } from '../cv/skillExtractor';
+import {
+  extractSkills,
+  extractExperience,
+  inferExperienceLevel,
+  calculateYearsOfExperience,
+} from '../cv/skillExtractor';
 import { detectProvider, callAI, type AIProvider } from './provider';
 
 const EXTRACTION_PROMPT = `You are a CV/resume parser. Extract structured information from the following CV text.
@@ -38,8 +43,6 @@ Rules:
 - If no languages mentioned, use empty array
 - Be thorough but accurate - don't invent information`;
 
-const API_TIMEOUT_MS = 30000;
-
 // ─── Public API ─────────────────────────────────────────────────────────────
 
 /**
@@ -50,7 +53,7 @@ const API_TIMEOUT_MS = 30000;
  */
 export async function extractProfileFromPDF(
   buffer: Buffer,
-  options?: ProfileExtractionOptions
+  options?: ProfileExtractionOptions,
 ): Promise<ProfileExtractionResult> {
   const startTime = Date.now();
 
@@ -75,7 +78,7 @@ export async function extractProfileFromPDF(
 export async function extractProfileFromText(
   text: string,
   options?: ProfileExtractionOptions,
-  startTime?: number
+  startTime?: number,
 ): Promise<ProfileExtractionResult> {
   const start = startTime ?? Date.now();
 
@@ -83,7 +86,7 @@ export async function extractProfileFromText(
   const aiConfig = await detectProvider(
     options?.aiProvider
       ? { provider: options.aiProvider, apiKey: options.aiApiKey || '' }
-      : undefined
+      : undefined,
   );
 
   // Try AI extraction first (if we have a configured provider)
@@ -98,7 +101,10 @@ export async function extractProfileFromText(
         };
       }
     } catch (err) {
-      console.warn('[ProfileExtractor] AI extraction threw unexpected error:', err instanceof Error ? err.message : String(err));
+      console.warn(
+        '[ProfileExtractor] AI extraction threw unexpected error:',
+        err instanceof Error ? err.message : String(err),
+      );
     }
   }
 
@@ -120,7 +126,7 @@ export async function extractProfileFromText(
 async function queryAIForProfile(
   text: string,
   provider: AIProvider,
-  apiKey: string
+  apiKey: string,
 ): Promise<ExtractedProfile | null> {
   // Truncate text to avoid hitting token limits
   const truncatedText = text.length > 15000 ? text.slice(0, 15000) + '...' : text;
@@ -130,13 +136,18 @@ async function queryAIForProfile(
     const rawText = await callAI(fullPrompt, { provider, apiKey });
 
     if (!rawText) {
-      console.warn(`[ProfileExtractor] ${provider} response missing text content — falling back to keyword extraction`);
+      console.warn(
+        `[ProfileExtractor] ${provider} response missing text content — falling back to keyword extraction`,
+      );
       return null;
     }
 
     return parseAIResponse(rawText);
   } catch (err) {
-    console.warn(`[ProfileExtractor] ${provider} request failed:`, err instanceof Error ? err.message : String(err));
+    console.warn(
+      `[ProfileExtractor] ${provider} request failed:`,
+      err instanceof Error ? err.message : String(err),
+    );
     return null;
   }
 }
@@ -164,18 +175,23 @@ export function parseAIResponse(response: string): ExtractedProfile | null {
     // Validate experienceLevel
     const validLevels = ['junior', 'mid', 'senior', 'lead'];
     const level = String(parsed.experienceLevel || 'mid').toLowerCase();
-    const experienceLevel = validLevels.includes(level) ? level as ExtractedProfile['experienceLevel'] : 'mid';
+    const experienceLevel = validLevels.includes(level)
+      ? (level as ExtractedProfile['experienceLevel'])
+      : 'mid';
 
     return {
       jobTitles: parsed.jobTitles as string[],
       skills: parsed.skills as string[],
-      industries: Array.isArray(parsed.industries) ? parsed.industries as string[] : [],
-      locations: Array.isArray(parsed.locations) ? parsed.locations as string[] : [],
+      industries: Array.isArray(parsed.industries) ? (parsed.industries as string[]) : [],
+      locations: Array.isArray(parsed.locations) ? (parsed.locations as string[]) : [],
       experienceLevel,
-      salaryRange: parsed.salaryRange && typeof parsed.salaryRange === 'object'
-        ? parsed.salaryRange as ExtractedProfile['salaryRange']
-        : undefined,
-      languages: Array.isArray(parsed.languages) ? parsed.languages as ExtractedProfile['languages'] : [],
+      salaryRange:
+        parsed.salaryRange && typeof parsed.salaryRange === 'object'
+          ? (parsed.salaryRange as ExtractedProfile['salaryRange'])
+          : undefined,
+      languages: Array.isArray(parsed.languages)
+        ? (parsed.languages as ExtractedProfile['languages'])
+        : [],
       summary: typeof parsed.summary === 'string' ? parsed.summary : undefined,
     };
   } catch {
@@ -192,7 +208,6 @@ export function parseAIResponse(response: string): ExtractedProfile | null {
 function keywordFallback(text: string): ExtractedProfile {
   const skills = extractSkills(text);
   const experiences = extractExperience(text);
-  const education = extractEducation(text);
   const yearsOfExp = calculateYearsOfExperience(experiences);
   const experienceLevel = inferExperienceLevel(yearsOfExp);
 
@@ -206,11 +221,19 @@ function keywordFallback(text: string): ExtractedProfile {
 
   // If no job titles from experiences, try extracting from text lines
   if (jobTitles.length === 0) {
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = text
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
     // First pass: look near EXPERIENCE sections for job titles
-    const expSection = text.match(/EXPERIENCE[\s\S]*?(?=\n\s*\n(?:EDUCATION|SKILLS|CERTIFICATION|$))/i);
+    const expSection = text.match(
+      /EXPERIENCE[\s\S]*?(?=\n\s*\n(?:EDUCATION|SKILLS|CERTIFICATION|$))/i,
+    );
     if (expSection) {
-      const expLines = expSection[0].split('\n').map(l => l.trim()).filter(Boolean);
+      const expLines = expSection[0]
+        .split('\n')
+        .map((l) => l.trim())
+        .filter(Boolean);
       for (const line of expLines) {
         // Skip section headers, empty bullet points, and description-only lines
         if (/^EXPERIENCE|^EDUCATION|^SKILLS|^CERTIFICATION$/i.test(line)) continue;
@@ -222,7 +245,11 @@ function keywordFallback(text: string): ExtractedProfile {
         if (companyTitleMatch) {
           const potentialTitle = companyTitleMatch[1].trim();
           // Verify it looks like a job title
-          if (/Engineer|Developer|Architect|Lead|Manager|Director|Head|Specialist|Analyst|Scientist|Consultant|Administrator|Officer|Intern/i.test(potentialTitle)) {
+          if (
+            /Engineer|Developer|Architect|Lead|Manager|Director|Head|Specialist|Analyst|Scientist|Consultant|Administrator|Officer|Intern/i.test(
+              potentialTitle,
+            )
+          ) {
             // Strip trailing date if present
             const cleanTitle = potentialTitle.replace(/\s*\([^)]*\)\s*$/, '').trim();
             if (cleanTitle.length > 3 && !jobTitles.includes(cleanTitle)) {
@@ -233,9 +260,14 @@ function keywordFallback(text: string): ExtractedProfile {
         }
 
         // Also try matching lines that start with a job title
-        const titleMatch = line.match(/^(?:Senior|Lead|Staff|Principal|Junior|Mid[-\s]*level|Head|Chief|Sr\.?)\.?\s*(?:Full[\s-]Stack|Frontend|Front[-\s]End|Backend|Back[-\s]End|Software|DevOps|Data|Machine Learning|ML|AI|Cloud|QA|Mobile|Security|Platform|Site Reliability|SRE|Systems|Embedded|Engineering|Product|Design|Research|QA)\s*(?:Engineer|Developer|Architect|Manager|Director|Lead|Specialist|Analyst|Scientist|Consultant|Administrator|Coordinator|Officer|Head|Intern)/i);
+        const titleMatch = line.match(
+          /^(?:Senior|Lead|Staff|Principal|Junior|Mid[-\s]*level|Head|Chief|Sr\.?)\.?\s*(?:Full[\s-]Stack|Frontend|Front[-\s]End|Backend|Back[-\s]End|Software|DevOps|Data|Machine Learning|ML|AI|Cloud|QA|Mobile|Security|Platform|Site Reliability|SRE|Systems|Embedded|Engineering|Product|Design|Research|QA)\s*(?:Engineer|Developer|Architect|Manager|Director|Lead|Specialist|Analyst|Scientist|Consultant|Administrator|Coordinator|Officer|Head|Intern)/i,
+        );
         if (titleMatch) {
-          const cleanTitle = line.replace(/\s*\|.*$/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+          const cleanTitle = line
+            .replace(/\s*\|.*$/, '')
+            .replace(/\s*\([^)]*\)\s*$/, '')
+            .trim();
           if (cleanTitle.length > 3 && !jobTitles.includes(cleanTitle)) {
             jobTitles.push(cleanTitle);
             if (jobTitles.length >= 5) break;
@@ -246,9 +278,14 @@ function keywordFallback(text: string): ExtractedProfile {
     // Second pass: broader search in whole text
     if (jobTitles.length === 0) {
       for (const line of lines) {
-        const titleMatch = line.match(/^(Senior|Lead|Staff|Principal|Junior|Head|Chief|Sr\.?)\s+(?:Full[\s-]Stack|Frontend|Backend|Software|DevOps|Data|Machine Learning|AI|Cloud|QA|Mobile|Security|Platform|Systems|Embedded|Engineering|Research)\s+(Engineer|Developer|Architect|Manager|Lead|Specialist|Scientist|Analyst|Intern)/i);
+        const titleMatch = line.match(
+          /^(Senior|Lead|Staff|Principal|Junior|Head|Chief|Sr\.?)\s+(?:Full[\s-]Stack|Frontend|Backend|Software|DevOps|Data|Machine Learning|AI|Cloud|QA|Mobile|Security|Platform|Systems|Embedded|Engineering|Research)\s+(Engineer|Developer|Architect|Manager|Lead|Specialist|Scientist|Analyst|Intern)/i,
+        );
         if (titleMatch) {
-          const cleanTitle = line.replace(/\s*\|.*$/, '').replace(/\s*\([^)]*\)\s*$/, '').trim();
+          const cleanTitle = line
+            .replace(/\s*\|.*$/, '')
+            .replace(/\s*\([^)]*\)\s*$/, '')
+            .trim();
           if (cleanTitle.length > 3 && !jobTitles.includes(cleanTitle)) {
             jobTitles.push(cleanTitle);
             if (jobTitles.length >= 3) break;
@@ -261,7 +298,10 @@ function keywordFallback(text: string): ExtractedProfile {
   // Override experience level based on actual job title keywords
   let adjustedLevel = experienceLevel;
   const allTitleText = jobTitles.join(' ').toLowerCase();
-  if (allTitleText && /\b(lead|principal|staff|head|chief|sr\.?|senior|architect|director)\b/.test(allTitleText)) {
+  if (
+    allTitleText &&
+    /\b(lead|principal|staff|head|chief|sr\.?|senior|architect|director)\b/.test(allTitleText)
+  ) {
     if (/\b(lead|principal|staff|head|chief|director|architect)\b/.test(allTitleText)) {
       adjustedLevel = 'lead';
     } else {
@@ -276,7 +316,7 @@ function keywordFallback(text: string): ExtractedProfile {
     const locText = locationSection[0].replace(/^\s*LOCATION[\s:]*/i, '').trim();
     if (locText) {
       // Split on common delimiters
-      locText.split(/[,;\n]/).forEach(l => {
+      locText.split(/[,;\n]/).forEach((l) => {
         const cleaned = l.replace(/^\(|\)$/g, '').trim();
         if (cleaned && cleaned.length > 2) locations.push(cleaned);
       });
@@ -339,10 +379,39 @@ function keywordFallback(text: string): ExtractedProfile {
 
   // Infer industries from skills
   const industries: string[] = [];
-  const techKeywords = ['javascript', 'typescript', 'python', 'java', 'react', 'node', 'aws', 'docker', 'sql', 'api', 'git', 'css', 'html', 'cloud', 'devops', 'kubernetes', 'agile', 'scrum'];
-  const hasTechSkills = skills.some(s => techKeywords.some(k => s.toLowerCase().includes(k)));
+  const techKeywords = [
+    'javascript',
+    'typescript',
+    'python',
+    'java',
+    'react',
+    'node',
+    'aws',
+    'docker',
+    'sql',
+    'api',
+    'git',
+    'css',
+    'html',
+    'cloud',
+    'devops',
+    'kubernetes',
+    'agile',
+    'scrum',
+  ];
+  const hasTechSkills = skills.some((s) => techKeywords.some((k) => s.toLowerCase().includes(k)));
   if (hasTechSkills) industries.push('technology');
-  const nonTechKeywords = ['healthcare', 'finance', 'banking', 'medical', 'education', 'marketing', 'sales', 'legal', 'consulting'];
+  const nonTechKeywords = [
+    'healthcare',
+    'finance',
+    'banking',
+    'medical',
+    'education',
+    'marketing',
+    'sales',
+    'legal',
+    'consulting',
+  ];
   for (const kw of nonTechKeywords) {
     if (text.toLowerCase().includes(kw)) {
       industries.push(kw);

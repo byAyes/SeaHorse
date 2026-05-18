@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         if (typeof body[key] !== 'string' || body[key].trim().length === 0) {
           return NextResponse.json(
             { success: false, error: `Invalid value for ${key}` },
-            { status: 400 }
+            { status: 400 },
           );
         }
         partial[key] = body[key].trim();
@@ -48,11 +48,11 @@ export async function POST(request: NextRequest) {
     if (Object.keys(partial).length === 0) {
       return NextResponse.json(
         { success: false, error: 'No valid API keys provided' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const saved = await saveConfig(partial);
+    await saveConfig(partial);
 
     return NextResponse.json({
       success: true,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to save API keys',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       {
         error: error instanceof Error ? error.message : 'Failed to read config',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

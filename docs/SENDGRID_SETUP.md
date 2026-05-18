@@ -45,12 +45,14 @@ npm run automate
 ## Done! 🎉
 
 **Benefits over Gmail OAuth2:**
+
 - No token expiration
 - No OAuth2 complexity
 - 100 emails/day free
 - More reliable delivery
 
 **Need Help?**
+
 - See `.env.example` for all configuration options
 - Email help: https://app.sendgrid.com/help
 - API docs: https://docs.sendgrid.com/

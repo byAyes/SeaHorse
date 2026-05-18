@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import {
   Search,
   ArrowUpDown,
@@ -11,36 +11,36 @@ import {
   Calendar,
   Building2,
   SlidersHorizontal,
-} from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge, ScoreBadge } from "@/components/ui/badge";
-import { Modal } from "@/components/ui/modal";
-import { TableSkeleton } from "@/components/ui/skeleton";
-import { formatDate, formatSalary, truncate } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n";
-import { useMatchJobs } from "@/lib/api-client";
-import type { MatchedJob } from "@/types/job-match";
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge, ScoreBadge } from '@/components/ui/badge';
+import { Modal } from '@/components/ui/modal';
+import { TableSkeleton } from '@/components/ui/skeleton';
+import { formatDate, formatSalary } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n';
+import { useMatchJobs } from '@/lib/api-client';
+import type { MatchedJob } from '@/types/job-match';
 
-type SortKey = "score" | "title" | "company" | "salary" | "date";
-type SortDir = "asc" | "desc";
+type SortKey = 'score' | 'title' | 'company' | 'salary' | 'date';
+type SortDir = 'asc' | 'desc';
 
 export default function JobsPage() {
   const { t } = useTranslation();
   const { data, isLoading } = useMatchJobs();
-  const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("score");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [search, setSearch] = useState('');
+  const [sortKey, setSortKey] = useState<SortKey>('score');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [selectedJob, setSelectedJob] = useState<MatchedJob | null>(null);
   const [scoreFilter, setScoreFilter] = useState<number>(0);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortKey(key);
-      setSortDir("desc");
+      setSortDir('desc');
     }
   };
 
@@ -55,8 +55,8 @@ export default function JobsPage() {
         (m) =>
           m.job.title.toLowerCase().includes(q) ||
           m.job.company.toLowerCase().includes(q) ||
-          (m.job.location || "").toLowerCase().includes(q) ||
-          (m.job.description || "").toLowerCase().includes(q)
+          (m.job.location || '').toLowerCase().includes(q) ||
+          (m.job.description || '').toLowerCase().includes(q),
       );
     }
 
@@ -69,25 +69,23 @@ export default function JobsPage() {
     items.sort((a, b) => {
       let cmp = 0;
       switch (sortKey) {
-        case "score":
+        case 'score':
           cmp = a.score.overall - b.score.overall;
           break;
-        case "title":
+        case 'title':
           cmp = a.job.title.localeCompare(b.job.title);
           break;
-        case "company":
+        case 'company':
           cmp = a.job.company.localeCompare(b.job.company);
           break;
-        case "salary":
+        case 'salary':
           cmp = (a.job.salary || 0) - (b.job.salary || 0);
           break;
-        case "date":
-          cmp =
-            new Date(a.job.scrapedAt).getTime() -
-            new Date(b.job.scrapedAt).getTime();
+        case 'date':
+          cmp = new Date(a.job.scrapedAt).getTime() - new Date(b.job.scrapedAt).getTime();
           break;
       }
-      return sortDir === "asc" ? cmp : -cmp;
+      return sortDir === 'asc' ? cmp : -cmp;
     });
 
     return items;
@@ -95,13 +93,10 @@ export default function JobsPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h2 className="text-xl font-semibold">{t("jobs.title")}</h2>
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+        <h2 className="text-xl font-semibold">{t('jobs.title')}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          {data?.total || 0} {t("jobs.evaluated")} — {filtered.length} {t("jobs.matches")}
+          {data?.total || 0} {t('jobs.evaluated')} — {filtered.length} {t('jobs.matches')}
         </p>
       </motion.div>
 
@@ -117,7 +112,7 @@ export default function JobsPage() {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("jobs.search")}
+                placeholder={t('jobs.search')}
                 className="pl-9"
               />
             </div>
@@ -132,14 +127,14 @@ export default function JobsPage() {
                   animate={{
                     scale: scoreFilter === v ? 1.05 : 1,
                   }}
-                  transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                     scoreFilter === v
-                      ? "bg-primary text-white shadow-sm"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-dark-surface-tertiary dark:text-slate-400"
+                      ? 'bg-primary text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-dark-surface-tertiary dark:text-slate-400'
                   }`}
                 >
-                  {v === 0 ? t("jobs.score.all") : `${v}%+`}
+                  {v === 0 ? t('jobs.score.all') : `${v}%+`}
                 </motion.button>
               ))}
             </div>
@@ -160,14 +155,10 @@ export default function JobsPage() {
                 <Search size={24} className="text-slate-400" />
               </div>
               <p className="text-sm font-medium text-slate-500">
-                {search
-                  ? t("jobs.noResults")
-                  : t("jobs.noResults")}
+                {search ? t('jobs.noResults') : t('jobs.noResults')}
               </p>
               <p className="text-xs text-slate-400 mt-1">
-                {search
-                  ? t("jobs.noResultsDesc")
-                  : t("upload.subtitle")}
+                {search ? t('jobs.noResultsDesc') : t('upload.subtitle')}
               </p>
             </div>
           ) : (
@@ -177,45 +168,45 @@ export default function JobsPage() {
                   <tr className="border-b dark:border-slate-800">
                     <th
                       className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort("title")}
+                      onClick={() => toggleSort('title')}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {t("jobs.table.title")} <ArrowUpDown size={12} />
+                        {t('jobs.table.title')} <ArrowUpDown size={12} />
                       </span>
                     </th>
                     <th
                       className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort("company")}
+                      onClick={() => toggleSort('company')}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {t("jobs.table.company")} <ArrowUpDown size={12} />
+                        {t('jobs.table.company')} <ArrowUpDown size={12} />
                       </span>
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">
-                      {t("jobs.table.location")}
+                      {t('jobs.table.location')}
                     </th>
                     <th
                       className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort("score")}
+                      onClick={() => toggleSort('score')}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {t("jobs.table.score")} <ArrowUpDown size={12} />
+                        {t('jobs.table.score')} <ArrowUpDown size={12} />
                       </span>
                     </th>
                     <th
                       className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort("salary")}
+                      onClick={() => toggleSort('salary')}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {t("jobs.table.salary")} <ArrowUpDown size={12} />
+                        {t('jobs.table.salary')} <ArrowUpDown size={12} />
                       </span>
                     </th>
                     <th
                       className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort("date")}
+                      onClick={() => toggleSort('date')}
                     >
                       <span className="inline-flex items-center gap-1">
-                        {t("jobs.table.date")} <ArrowUpDown size={12} />
+                        {t('jobs.table.date')} <ArrowUpDown size={12} />
                       </span>
                     </th>
                     <th className="px-4 py-3" />
@@ -227,14 +218,12 @@ export default function JobsPage() {
                       key={match.job.id}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.025, type: "spring", stiffness: 200, damping: 20 }}
+                      transition={{ delay: i * 0.025, type: 'spring', stiffness: 200, damping: 20 }}
                       className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-dark-surface-tertiary/50 cursor-pointer transition-colors origin-left"
                       onClick={() => setSelectedJob(match)}
                     >
                       <td className="px-4 py-3">
-                        <p className="font-medium truncate max-w-[200px]">
-                          {match.job.title}
-                        </p>
+                        <p className="font-medium truncate max-w-[200px]">{match.job.title}</p>
                       </td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                         <span className="inline-flex items-center gap-1">
@@ -254,7 +243,7 @@ export default function JobsPage() {
                         <ScoreBadge score={match.score.overall} />
                       </td>
                       <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
-                        {match.job.salary ? formatSalary(match.job.salary) : "—"}
+                        {match.job.salary ? formatSalary(match.job.salary) : '—'}
                       </td>
                       <td className="px-4 py-3 text-xs text-slate-500">
                         <span className="inline-flex items-center gap-1">
@@ -268,7 +257,7 @@ export default function JobsPage() {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(match.job.url, "_blank");
+                            window.open(match.job.url, '_blank');
                           }}
                         >
                           <ExternalLink size={14} />
@@ -296,16 +285,16 @@ export default function JobsPage() {
             {/* Score Breakdown */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: t("jobs.modal.skills"), value: selectedJob.score.skillMatch },
-                { label: t("jobs.modal.interests"), value: selectedJob.score.interestMatch },
-                { label: t("jobs.modal.location"), value: selectedJob.score.locationMatch },
-                { label: t("jobs.modal.salary"), value: selectedJob.score.salaryMatch },
+                { label: t('jobs.modal.skills'), value: selectedJob.score.skillMatch },
+                { label: t('jobs.modal.interests'), value: selectedJob.score.interestMatch },
+                { label: t('jobs.modal.location'), value: selectedJob.score.locationMatch },
+                { label: t('jobs.modal.salary'), value: selectedJob.score.salaryMatch },
               ].map((item, i) => (
                 <motion.div
                   key={item.label}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.05, type: "spring", stiffness: 200 }}
+                  transition={{ delay: 0.1 + i * 0.05, type: 'spring', stiffness: 200 }}
                   className="rounded-lg bg-slate-50 p-3 dark:bg-dark-surface-tertiary"
                 >
                   <p className="text-xs text-slate-500">{item.label}</p>
@@ -321,7 +310,7 @@ export default function JobsPage() {
                       className="h-full rounded-full bg-primary"
                       initial={{ width: 0 }}
                       animate={{ width: `${item.value}%` }}
-                      transition={{ delay: 0.2 + i * 0.05, duration: 0.6, ease: "easeOut" }}
+                      transition={{ delay: 0.2 + i * 0.05, duration: 0.6, ease: 'easeOut' }}
                     />
                   </motion.div>
                 </motion.div>
@@ -332,7 +321,7 @@ export default function JobsPage() {
             {selectedJob.score.matchedSkills.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-slate-500 mb-2">
-                  {t("jobs.modal.matchedSkills")}
+                  {t('jobs.modal.matchedSkills')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedJob.score.matchedSkills.map((skill) => (
@@ -364,7 +353,7 @@ export default function JobsPage() {
             {selectedJob.job.description && (
               <div>
                 <p className="text-xs font-medium text-slate-500 mb-2">
-                  {t("jobs.modal.jobDescription")}
+                  {t('jobs.modal.jobDescription')}
                 </p>
                 <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                   {selectedJob.job.description}
@@ -374,18 +363,12 @@ export default function JobsPage() {
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button
-                onClick={() => window.open(selectedJob.job.url, "_blank")}
-                className="flex-1"
-              >
+              <Button onClick={() => window.open(selectedJob.job.url, '_blank')} className="flex-1">
                 <ExternalLink size={14} />
-                {t("jobs.modal.viewJob")}
+                {t('jobs.modal.viewJob')}
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedJob(null)}
-              >
-                {t("jobs.modal.close")}
+              <Button variant="outline" onClick={() => setSelectedJob(null)}>
+                {t('jobs.modal.close')}
               </Button>
             </div>
           </div>

@@ -7,16 +7,16 @@
 
 ## Overview
 
-| # | Phase | Goal | Status | Issues |
-|---|-------|------|--------|--------|
-| 1 | Job Board Scraper | Scrape jobs from LinkedIn, Indeed, Glassdoor, Computrabajo, JSearch | ✅ **Complete** | — |
-| 2 | AI Job Matching | Score jobs against user profile with weighted algorithm | ✅ **Complete** | — |
-| 3 | Email Notifications | Send weekly digests with HTML template + emojis | ✅ **Complete** | — |
-| 4 | Automation & Scheduling | GitHub Actions weekly pipeline | ✅ **Complete** | — |
-| 5 | PDF Profile Extraction | Extract job profile from CV/PDF with Gemini AI | ✅ **Complete** | #7 ✅ |
-| 6 | ~~Supabase Database Integration~~ (IPv6 block) | 🔴 **Cancelado** → reemplazado por Fase 8 | #9 🔁 #10 |
-| 7 | Frontend UI Dashboard | React SPA for pipeline management | ✅ **Complete** | #8 ✅ |
-| 8 | **Refactor: Almacenamiento Local JSON** | Reemplazar Prisma + Supabase por archivos JSON locales, 0 config de DB | 🔜 **Planificado** | #10 |
+| #   | Phase                                          | Goal                                                                   | Status             | Issues |
+| --- | ---------------------------------------------- | ---------------------------------------------------------------------- | ------------------ | ------ |
+| 1   | Job Board Scraper                              | Scrape jobs from LinkedIn, Indeed, Glassdoor, Computrabajo, JSearch    | ✅ **Complete**    | —      |
+| 2   | AI Job Matching                                | Score jobs against user profile with weighted algorithm                | ✅ **Complete**    | —      |
+| 3   | Email Notifications                            | Send weekly digests with HTML template + emojis                        | ✅ **Complete**    | —      |
+| 4   | Automation & Scheduling                        | GitHub Actions weekly pipeline                                         | ✅ **Complete**    | —      |
+| 5   | PDF Profile Extraction                         | Extract job profile from CV/PDF with Gemini AI                         | ✅ **Complete**    | #7 ✅  |
+| 6   | ~~Supabase Database Integration~~ (IPv6 block) | 🔴 **Cancelado** → reemplazado por Fase 8                              | #9 🔁 #10          |
+| 7   | Frontend UI Dashboard                          | React SPA for pipeline management                                      | ✅ **Complete**    | #8 ✅  |
+| 8   | **Refactor: Almacenamiento Local JSON**        | Reemplazar Prisma + Supabase por archivos JSON locales, 0 config de DB | 🔜 **Planificado** | #10    |
 
 ---
 
@@ -26,15 +26,16 @@
 
 **Sources:**
 
-| Scraper | Type | Status | Notes |
-|---------|------|--------|-------|
-| JSearch API | REST API | ✅ **Working** | ~10 jobs per run, free tier |
-| Computrabajo | Python (Scrapling) | ✅ **Working** | ~10 jobs per run |
-| Indeed | Python (Scrapling) | ⚠️ **Intermittent** | 403/blocking, fallback graceful |
-| LinkedIn | Python (Scrapling) | ⚠️ **Intermittent** | Login wall/rate limits |
-| Glassdoor | Python (Scrapling) | ⚠️ **Intermittent** | Anti-bot measures |
+| Scraper      | Type               | Status              | Notes                           |
+| ------------ | ------------------ | ------------------- | ------------------------------- |
+| JSearch API  | REST API           | ✅ **Working**      | ~10 jobs per run, free tier     |
+| Computrabajo | Python (Scrapling) | ✅ **Working**      | ~10 jobs per run                |
+| Indeed       | Python (Scrapling) | ⚠️ **Intermittent** | 403/blocking, fallback graceful |
+| LinkedIn     | Python (Scrapling) | ⚠️ **Intermittent** | Login wall/rate limits          |
+| Glassdoor    | Python (Scrapling) | ⚠️ **Intermittent** | Anti-bot measures               |
 
 **Features:**
+
 - ✅ Rate limiter with configurable delays
 - ✅ Python subprocess bridge (`pythonBridge.ts`)
 - ✅ HTTP fallback scraper for basic sites
@@ -49,14 +50,15 @@
 
 **Algorithm — Weighted scoring:**
 
-| Factor | Weight | Source |
-|--------|--------|--------|
-| Skills match | **40%** | CV extracted skills vs job description |
-| Interests match | **30%** | Job titles/industry vs user interests |
-| Location match | **20%** | Job location vs preferred locations + remote |
-| Salary match | **10%** | Job salary vs min/max range |
+| Factor          | Weight  | Source                                       |
+| --------------- | ------- | -------------------------------------------- |
+| Skills match    | **40%** | CV extracted skills vs job description       |
+| Interests match | **30%** | Job titles/industry vs user interests        |
+| Location match  | **20%** | Job location vs preferred locations + remote |
+| Salary match    | **10%** | Job salary vs min/max range                  |
 
 **Features:**
+
 - ✅ `calculateMatchScore()` in `src/matching/scorer.ts`
 - ✅ Individual matchers: skill, interest, location, salary
 - ✅ Scores are **honest** — no more fake `score: 100`
@@ -72,13 +74,14 @@
 
 **Email Providers:**
 
-| Provider | Method | Status | Notes |
-|----------|--------|--------|-------|
+| Provider         | Method       | Status         | Notes                   |
+| ---------------- | ------------ | -------------- | ----------------------- |
 | **SMTP (Gmail)** | App Password | ✅ **Default** | HTML + CC support fixed |
-| Resend | API | ✅ Available | Free tier (100/day) |
-| Gmail API | OAuth2 | ✅ Available | Tokens refresh required |
+| Resend           | API          | ✅ Available   | Free tier (100/day)     |
+| Gmail API        | OAuth2       | ✅ Available   | Tokens refresh required |
 
 **Features:**
+
 - ✅ **Premium HTML template** with SVG icons and gradients
 - ✅ **Emojis** throughout: 📬 header, 📊 stats, 🎯 scores, 🚀 CTA, 🐴💨 footer
 - ✅ **Real match scores** displayed per job — no more fake 100%
@@ -96,23 +99,25 @@
 
 **Infrastructure:**
 
-| Component | Detail | Status |
-|-----------|--------|--------|
-| Storage | Local JSON files (`data/database.json`) — 0 dependencias externas | 🔜 **Planificado (#10)** |
-|-----------|--------|--------|
-| GitHub Actions | `.github/workflows/main.yml` | ✅ **Running** |
-| Trigger | Push to `main` + weekly cron (Thu 9 AM UTC) | ✅ |
-| Email provider | SMTP (Gmail App Password) via secrets | ✅ Configurado |
-| Python deps | `scrapers/requirements.txt` | ✅ |
-| Browser | Chrome/Chromium install step | ✅ |
-| Paths filter | `.github/workflows/**` included | ✅ Fixed |
+| Component      | Detail                                                            | Status                   |
+| -------------- | ----------------------------------------------------------------- | ------------------------ |
+| Storage        | Local JSON files (`data/database.json`) — 0 dependencias externas | 🔜 **Planificado (#10)** |
+| -----------    | --------                                                          | --------                 |
+| GitHub Actions | `.github/workflows/main.yml`                                      | ✅ **Running**           |
+| Trigger        | Push to `main` + weekly cron (Thu 9 AM UTC)                       | ✅                       |
+| Email provider | SMTP (Gmail App Password) via secrets                             | ✅ Configurado           |
+| Python deps    | `scrapers/requirements.txt`                                       | ✅                       |
+| Browser        | Chrome/Chromium install step                                      | ✅                       |
+| Paths filter   | `.github/workflows/**` included                                   | ✅ Fixed                 |
 
 **Pipeline flow:**
+
 ```
 Trigger → Install deps → Run scraper → Match jobs → Send email → Cleanup
 ```
 
 **Recent fixes:**
+
 - ✅ SMTP provider now sends HTML (was plain text only)
 - ✅ CI switched from Resend to SMTP (more reliable)
 - ✅ Workflow path filter added (changes to `.github/workflows` now trigger runs)
@@ -120,22 +125,23 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 
 ---
 
-## Phase 5: PDF Profile Extraction ✅ *(formerly "PDF Job Detection")*
+## Phase 5: PDF Profile Extraction ✅ _(formerly "PDF Job Detection")_
 
 **Goal:** Extract user profile from uploaded CV/PDF to drive intelligent job scraping.
 
 **Feature:** `AI PDF profile extraction for intelligent job scraping` — **Closed** ✅
 
-| Component | File | Status |
-|-----------|------|--------|
-| Gemini AI extraction | `src/lib/ai/pdfProfileExtractor.ts` | ✅ Gemini Flash |
-| Keyword fallback | `src/lib/ai/pdfProfileExtractor.ts` | ✅ When AI unavailable |
-| Scrape strategy builder | `src/lib/ai/scrapeStrategy.ts` | ✅ Queries from profile |
-| PDF parsing | `src/lib/pdf/pdfParser.ts` | ✅ |
-| Pipeline integration | `src/automation/orchestrator.ts` | ✅ |
-| Pipeline entry script | `scripts/run-profile-pipeline.ts` | ✅ |
+| Component               | File                                | Status                  |
+| ----------------------- | ----------------------------------- | ----------------------- |
+| Gemini AI extraction    | `src/lib/ai/pdfProfileExtractor.ts` | ✅ Gemini Flash         |
+| Keyword fallback        | `src/lib/ai/pdfProfileExtractor.ts` | ✅ When AI unavailable  |
+| Scrape strategy builder | `src/lib/ai/scrapeStrategy.ts`      | ✅ Queries from profile |
+| PDF parsing             | `src/lib/pdf/pdfParser.ts`          | ✅                      |
+| Pipeline integration    | `src/automation/orchestrator.ts`    | ✅                      |
+| Pipeline entry script   | `scripts/run-profile-pipeline.ts`   | ✅                      |
 
 **Extracted profile fields:**
+
 - ✅ Job titles (career targets)
 - ✅ Skills (technical + soft)
 - ✅ Preferred locations
@@ -159,13 +165,13 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 
 **Resolución:** En lugar de luchar con conectividad cloud, se optó por **almacenamiento local en archivos JSON** — ver Fase 8.
 
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| CV-01: Store CVs with versioning | ✅ **Refactorizado en Fase 8** | JSON local |
-| CV-02: Auto-extract skills from CV | ✅ **Done in #7** | — |
-| CV-03: Update profile from CV | ✅ **Done in #7** | — |
-| CV-04: Use profile for matching | ✅ **Done in #7** | — |
-| CV-05: Track profile changes | ✅ **Refactorizado en Fase 8** | JSON local |
+| Requirement                        | Status                         | Notes      |
+| ---------------------------------- | ------------------------------ | ---------- |
+| CV-01: Store CVs with versioning   | ✅ **Refactorizado en Fase 8** | JSON local |
+| CV-02: Auto-extract skills from CV | ✅ **Done in #7**              | —          |
+| CV-03: Update profile from CV      | ✅ **Done in #7**              | —          |
+| CV-04: Use profile for matching    | ✅ **Done in #7**              | —          |
+| CV-05: Track profile changes       | ✅ **Refactorizado en Fase 8** | JSON local |
 
 ---
 
@@ -178,6 +184,7 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 **Status:** ✅ **Completado**
 
 **Features implementadas:**
+
 - 📄 PDF drag & drop upload zone
 - 📧 Email configuration form (SMTP, destination, CC)
 - 📊 Dashboard with job stats, scores, history
@@ -188,6 +195,7 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 - 🎬 Micro-interacciones con Framer Motion (animaciones, transiciones)
 
 **Stack usado:**
+
 - Next.js App Router · Tailwind CSS · Framer Motion · Recharts
 
 ---
@@ -201,6 +209,7 @@ Trigger → Install deps → Run scraper → Match jobs → Send email → Clean
 **Documento detallado:** `.planning/REFACTOR-local-database.md`
 
 **Motivación:**
+
 - 🚫 **0 config**: No más `DATABASE_URL`, ni Docker, ni servicios cloud
 - 🔧 **Portable**: `git clone + npm install + npm run dev = funciona`
 - 📁 **Persistencia real**: Datos guardados en `data/database.json`
@@ -224,6 +233,7 @@ src/lib/local-data/
 ```
 
 **Cambios principales:**
+
 1. Crear `src/lib/local-data/` con stores por entidad
 2. Re-escribir `src/lib/prisma.ts` como wrapper de compatibilidad sobre `LocalData`
 3. Refactorizar `src/lib/automation/job-history.ts`, `src/lib/cv/profileHistory.ts`, `src/lib/pdf/duplicateDetector.ts`, `src/lib/pdf/pdfIntegration.ts`, `src/matching/cvMatcher.ts`
@@ -232,61 +242,60 @@ src/lib/local-data/
 6. Eliminar dependencias npm: `@prisma/client`, `prisma`, `@prisma/adapter-pg`, `pg`
 7. Tests unitarios para cada store
 
-**Ver documento completo para detalle de cada archivo y orden de trabajo.**
----
+## **Ver documento completo para detalle de cada archivo y orden de trabajo.**
 
 ## Issues Overview
 
-| # | Title | State | Phase |
-|---|-------|-------|-------|
-| **10** | [REFACTOR] Almacenamiento local JSON | 🟢 **Open** | Phase 8 |
-| **9** | [BACKEND] Integración Supabase | 🔵 **Closed** (reemplazado por #10) | Phase 6 |
-| **8** | [FEATURE] Frontend UI Dashboard | 🔵 **Closed** ✅ | Phase 7 |
-| **7** | [FEATURE] AI PDF profile extraction | 🔵 **Closed** ✅ | Phase 5 |
-| **6** | [DEFERRED] process-cv pipeline | 🔵 **Closed** — absorbed | Phase 6 |
+| #      | Title                                | State                               | Phase   |
+| ------ | ------------------------------------ | ----------------------------------- | ------- |
+| **10** | [REFACTOR] Almacenamiento local JSON | 🟢 **Open**                         | Phase 8 |
+| **9**  | [BACKEND] Integración Supabase       | 🔵 **Closed** (reemplazado por #10) | Phase 6 |
+| **8**  | [FEATURE] Frontend UI Dashboard      | 🔵 **Closed** ✅                    | Phase 7 |
+| **7**  | [FEATURE] AI PDF profile extraction  | 🔵 **Closed** ✅                    | Phase 5 |
+| **6**  | [DEFERRED] process-cv pipeline       | 🔵 **Closed** — absorbed            | Phase 6 |
 
 ---
 
 ## Requirement Traceability
 
-| ID | Description | Phase | Status |
-|----|-------------|-------|--------|
-| JOB-01 | Scrape LinkedIn | 1 | ✅ Complete |
-| JOB-02 | Scrape Indeed | 1 | ✅ Complete |
-| JOB-03 | Scrape Glassdoor | 1 | ✅ Complete |
-| JOB-04 | User profile schema | 2 | ✅ Complete |
-| JOB-05 | AI job matching | 2 | ✅ Complete |
-| JOB-06 | Email integration (SMTP/Resend/Gmail) | 3 | ✅ Complete |
-| JOB-07 | Email formatting (HTML + emojis + scores) | 3 | ✅ Complete |
-| JOB-08 | GitHub Actions workflow | 4 | ✅ Complete |
-| JOB-09 | Job history management | 4 | ✅ **Refactorizado en Fase 8** |
-| PDF-01 | PDF upload and parsing | 5 | ✅ Complete |
-| PDF-02 | Profile extraction from text | 5 | ✅ Complete |
-| PDF-03 | Integration with matching | 5 | ✅ Complete |
-| PDF-04 | Integration with email | 5 | ✅ Complete |
-| PDF-05 | Duplicate detection | 5 | ✅ Complete |
-| CV-01 | Store CVs with versioning | 6 | ✅ **Refactorizado en Fase 8** |
-| CV-02 | Auto-extract skills from CV | 6 | ✅ Complete (in #7) |
-| CV-03 | Update profile from CV data | 6 | ✅ Complete (in #7) |
-| CV-04 | Use profile for job matching | 6 | ✅ Complete (in #7) |
-| CV-05 | Track profile changes | 6 | ✅ **Refactorizado en Fase 8** |
-| UI-01 | React frontend dashboard | 7 | ✅ **Complete** |
+| ID     | Description                               | Phase | Status                         |
+| ------ | ----------------------------------------- | ----- | ------------------------------ |
+| JOB-01 | Scrape LinkedIn                           | 1     | ✅ Complete                    |
+| JOB-02 | Scrape Indeed                             | 1     | ✅ Complete                    |
+| JOB-03 | Scrape Glassdoor                          | 1     | ✅ Complete                    |
+| JOB-04 | User profile schema                       | 2     | ✅ Complete                    |
+| JOB-05 | AI job matching                           | 2     | ✅ Complete                    |
+| JOB-06 | Email integration (SMTP/Resend/Gmail)     | 3     | ✅ Complete                    |
+| JOB-07 | Email formatting (HTML + emojis + scores) | 3     | ✅ Complete                    |
+| JOB-08 | GitHub Actions workflow                   | 4     | ✅ Complete                    |
+| JOB-09 | Job history management                    | 4     | ✅ **Refactorizado en Fase 8** |
+| PDF-01 | PDF upload and parsing                    | 5     | ✅ Complete                    |
+| PDF-02 | Profile extraction from text              | 5     | ✅ Complete                    |
+| PDF-03 | Integration with matching                 | 5     | ✅ Complete                    |
+| PDF-04 | Integration with email                    | 5     | ✅ Complete                    |
+| PDF-05 | Duplicate detection                       | 5     | ✅ Complete                    |
+| CV-01  | Store CVs with versioning                 | 6     | ✅ **Refactorizado en Fase 8** |
+| CV-02  | Auto-extract skills from CV               | 6     | ✅ Complete (in #7)            |
+| CV-03  | Update profile from CV data               | 6     | ✅ Complete (in #7)            |
+| CV-04  | Use profile for job matching              | 6     | ✅ Complete (in #7)            |
+| CV-05  | Track profile changes                     | 6     | ✅ **Refactorizado en Fase 8** |
+| UI-01  | React frontend dashboard                  | 7     | ✅ **Complete**                |
 
 ---
 
 ## Tech Stack Summary
 
-| Layer | Technology | Status |
-|-------|-----------|--------|
-| Runtime | TypeScript (CommonJS) + tsx | ✅ |
-| Scrapers | Python (Scrapling) + JSearch API | ✅ |
-| AI | Gemini Flash + keyword fallback | ✅ |
-| Scoring | Weighted (40/30/20/10) | ✅ |
-| Email | SMTP · Resend · Gmail API | ✅ |
-| CI/CD | GitHub Actions (weekly + push) | ✅ |
-| Storage | Local JSON files (`data/database.json`) | ✅ **Refactorizado** |
-| Frontend | Next.js · Tailwind CSS · Framer Motion · Recharts | ✅ **Complete** |
+| Layer    | Technology                                        | Status               |
+| -------- | ------------------------------------------------- | -------------------- |
+| Runtime  | TypeScript (CommonJS) + tsx                       | ✅                   |
+| Scrapers | Python (Scrapling) + JSearch API                  | ✅                   |
+| AI       | Gemini Flash + keyword fallback                   | ✅                   |
+| Scoring  | Weighted (40/30/20/10)                            | ✅                   |
+| Email    | SMTP · Resend · Gmail API                         | ✅                   |
+| CI/CD    | GitHub Actions (weekly + push)                    | ✅                   |
+| Storage  | Local JSON files (`data/database.json`)           | ✅ **Refactorizado** |
+| Frontend | Next.js · Tailwind CSS · Framer Motion · Recharts | ✅ **Complete**      |
 
 ---
 
-*Maintained by AI assistant — last updated 2026-05-15*
+_Maintained by AI assistant — last updated 2026-05-15_

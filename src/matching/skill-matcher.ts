@@ -7,15 +7,15 @@
  * Common skill name variations and synonyms
  */
 const skillSynonyms: Record<string, string> = {
-  'javascript': 'javascript',
-  'js': 'javascript',
-  'node': 'node.js',
-  'reactjs': 'react',
+  javascript: 'javascript',
+  js: 'javascript',
+  node: 'node.js',
+  reactjs: 'react',
   'react.js': 'react',
-  'reactjavascript': 'react',
-  'nodejs': 'node.js',
-  'typescript': 'typescript',
-  'ts': 'typescript',
+  reactjavascript: 'react',
+  nodejs: 'node.js',
+  typescript: 'typescript',
+  ts: 'typescript',
 };
 
 /**
@@ -24,11 +24,7 @@ const skillSynonyms: Record<string, string> = {
  * @returns Normalized skill name in lowercase
  */
 export function normalizeSkill(skill: string): string {
-  const normalized = skill
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, ' ')
-    .trim();
+  const normalized = skill.toLowerCase().trim().replace(/\s+/g, ' ').trim();
 
   if (skillSynonyms[normalized]) {
     return skillSynonyms[normalized];
@@ -52,35 +48,39 @@ export function normalizeSkill(skill: string): string {
 function levenshteinDistance(s1: string, s2: string): number {
   const m = s1.length;
   const n = s2.length;
-  
+
   // Create matrix
-  const dp: number[][] = Array(m + 1).fill(0).map(() => Array(n + 1).fill(0));
-  
+  const dp: number[][] = Array(m + 1)
+    .fill(0)
+    .map(() => Array(n + 1).fill(0));
+
   // Initialize first column
   for (let i = 0; i <= m; i++) {
     dp[i][0] = i;
   }
-  
+
   // Initialize first row
   for (let j = 0; j <= n; j++) {
     dp[0][j] = j;
   }
-  
+
   // Fill matrix
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       if (s1[i - 1] === s2[j - 1]) {
         dp[i][j] = dp[i - 1][j - 1];
       } else {
-        dp[i][j] = 1 + Math.min(
-          dp[i - 1][j],     // deletion
-          dp[i][j - 1],     // insertion
-          dp[i - 1][j - 1]  // substitution
-        );
+        dp[i][j] =
+          1 +
+          Math.min(
+            dp[i - 1][j], // deletion
+            dp[i][j - 1], // insertion
+            dp[i - 1][j - 1], // substitution
+          );
       }
     }
   }
-  
+
   return dp[m][n];
 }
 
@@ -103,7 +103,7 @@ function skillsMatch(userSkill: string, jobSkill: string): boolean {
   }
 
   const isSubstring = userSkill.includes(jobSkill) || jobSkill.includes(userSkill);
-  if (isSubstring && (maxLen - minLen) <= 2) {
+  if (isSubstring && maxLen - minLen <= 2) {
     return true;
   }
 
@@ -120,17 +120,17 @@ function skillsMatch(userSkill: string, jobSkill: string): boolean {
  */
 export function calculateSkillOverlap(
   userSkills: string[],
-  jobSkills: string[]
+  jobSkills: string[],
 ): { score: number; matchedSkills: string[] } {
   if (userSkills.length === 0) {
     return { score: 100, matchedSkills: [] }; // No user skills = neutral
   }
-  
+
   const normalizedUserSkills = userSkills.map(normalizeSkill);
   const normalizedJobSkills = jobSkills.map(normalizeSkill);
-  
+
   const matchedSkills: string[] = [];
-  
+
   for (const userSkill of normalizedUserSkills) {
     for (const jobSkill of normalizedJobSkills) {
       if (skillsMatch(userSkill, jobSkill)) {
@@ -139,12 +139,12 @@ export function calculateSkillOverlap(
       }
     }
   }
-  
+
   // Calculate percentage: matchedSkills / totalUserSkills
   const score = (matchedSkills.length / userSkills.length) * 100;
-  
+
   return {
     score: Math.round(score * 100) / 100,
-    matchedSkills: [...new Set(matchedSkills)] // Remove duplicates
+    matchedSkills: [...new Set(matchedSkills)], // Remove duplicates
   };
 }

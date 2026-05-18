@@ -16,7 +16,9 @@ const PDF_WORKER_PATH = path.join(process.cwd(), 'public', 'pdf.worker.mjs');
 if (fs.existsSync(PDF_WORKER_PATH)) {
   PDFParse.setWorker(pathToFileURL(PDF_WORKER_PATH).href);
 } else {
-  console.warn('[PDFParser] pdf.worker.mjs not found in public/ — PDF extraction may fail in Next.js. Run: cp node_modules/pdf-parse/dist/pdf-parse/esm/pdf.worker.mjs public/pdf.worker.mjs');
+  console.warn(
+    '[PDFParser] pdf.worker.mjs not found in public/ — PDF extraction may fail in Next.js. Run: cp node_modules/pdf-parse/dist/pdf-parse/esm/pdf.worker.mjs public/pdf.worker.mjs',
+  );
 }
 
 /**
@@ -66,18 +68,20 @@ export async function parsePDF(buffer: Buffer): Promise<PDFUploadResult> {
  * @returns Cleaned text with normalized whitespace
  */
 function cleanText(text: string): string {
-  return text
-    // Replace multiple newlines with double newline
-    .replace(/\n\s*\n/g, '\n\n')
-    // Replace multiple spaces with single space
-    .replace(/ +/g, ' ')
-    // Remove spaces around newlines
-    .replace(/\n +/g, '\n')
-    .replace(/ +\n/g, '\n')
-    // Trim each line
-    .split('\n')
-    .map(line => line.trim())
-    .join('\n')
-    // Final trim
-    .trim();
+  return (
+    text
+      // Replace multiple newlines with double newline
+      .replace(/\n\s*\n/g, '\n\n')
+      // Replace multiple spaces with single space
+      .replace(/ +/g, ' ')
+      // Remove spaces around newlines
+      .replace(/\n +/g, '\n')
+      .replace(/ +\n/g, '\n')
+      // Trim each line
+      .split('\n')
+      .map((line) => line.trim())
+      .join('\n')
+      // Final trim
+      .trim()
+  );
 }

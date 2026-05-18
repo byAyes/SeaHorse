@@ -30,9 +30,7 @@ export interface AuthUser {
  *
  * Returns the user identity on success, or a 401 NextResponse on failure.
  */
-export async function authenticate(
-  request: NextRequest
-): Promise<AuthUser | NextResponse> {
+export async function authenticate(request: NextRequest): Promise<AuthUser | NextResponse> {
   const adminToken = process.env.ADMIN_API_TOKEN;
 
   // No token configured — skip auth (safe for local development)
@@ -43,26 +41,20 @@ export async function authenticate(
   const authHeader = request.headers.get('authorization');
 
   if (!authHeader) {
-    return NextResponse.json(
-      { error: 'Authorization header is required' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Authorization header is required' }, { status: 401 });
   }
 
   if (!authHeader.startsWith('Bearer ')) {
     return NextResponse.json(
       { error: 'Authorization header must use Bearer scheme' },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   const token = authHeader.slice(7).trim();
 
   if (!token || token !== adminToken) {
-    return NextResponse.json(
-      { error: 'Invalid authentication token' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Invalid authentication token' }, { status: 401 });
   }
 
   return { user: 'admin' };

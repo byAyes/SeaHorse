@@ -14,6 +14,7 @@ Job seekers need to check multiple job boards frequently to find relevant opport
 ## Solution Overview
 
 A Node.js application that:
+
 - Scrapes major job boards (LinkedIn, Indeed, Glassdoor, etc.)
 - Uses AI to match jobs against user's skills/interests
 - Sends weekly email digests via Gmail
@@ -42,13 +43,13 @@ A Node.js application that:
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Programming Language | Strong ecosystem for scraping and automation | Node.js with TypeScript |
-| Email Service | User already has Gmail | Gmail API |
-| Scheduling | Free, reliable, integrates with GitHub | GitHub Actions (weekly) |
-| Job Sources | Most comprehensive job listings | Major boards (LinkedIn, Indeed, Glassdoor) |
-| Filtering | Better than keyword matching | AI-powered matching |
+| Decision             | Rationale                                    | Outcome                                    |
+| -------------------- | -------------------------------------------- | ------------------------------------------ |
+| Programming Language | Strong ecosystem for scraping and automation | Node.js with TypeScript                    |
+| Email Service        | User already has Gmail                       | Gmail API                                  |
+| Scheduling           | Free, reliable, integrates with GitHub       | GitHub Actions (weekly)                    |
+| Job Sources          | Most comprehensive job listings              | Major boards (LinkedIn, Indeed, Glassdoor) |
+| Filtering            | Better than keyword matching                 | AI-powered matching                        |
 
 ## Constraints
 
@@ -64,4 +65,5 @@ A Node.js application that:
 - [ ] User finds at least one relevant job per month
 
 ---
-*Last updated: 2026-03-25 after initialization*
+
+_Last updated: 2026-03-25 after initialization_

@@ -41,13 +41,16 @@ function forwardPythonLogs(raw: string): void {
 }
 
 export async function spawnPythonScraper(
-  options: PythonBridgeOptions
+  options: PythonBridgeOptions,
 ): Promise<PythonScraperResult> {
-  const module = `scrapers.${options.scriptName}`;
+  const scriptModule = `scrapers.${options.scriptName}`;
   const args = [
-    '-m', module,
-    '--query', options.query,
-    '--max-jobs', String(options.maxJobs),
+    '-m',
+    scriptModule,
+    '--query',
+    options.query,
+    '--max-jobs',
+    String(options.maxJobs),
   ];
   const startTime = Date.now();
 
@@ -76,9 +79,9 @@ export async function spawnPythonScraper(
 
       if (code === 0) {
         try {
-          const jobs: Job[] = JSON.parse(stdout.trim()).map((j: any) => ({
+          const jobs: Job[] = JSON.parse(stdout.trim()).map((j: Record<string, unknown>) => ({
             ...j,
-            scrapedAt: new Date(j.scrapedAt),
+            scrapedAt: new Date(j.scrapedAt as string),
           }));
           resolve({
             scraper: options.scriptName,

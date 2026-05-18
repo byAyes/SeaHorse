@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { success: false, error: 'Demasiadas solicitudes. Intenta de nuevo en un minuto.' },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -32,24 +32,18 @@ export async function POST(request: NextRequest) {
     const userId = formData.get('userId') as string;
 
     if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'userId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'userId is required' }, { status: 400 });
     }
 
     if (!file) {
-      return NextResponse.json(
-        { success: false, error: 'file is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'file is required' }, { status: 400 });
     }
 
     // Validate file type
     if (file.type !== 'application/pdf') {
       return NextResponse.json(
         { success: false, error: 'Only PDF files are allowed' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -58,7 +52,7 @@ export async function POST(request: NextRequest) {
     if (file.size > maxSize) {
       return NextResponse.json(
         { success: false, error: 'File size must be less than 10MB' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -123,10 +117,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('Error uploading CV:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to upload CV' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Failed to upload CV' }, { status: 500 });
   }
 }
 
@@ -143,10 +134,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
 
     if (!userId) {
-      return NextResponse.json(
-        { success: false, error: 'userId is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: 'userId is required' }, { status: 400 });
     }
 
     const cvs = await prisma.cV.findMany({
@@ -176,7 +164,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching CV versions:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch CV versions' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

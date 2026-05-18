@@ -3,6 +3,7 @@
 ## Objective
 
 Build a modern, interactive Single Page Application (SPA) dashboard for the Seahorse job scraping/matching pipeline. The dashboard will allow users to:
+
 - Upload CVs/PDFs and see extracted profiles
 - Configure email recipients and run the pipeline
 - View job matching results with animated stats and scores
@@ -11,18 +12,18 @@ Build a modern, interactive Single Page Application (SPA) dashboard for the Seah
 
 ## Tech Stack
 
-| Layer | Technology | Version | Notes |
-|-------|-----------|---------|-------|
-| Framework | **Next.js** (App Router) | ^16.2.1 | Already in project — we use what's installed |
-| Language | TypeScript (strict) | ^6.0.2 | Already configured |
-| UI Library | React | ^19.2.4 | Already installed |
-| Styling | **Tailwind CSS v4** | latest | Need to install — Next.js 16 has built-in support via `@tailwindcss/postcss` |
-| Icons | **Lucide React** | latest | SVG icon library, pairs well with Tailwind |
-| Animations | **Framer Motion** | latest | Staggered animations, micro-interactions, skeleton screens |
-| Charts | **Recharts** | latest | Dashboard stats charts |
-| HTTP | **TanStack Query** | latest | API data fetching with caching |
-| State | **Zustand** | latest | Lightweight global state management |
-| Package Mgr | npm | — | Already configured |
+| Layer       | Technology               | Version | Notes                                                                        |
+| ----------- | ------------------------ | ------- | ---------------------------------------------------------------------------- |
+| Framework   | **Next.js** (App Router) | ^16.2.1 | Already in project — we use what's installed                                 |
+| Language    | TypeScript (strict)      | ^6.0.2  | Already configured                                                           |
+| UI Library  | React                    | ^19.2.4 | Already installed                                                            |
+| Styling     | **Tailwind CSS v4**      | latest  | Need to install — Next.js 16 has built-in support via `@tailwindcss/postcss` |
+| Icons       | **Lucide React**         | latest  | SVG icon library, pairs well with Tailwind                                   |
+| Animations  | **Framer Motion**        | latest  | Staggered animations, micro-interactions, skeleton screens                   |
+| Charts      | **Recharts**             | latest  | Dashboard stats charts                                                       |
+| HTTP        | **TanStack Query**       | latest  | API data fetching with caching                                               |
+| State       | **Zustand**              | latest  | Lightweight global state management                                          |
+| Package Mgr | npm                      | —       | Already configured                                                           |
 
 ## Commands
 
@@ -148,6 +149,7 @@ export function StatsCard({ title, value, icon, trend, className }: StatsCardPro
 **Style**: Modern-minimalist dashboard with glassmorphism accents — clean lines, subtle shadows, generous white space.
 
 **Color Palette**:
+
 - Background: slate-50 (light) / slate-950 (dark)
 - Surface: white (light) / slate-900 (dark)
 - Primary: indigo-600 → indigo-500
@@ -155,6 +157,7 @@ export function StatsCard({ title, value, icon, trend, className }: StatsCardPro
 - Text: slate-900 (light) / slate-50 (dark)
 
 **Typography**:
+
 - Font: Inter (body) + system sans-serif fallback
 - Scale: 12/14/16/18/20/24/32/40
 - Body: 16px, line-height 1.6
@@ -169,29 +172,34 @@ export function StatsCard({ title, value, icon, trend, className }: StatsCardPro
 ## UI Components & Pages
 
 ### 1. Dashboard Page (`/dashboard`)
+
 - **Stats Grid**: 4 animated cards — Total Jobs, Matches Found, Profiles Extracted, Pipelines Run
 - **Job Trend Chart**: Recharts area chart showing jobs over time (7/30 days)
 - **Recent Matches**: List of top-5 matched jobs with score badges
 - **Quick Actions**: "Upload CV", "Run Pipeline", "View All Jobs" buttons
 
 ### 2. Upload Page (`/upload`)
+
 - **Drop Zone**: Drag & drop area with file preview, progress indicator
 - **Profile Preview**: Extracted skills, experience, education displayed after parsing
 - **Confirm & Match**: Button to start matching against extracted profile
 
 ### 3. Jobs Page (`/jobs`)
+
 - **Filters**: Search bar, category filter, score range slider
 - **Results Table**: Sortable columns (title, company, score, location, salary, date)
 - **Job Detail Modal**: Full job description with match breakdown
 - **Empty State**: Helpful message when no jobs matched yet
 
 ### 4. Pipeline Page (`/pipeline`)
+
 - **Run Button**: Prominent "Run Pipeline" CTA with last-run timestamp
 - **Progress Tracker**: Animated step indicators (Scraping → Matching → Sending)
 - **Log Viewer**: Scrollable log output in terminal-style dark panel
 - **Results Summary**: Jobs scraped, matched, and emailed counts
 
 ### 5. Settings Page (`/settings`)
+
 - **Email Config**: SMTP fields (host, port, user, password, from, recipient, CC)
 - **Profile Preferences**: Skills, interests, location, remote toggle, salary range
 - **API Keys**: JSearch API key, Gemini API key inputs (masked)
@@ -201,17 +209,17 @@ export function StatsCard({ title, value, icon, trend, className }: StatsCardPro
 
 ### Existing Endpoints to Consume
 
-| Endpoint | Method | Purpose | Page |
-|----------|--------|---------|------|
-| `/api/match-jobs?userId=...` | GET | Get matched jobs with scores | Dashboard, Jobs |
-| `/api/profile/extract?userId=...` | GET | Get user profile | Settings |
-| `/api/profile/history?userId=...` | GET | Profile change history | Settings |
-| `/api/cv/upload` | POST | Upload CV/PDF | Upload |
-| `/api/cv/process` | POST | Process uploaded CV | Upload |
-| `/api/cv/update-profile` | POST | Update user profile | Settings |
-| `/api/email/send` | POST | Send email digest | Pipeline |
-| `/api/pdf/upload` | POST | Upload PDF for matching | Upload |
-| `/api/pdf/match` | POST | Match PDF against jobs | Upload |
+| Endpoint                          | Method | Purpose                      | Page            |
+| --------------------------------- | ------ | ---------------------------- | --------------- |
+| `/api/match-jobs?userId=...`      | GET    | Get matched jobs with scores | Dashboard, Jobs |
+| `/api/profile/extract?userId=...` | GET    | Get user profile             | Settings        |
+| `/api/profile/history?userId=...` | GET    | Profile change history       | Settings        |
+| `/api/cv/upload`                  | POST   | Upload CV/PDF                | Upload          |
+| `/api/cv/process`                 | POST   | Process uploaded CV          | Upload          |
+| `/api/cv/update-profile`          | POST   | Update user profile          | Settings        |
+| `/api/email/send`                 | POST   | Send email digest            | Pipeline        |
+| `/api/pdf/upload`                 | POST   | Upload PDF for matching      | Upload          |
+| `/api/pdf/match`                  | POST   | Match PDF against jobs       | Upload          |
 
 - Need to add: `GET /api/stats` for dashboard aggregate stats (or compute client-side)
 
@@ -221,8 +229,8 @@ export function StatsCard({ title, value, icon, trend, className }: StatsCardPro
 // TanStack Query hooks for each endpoint
 export function useJobs(params: MatchJobsParams) {
   return useQuery({
-    queryKey: ["jobs", params],
-    queryFn: () => fetch(`/api/match-jobs?${toQueryString(params)}`).then(r => r.json()),
+    queryKey: ['jobs', params],
+    queryFn: () => fetch(`/api/match-jobs?${toQueryString(params)}`).then((r) => r.json()),
   });
 }
 ```
@@ -237,6 +245,7 @@ export function useJobs(params: MatchJobsParams) {
 ## Boundaries
 
 ### Always Do
+
 - Run `npx tsc --noEmit` after any TypeScript changes
 - Use existing API types (`Job`, `UserProfile`, `MatchedJob`) from `src/types/`
 - Use the `@/` path alias for imports (already configured)
@@ -246,12 +255,14 @@ export function useJobs(params: MatchJobsParams) {
 - Make all interactive elements keyboard-accessible
 
 ### Ask First
+
 - Adding new npm packages beyond the spec'd stack (Tailwind, Lucide, Framer Motion, Recharts, TanStack Query, Zustand)
 - Changing existing API route signatures or adding new API endpoints
 - Modifying the Prisma schema or database models
 - Changing the routing structure (Next.js App Router)
 
 ### Never Do
+
 - Commit API keys or secrets to the codebase
 - Remove error/loading/empty states from components
 - Use emoji as icons (use Lucide SVG icons instead)

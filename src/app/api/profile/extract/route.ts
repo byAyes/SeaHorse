@@ -42,10 +42,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Profile GET error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -62,17 +59,14 @@ export async function POST(request: NextRequest) {
       const file = formData.get('file') as File | null;
 
       if (!file) {
-        return NextResponse.json(
-          { success: false, error: 'No file provided' },
-          { status: 400 }
-        );
+        return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
       }
 
       // Validate file type
       if (!file.type || (!file.type.includes('pdf') && !file.type.includes('octet-stream'))) {
         return NextResponse.json(
           { success: false, error: 'Only PDF files are accepted' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -81,7 +75,7 @@ export async function POST(request: NextRequest) {
       if (file.size > maxSize) {
         return NextResponse.json(
           { success: false, error: 'File exceeds 10MB limit' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -91,7 +85,7 @@ export async function POST(request: NextRequest) {
       if (!result.success) {
         return NextResponse.json(
           { success: false, error: result.error || 'Failed to extract profile' },
-          { status: 422 }
+          { status: 422 },
         );
       }
 
@@ -100,13 +94,13 @@ export async function POST(request: NextRequest) {
 
     // ── JSON body with raw text ──────────────────────────────────────────
     if (contentType.includes('application/json')) {
-      const body = await request.json() as { text?: string };
+      const body = (await request.json()) as { text?: string };
       const text = body?.text;
 
       if (!text || typeof text !== 'string' || text.trim().length === 0) {
         return NextResponse.json(
           { success: false, error: 'No text provided in request body' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -115,7 +109,7 @@ export async function POST(request: NextRequest) {
       if (!result.success) {
         return NextResponse.json(
           { success: false, error: result.error || 'Failed to extract profile' },
-          { status: 422 }
+          { status: 422 },
         );
       }
 
@@ -123,14 +117,14 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Binary PDF upload ────────────────────────────────────────────────
-    if (contentType.includes('application/pdf') || contentType.includes('application/octet-stream')) {
+    if (
+      contentType.includes('application/pdf') ||
+      contentType.includes('application/octet-stream')
+    ) {
       const buffer = Buffer.from(await request.arrayBuffer());
 
       if (buffer.length === 0) {
-        return NextResponse.json(
-          { success: false, error: 'Empty file' },
-          { status: 400 }
-        );
+        return NextResponse.json({ success: false, error: 'Empty file' }, { status: 400 });
       }
 
       const result = await extractProfileFromPDF(buffer);
@@ -138,7 +132,7 @@ export async function POST(request: NextRequest) {
       if (!result.success) {
         return NextResponse.json(
           { success: false, error: result.error || 'Failed to extract profile' },
-          { status: 422 }
+          { status: 422 },
         );
       }
 
@@ -149,15 +143,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Unsupported content type. Use multipart/form-data with a PDF file, application/json with text field, or application/pdf binary.',
+        error:
+          'Unsupported content type. Use multipart/form-data with a PDF file, application/json with text field, or application/pdf binary.',
       },
-      { status: 415 }
+      { status: 415 },
     );
   } catch (error) {
     console.error('Profile extraction error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error during profile extraction' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

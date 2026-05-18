@@ -49,7 +49,7 @@ export interface PythonScraperConfig {
   enabled: boolean;
   maxJobs: number;
   rateLimitMs: number;
-  extra?: Record<string, any>;
+  extra?: Record<string, unknown>;
 }
 
 /**

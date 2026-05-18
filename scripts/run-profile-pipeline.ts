@@ -57,7 +57,9 @@ async function main() {
   console.log(`     Level:        ${profile.experienceLevel}`);
   console.log(`     Skills:       ${profile.skills.length} identified`);
   console.log(`     Locations:    ${profile.locations.join(', ') || 'N/A'}`);
-  console.log(`     Languages:    ${profile.languages.map(l => `${l.language} (${l.level})`).join(', ') || 'N/A'}`);
+  console.log(
+    `     Languages:    ${profile.languages.map((l) => `${l.language} (${l.level})`).join(', ') || 'N/A'}`,
+  );
 
   // ── Step 2: Show search strategy ──────────────────────────────────────────
   console.log('\n' + '-'.repeat(60));
@@ -101,7 +103,9 @@ async function main() {
     for (const stat of result.scraperStats) {
       const status = stat.success ? '✅' : '❌';
       const detail = stat.error ? ` (${stat.error})` : '';
-      console.log(`    ${status} ${stat.scraper}: ${stat.jobCount} jobs in ${(stat.duration / 1000).toFixed(1)}s${detail}`);
+      console.log(
+        `    ${status} ${stat.scraper}: ${stat.jobCount} jobs in ${(stat.duration / 1000).toFixed(1)}s${detail}`,
+      );
     }
   }
 

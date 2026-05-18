@@ -41,13 +41,13 @@ Resend is a modern email API designed for developers with 100 emails/day free, p
 
 Go to your GitHub repository: `https://github.com/byAyes/automatitation/settings/secrets/actions`
 
-| Secret Name | Value | Example |
-|-------------|-------|---------|
-| `RESEND_API_KEY` | Your API key from Step 2 | `re_xxx123...` |
-| `RESEND_FROM_EMAIL` | Verified email/domain | `onboarding@resend.dev` |
-| `GMAIL_RECIPIENT` | Where to send jobs | `your.email@example.com` |
-| `JSEARCH_API_KEY` | Your RapidAPI key | `xxx...` |
-| `OPENAI_API_KEY` | Your OpenAI key | `sk-xxx...` |
+| Secret Name         | Value                    | Example                  |
+| ------------------- | ------------------------ | ------------------------ |
+| `RESEND_API_KEY`    | Your API key from Step 2 | `re_xxx123...`           |
+| `RESEND_FROM_EMAIL` | Verified email/domain    | `onboarding@resend.dev`  |
+| `GMAIL_RECIPIENT`   | Where to send jobs       | `your.email@example.com` |
+| `JSEARCH_API_KEY`   | Your RapidAPI key        | `xxx...`                 |
+| `OPENAI_API_KEY`    | Your OpenAI key          | `sk-xxx...`              |
 
 **Add these 5 secrets** in your repository settings.
 
@@ -70,7 +70,7 @@ on:
 jobs:
   send-job-digest:
     runs-on: ubuntu-latest
-    
+
     env:
       # Resend Configuration (from GitHub Secrets)
       EMAIL_PROVIDER: resend
@@ -79,20 +79,20 @@ jobs:
       GMAIL_RECIPIENT: ${{ secrets.GMAIL_RECIPIENT }}
       JSEARCH_API_KEY: ${{ secrets.JSEARCH_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run automation
         run: npm run automate
 ```
@@ -127,6 +127,7 @@ Go to GitHub and trigger the workflow manually:
 4. Watch the logs as it runs
 
 **Expected successful output:**
+
 ```
 ✓ Checkout code
 ✓ Setup Node.js
@@ -166,6 +167,7 @@ cron: '0 7 * * 1-5'
 ### Error: "Unable to load credentials"
 
 **Fix**: Secrets not set or misspelled. Check:
+
 - Go to: https://github.com/byAyes/automatitation/settings/secrets/actions
 - Verify all 5 secrets exist and are spelled exactly:
   - `RESEND_API_KEY`
@@ -177,6 +179,7 @@ cron: '0 7 * * 1-5'
 ### Error: "Invalid API key" (403 Forbidden)
 
 **Fix**: API key is wrong. In GitHub:
+
 1. Go to Secrets → Click **"Update"** on `RESEND_API_KEY`
 2. Regenerate key at: https://resend.com/api-keys
 3. Paste new key and click **"Update secret"**
@@ -184,6 +187,7 @@ cron: '0 7 * * 1-5'
 ### Error: "Invalid from address"
 
 **Fix**: Use `onboarding@resend.dev` (pre-verified) or verify your own domain:
+
 1. Go to: https://resend.com/domains
 2. Click "Add Domain"
 3. Add DNS records to your domain
@@ -192,6 +196,7 @@ cron: '0 7 * * 1-5'
 ### Error: "Unable to find node"
 
 **Fix**: Node.js version issue. Edit workflow:
+
 ```yaml
 - name: Setup Node.js
   uses: actions/setup-node@v4
@@ -208,11 +213,13 @@ cron: '0 7 * * 1-5'
 ## 🔒 GitHub Secrets Best Practices
 
 ✅ **DO:**
+
 - Use secrets for ALL sensitive data (API keys, emails)
 - Rotate keys regularly (generate new ones monthly)
 - Use different keys for different environments
 
 ❌ **DON'T:**
+
 - Hardcode API keys in code or `.env` files
 - Commit `.env` to git (it's in `.gitignore` for a reason)
 - Share API keys in messages/chats
@@ -228,6 +235,7 @@ https://resend.com/dashboard
 ```
 
 **Track:**
+
 - Emails sent, delivered, bounced
 - API usage
 - Rate limits
@@ -241,7 +249,7 @@ https://resend.com/dashboard
 ✅ **Sender verified**: Using onboarding@resend.dev  
 ✅ **GitHub Secrets**: RESEND_API_KEY, RESEND_FROM_EMAIL, JSEARCH_API_KEY, OPENAI_API_KEY, GMAIL_RECIPIENT  
 ✅ **Workflow**: Created at `.github/workflows/job-email-automation.yml`  
-✅ **Test**: Manually triggered and email received  
+✅ **Test**: Manually triggered and email received
 
 **Done!** Your job automation runs automatically every Monday at 9 AM UTC via GitHub Actions using encrypted secrets! 🚀
 
@@ -251,10 +259,10 @@ https://resend.com/dashboard
 
 ### Updating Resend API Key (Monthly rotation)
 
-1. Go to: https://resend.com/api-keys  
-2. Create new key  
-3. Update secret: https://github.com/byAyes/automatitation/settings/secrets/actions  
-4. Click "Update" on RESEND_API_KEY  
+1. Go to: https://resend.com/api-keys
+2. Create new key
+3. Update secret: https://github.com/byAyes/automatitation/settings/secrets/actions
+4. Click "Update" on RESEND_API_KEY
 5. No code changes needed!
 
 ### Changing Schedule
@@ -264,8 +272,9 @@ Edit `.github/workflows/job-email-automation.yml`:
 ```yaml
 on:
   schedule:
-    - cron: '0 9 * * *'  # Change this
-  
+    - cron: '0 9 * * *' # Change this
+
+
   # Help: https://crontab.guru/
 ```
 

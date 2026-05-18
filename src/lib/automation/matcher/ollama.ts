@@ -11,30 +11,31 @@ async function queryOllama(job: Job, interests: string[]): Promise<MatchResult |
       body: JSON.stringify({
         model: process.env.OLLAMA_MODEL || 'llama3.2',
         prompt: `Rate how well this job matches the user's interests on a 0-100 scale. Job: "${job.title}" at ${job.company}. Skills: ${job.skills.join(', ')}. User interests: ${interests.join(', ')}. Reply with only a JSON object: {"score": number, "reason": "brief explanation"}`,
-        stream: false
+        stream: false,
       }),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(30000),
     });
 
     if (!response.ok) return null;
 
-    const data = await response.json() as { response: string };
+    const data = (await response.json()) as { response: string };
     const parsed = JSON.parse(data.response) as { score: number; reason: string };
 
     if (typeof parsed.score === 'number') {
       return {
         score: Math.min(100, Math.max(0, Math.round(parsed.score))),
-        matchedSkills: job.skills.filter(s =>
-          interests.some(i => i.toLowerCase() === s.toLowerCase())
+        matchedSkills: job.skills.filter((s) =>
+          interests.some((i) => i.toLowerCase() === s.toLowerCase()),
         ),
-        matchedInterests: interests.filter(i =>
-          job.skills.some(s => s.toLowerCase() === i.toLowerCase())
-          || job.title.toLowerCase().includes(i.toLowerCase())
+        matchedInterests: interests.filter(
+          (i) =>
+            job.skills.some((s) => s.toLowerCase() === i.toLowerCase()) ||
+            job.title.toLowerCase().includes(i.toLowerCase()),
         ),
-        missingSkills: job.skills.filter(s =>
-          !interests.some(i => i.toLowerCase() === s.toLowerCase())
+        missingSkills: job.skills.filter(
+          (s) => !interests.some((i) => i.toLowerCase() === s.toLowerCase()),
         ),
-        reason: parsed.reason || 'Ollama match'
+        reason: parsed.reason || 'Ollama match',
       };
     }
   } catch {
@@ -51,7 +52,7 @@ const ollamaMatcher: Matcher = {
 
     const { default: keywordMatcher } = await import('./keyword');
     return keywordMatcher.calculateMatchScore(job, interests);
-  }
+  },
 };
 
 export default ollamaMatcher;

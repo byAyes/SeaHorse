@@ -12,20 +12,20 @@ import * as path from 'path';
 
 async function autoUpdateProfiles() {
   console.log('🔄 Auto-updating profiles from CVs...');
-  
+
   try {
-  // Buscar CVs procesados pero no aplicados al perfil
-  const processedCVs = await prisma.cV.findMany({
-    where: {
-      status: 'processed'
-    },
-    include: {
-      user: true
-    },
-    orderBy: {
-      uploadedAt: 'asc'
-    }
-  });
+    // Buscar CVs procesados pero no aplicados al perfil
+    const processedCVs = await prisma.cV.findMany({
+      where: {
+        status: 'processed',
+      },
+      include: {
+        user: true,
+      },
+      orderBy: {
+        uploadedAt: 'asc',
+      },
+    });
 
     if (processedCVs.length === 0) {
       console.log('✅ No CVs to apply to profiles');
@@ -46,84 +46,87 @@ async function autoUpdateProfiles() {
         }
 
         const pdfBuffer = fs.readFileSync(pdfPath);
-        
+
         // Parsear CV
         const cvData = await parseCV(pdfBuffer);
-        
+
         if (!cvData) {
           console.error(`❌ Failed to parse CV ${cv.id}`);
           continue;
         }
 
-    // Extraer skills del texto completo y de la sección de skills
-    const skillsFromFull = extractSkills(cvData.rawText || '');
-    const skillsFromSection = cvData.sections.skills ? extractSkills(cvData.sections.skills) : [];
-    const skills = [...new Set([...skillsFromFull, ...skillsFromSection])];
+        // Extraer skills del texto completo y de la sección de skills
+        const skillsFromFull = extractSkills(cvData.rawText || '');
+        const skillsFromSection = cvData.sections.skills
+          ? extractSkills(cvData.sections.skills)
+          : [];
+        const skills = [...new Set([...skillsFromFull, ...skillsFromSection])];
 
-    // Actualizar perfil del usuario
-    const updateData: any = {};
+        // Actualizar perfil del usuario
+        const updateData: Record<string, unknown> = {};
 
-    // Agregar skills (sin duplicados)
-    if (skills.length > 0) {
-      const existingSkills: string[] = cv.user.skills || [];
-      const newSkills = skills.filter(
-        skill => !existingSkills.some(
-          existing => existing.toLowerCase() === skill.toLowerCase()
-        )
-      );
+        // Agregar skills (sin duplicados)
+        if (skills.length > 0) {
+          const existingSkills: string[] = cv.user.skills || [];
+          const newSkills = skills.filter(
+            (skill) =>
+              !existingSkills.some((existing) => existing.toLowerCase() === skill.toLowerCase()),
+          );
 
-      if (newSkills.length > 0) {
-        updateData.skills = [...existingSkills, ...newSkills];
-        console.log(`✅ Added ${newSkills.length} new skills: ${newSkills.join(', ')}`);
+          if (newSkills.length > 0) {
+            updateData.skills = [...existingSkills, ...newSkills];
+            console.log(`✅ Added ${newSkills.length} new skills: ${newSkills.join(', ')}`);
 
-        await trackProfileChange({
-          userId: cv.userId,
-          changeType: 'skills',
-          previousValue: existingSkills,
-          newValue: updateData.skills,
-          source: 'cv_upload',
-          cvId: cv.id,
-        });
-      }
-    }
+            await trackProfileChange({
+              userId: cv.userId,
+              changeType: 'skills',
+              previousValue: existingSkills,
+              newValue: updateData.skills,
+              source: 'cv_upload',
+              cvId: cv.id,
+            });
+          }
+        }
 
-    // Inferir experiencia desde la sección de experiencia del CV
-    if (cvData.sections.experience) {
-      const yearsOfExperience = calculateYearsOfExperience(cvData.sections.experience as any);
-      if (yearsOfExperience > 0) {
-        updateData.experienceLevel = inferExperienceLevel(yearsOfExperience);
-        console.log(`✅ Inferred experience level: ${updateData.experienceLevel}`);
+        // Inferir experiencia desde la sección de experiencia del CV
+        if (cvData.sections.experience) {
+          const yearsOfExperience = calculateYearsOfExperience(
+            cvData.sections.experience as Array<Record<string, string>>,
+          );
+          if (yearsOfExperience > 0) {
+            updateData.experienceLevel = inferExperienceLevel(yearsOfExperience);
+            console.log(`✅ Inferred experience level: ${updateData.experienceLevel}`);
 
-        await trackProfileChange({
-          userId: cv.userId,
-          changeType: 'experienceLevel',
-          previousValue: cv.user.experienceLevel,
-          newValue: updateData.experienceLevel,
-          source: 'cv_upload',
-          cvId: cv.id,
-        });
-      }
-    }
+            await trackProfileChange({
+              userId: cv.userId,
+              changeType: 'experienceLevel',
+              previousValue: cv.user.experienceLevel,
+              newValue: updateData.experienceLevel,
+              source: 'cv_upload',
+              cvId: cv.id,
+            });
+          }
+        }
 
-    // Actualizar intereses si se extrajo información relevante
-    if (skills.length > 0 && !updateData.interests) {
-      updateData.interests = skills.slice(0, 5);
-      console.log(`✅ Updated interests from CV skills`);
-    }
+        // Actualizar intereses si se extrajo información relevante
+        if (skills.length > 0 && !updateData.interests) {
+          updateData.interests = skills.slice(0, 5);
+          console.log(`✅ Updated interests from CV skills`);
+        }
 
         // Aplicar actualizaciones
         if (Object.keys(updateData).length > 0) {
           await prisma.userProfile.update({
             where: { id: cv.userId },
-            data: updateData
+            data: updateData,
           });
-          
-        // Marcar CV como aplicado al perfil
-        await prisma.cV.update({
-          where: { id: cv.id },
-          data: { status: 'applied' }
-        });
-          
+
+          // Marcar CV como aplicado al perfil
+          await prisma.cV.update({
+            where: { id: cv.id },
+            data: { status: 'applied' },
+          });
+
           console.log(`✅ Profile updated for user ${cv.userId}`);
         } else {
           console.log(`ℹ️ No changes needed for user ${cv.userId}`);
@@ -142,17 +145,17 @@ async function autoUpdateProfiles() {
   }
 }
 
-function calculateYearsOfExperience(experiences: any[]): number {
+function calculateYearsOfExperience(experiences: Array<Record<string, string>>): number {
   let totalYears = 0;
-  
-  experiences.forEach(exp => {
+
+  experiences.forEach((exp) => {
     const duration = exp.duration || '';
     const match = duration.match(/(\d+)\s*(year|año)/i);
     if (match) {
       totalYears += parseInt(match[1]);
     }
   });
-  
+
   return totalYears;
 }
 

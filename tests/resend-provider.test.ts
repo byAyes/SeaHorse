@@ -20,18 +20,22 @@ describe('ResendProvider', () => {
         json: async () => mockResponse,
       });
 
-      const result: SendResult = await provider.sendEmail('to@test.com', 'Test Subject', 'Test Body');
+      const result: SendResult = await provider.sendEmail(
+        'to@test.com',
+        'Test Subject',
+        'Test Body',
+      );
 
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.resend.com/emails',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Authorization': `Bearer ${mockApiKey}`,
+            Authorization: `Bearer ${mockApiKey}`,
             'Content-Type': 'application/json',
           }),
           body: expect.stringContaining('"to":"to@test.com"'),
-        })
+        }),
       );
 
       expect(result.success).toBe(true);
@@ -51,7 +55,7 @@ describe('ResendProvider', () => {
         'https://api.resend.com/emails',
         expect.objectContaining({
           body: expect.stringContaining('"from":"custom@example.com"'),
-        })
+        }),
       );
     });
 
@@ -68,7 +72,7 @@ describe('ResendProvider', () => {
     });
 
     it('should handle network errors', async () => {
-      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network timeout'));
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network timeout'));
 
       const result: SendResult = await provider.sendEmail('to@test.com', 'Test', 'Body');
 
@@ -111,13 +115,13 @@ describe('ResendProvider', () => {
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
-            'Authorization': `Bearer ${mockApiKey}`,
+            Authorization: `Bearer ${mockApiKey}`,
           }),
           body: JSON.stringify({
             name: 'updates.example.com',
-            customReturnPath: 'outbound',
+            custom_return_path: 'outbound',
           }),
-        })
+        }),
       );
 
       expect(result.success).toBe(true);
@@ -138,7 +142,7 @@ describe('ResendProvider', () => {
           body: JSON.stringify({
             name: 'example.com',
           }),
-        })
+        }),
       );
     });
 
@@ -184,9 +188,9 @@ describe('ResendProvider', () => {
         expect.objectContaining({
           method: 'GET',
           headers: expect.objectContaining({
-            'Authorization': `Bearer ${mockApiKey}`,
+            Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
 
       expect(result.success).toBe(true);
@@ -249,9 +253,9 @@ describe('ResendProvider', () => {
         expect.objectContaining({
           method: 'GET',
           headers: expect.objectContaining({
-            'Authorization': `Bearer ${mockApiKey}`,
+            Authorization: `Bearer ${mockApiKey}`,
           }),
-        })
+        }),
       );
 
       expect(result.success).toBe(true);

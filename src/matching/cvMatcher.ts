@@ -12,10 +12,7 @@ import { UserProfile, ExperienceLevel } from '../types/user-profile';
  * Match jobs to a user's CV profile
  * Uses the latest CV data for matching
  */
-export async function matchJobsToCVProfile(
-  jobs: Job[],
-  cvId: string
-): Promise<any[]> {
+export async function matchJobsToCVProfile(jobs: Job[], cvId: string): Promise<unknown[]> {
   try {
     // Fetch CV data
     const cv = await prisma.cV.findUnique({
@@ -55,7 +52,9 @@ export async function matchJobsToCVProfile(
       interests: userProfile?.interests || [],
       location: cvProfile.location || userProfile?.location || null,
       remoteOnly: userProfile?.remoteOnly || false,
-      experienceLevel: (cvProfile.experienceLevel || userProfile?.experienceLevel || null) as ExperienceLevel | null,
+      experienceLevel: (cvProfile.experienceLevel ||
+        userProfile?.experienceLevel ||
+        null) as ExperienceLevel | null,
       minSalary: userProfile?.minSalary || null,
       maxSalary: userProfile?.maxSalary || null,
       skillWeight: userProfile?.skillWeight || 0.4,

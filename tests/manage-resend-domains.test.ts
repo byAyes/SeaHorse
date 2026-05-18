@@ -100,7 +100,9 @@ describe('manageResendDomains', () => {
     expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Listing current domains'));
     expect(console.log).toHaveBeenCalledWith(expect.stringContaining('example.com'));
     expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Creating new domain'));
-    expect(console.log).toHaveBeenCalledWith(expect.stringContaining('Domain created successfully'));
+    expect(console.log).toHaveBeenCalledWith(
+      expect.stringContaining('Domain created successfully'),
+    );
   });
 
   it('should handle empty domains list', async () => {
@@ -133,7 +135,7 @@ describe('manageResendDomains', () => {
     await manageResendDomains();
 
     expect(console.error).toHaveBeenCalledWith(
-      'Missing required environment variables: RESEND_API_KEY and RESEND_FROM_EMAIL'
+      'Missing required environment variables: RESEND_API_KEY and RESEND_FROM_EMAIL',
     );
     expect(process.exit).toHaveBeenCalledWith(1);
   });
@@ -156,7 +158,10 @@ describe('manageResendDomains', () => {
     await manageResendDomains();
 
     expect(mockProvider.createDomain).toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalledWith('Failed to create domain:', 'Domain name already exists');
+    expect(console.error).toHaveBeenCalledWith(
+      'Failed to create domain:',
+      'Domain name already exists',
+    );
   });
 
   it('should handle API failures gracefully', async () => {
@@ -177,7 +182,10 @@ describe('manageResendDomains', () => {
     await manageResendDomains();
 
     expect(mockProvider.listDomains).toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalledWith('Failed to list domains:', 'Unauthorized: Invalid API key');
+    expect(console.error).toHaveBeenCalledWith(
+      'Failed to list domains:',
+      'Unauthorized: Invalid API key',
+    );
   });
 
   it('should handle domain creation with DNS records', async () => {

@@ -97,4 +97,3 @@ jobs:
             *.log
             logs/
           retention-days: 30
-

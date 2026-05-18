@@ -18,8 +18,7 @@ if (process.env.GMAIL_ACCESS_TOKEN && process.env.GMAIL_REFRESH_TOKEN) {
   });
 }
 
-// Initialize Gmail API client
-const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+// Gmail API client is initialized per-request in sendEmail()
 
 /**
  * Generate OAuth2 authorization URL for initial setup
@@ -77,16 +76,14 @@ export async function sendEmail(
   body: string,
   from?: string,
   html?: string,
-  cc?: string | string[]
+  cc?: string | string[],
 ): Promise<SendResult> {
   try {
     // Create RFC 2822 formatted email
     const sender = from || 'me';
 
     // Build CC header line if CC recipients are specified
-    const ccHeader = cc
-      ? `Cc: ${Array.isArray(cc) ? cc.join(', ') : cc}`
-      : null;
+    const ccHeader = cc ? `Cc: ${Array.isArray(cc) ? cc.join(', ') : cc}` : null;
 
     // Build MIME multipart email if HTML is provided, otherwise plain text
     let email: string;
@@ -165,7 +162,9 @@ export async function sendEmail(
 export async function authenticateGmail(): Promise<void> {
   // Check if we have credentials
   if (!CLIENT_ID || !CLIENT_SECRET) {
-    throw new Error('Missing Gmail OAuth2 credentials. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.');
+    throw new Error(
+      'Missing Gmail OAuth2 credentials. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.',
+    );
   }
 
   // The OAuth2 client is already initialized with credentials from env vars
