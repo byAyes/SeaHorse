@@ -58,7 +58,11 @@ describe('buildScrapeStrategy', () => {
     expect(strategy.searchQueries.length).toBeGreaterThanOrEqual(1);
     expect(strategy.searchQueries[0]).toContain('Software Engineer');
     // Should include remote when no locations provided
-    expect(strategy.searchQueries.some(function(q) { return q.toLowerCase().includes('remote'); })).toBe(true);
+    expect(
+      strategy.searchQueries.some(function (q) {
+        return q.toLowerCase().includes('remote');
+      }),
+    ).toBe(true);
   });
 });
 
@@ -67,7 +71,7 @@ describe('generateSearchQueries', () => {
     const queries = generateSearchQueries(
       ['Senior React Engineer', 'Backend Developer'],
       ['TypeScript', 'React', 'Node.js'],
-      ['Colombia', 'Remote']
+      ['Colombia', 'Remote'],
     );
 
     expect(queries.length).toBeGreaterThanOrEqual(2);
@@ -76,14 +80,14 @@ describe('generateSearchQueries', () => {
   });
 
   it('should not duplicate queries (case-insensitive)', () => {
-    const queries = generateSearchQueries(
-      ['Developer'],
-      ['JavaScript'],
-      ['New York']
-    );
+    const queries = generateSearchQueries(['Developer'], ['JavaScript'], ['New York']);
 
     // Same query shouldn't appear twice
-    const unique = new Set(queries.map(function(q) { return q.toLowerCase(); }));
+    const unique = new Set(
+      queries.map(function (q) {
+        return q.toLowerCase();
+      }),
+    );
     expect(unique.size).toBe(queries.length);
   });
 
@@ -166,11 +170,16 @@ describe('Profile data integrity', () => {
     expect(languages[0].level).toBe('Professional');
   });
 
-  it('should have valid experience levels', function() {
-    var validLevels = ['junior', 'mid', 'senior', 'lead'];
+  it('should have valid experience levels', function () {
+    const validLevels = ['junior', 'mid', 'senior', 'lead'];
     expect(validLevels).toContain('mid');
     expect(validLevels).toContain('senior');
     expect(validLevels).toContain('junior');
     expect(validLevels).toContain('lead');
+  });
+
+  it('should trigger the pre-commit hook', function () {
+    const deliberateError = 'this var should trigger no-var';
+    expect(deliberateError).toBeDefined();
   });
 });
