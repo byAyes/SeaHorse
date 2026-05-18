@@ -1,0 +1,30 @@
+{
+  "totalJobs": 47,
+  "todayJobs": 5,
+  "matches": 12,
+  "matchRate": 25.5,
+  "trend": [10, 15, 12, 18, 14, 20, 22],
+  "topSkills": ["TypeScript", "React", "Node.js", "Python", "AWS"],
+  "recentMatches": [
+    {
+      "id": "1",
+      "title": "Senior Frontend Developer",
+      "company": "TechCorp",
+      "score": 92,
+      "location": "Remote",
+      "salary": "$120k-$150k",
+      "url": "https://example.com/job/1",
+      "matchedAt": "2025-06-01T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "title": "Full Stack Engineer",
+      "company": "StartupXYZ",
+      "score": 78,
+      "location": "San Francisco, CA",
+      "salary": "$130k-$160k",
+      "url": "https://example.com/job/2",
+      "matchedAt": "2025-06-01T09:00:00Z"
+    }
+  ]
+}
