@@ -347,6 +347,15 @@ Hace 1 día
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Mock setTimeout to resolve immediately in retry tests (avoids 2s/4s real delays)
+  jest.spyOn(global, 'setTimeout').mockImplementation((fn: (...args: unknown[]) => void) => {
+    if (typeof fn === 'function') fn();
+    return 0 as unknown as NodeJS.Timeout;
+  });
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 // =============================================================================
@@ -1044,7 +1053,7 @@ describe('ScraperRunner — runJinaReaderFallbacks()', () => {
     expect(googleJob!.location).toBe('Already Scraped');
   });
 
-  it('should handle JinaReader fallback failure gracefully', async () => {
+  it('should handle JinaReader fallback failure gracefully (retries 3x, all fail)', async () => {
     const runner = new ScraperRunner({ query: 'engineer', maxJobs: 10 });
 
     const stats: ScraperStats[] = [
@@ -1052,8 +1061,8 @@ describe('ScraperRunner — runJinaReaderFallbacks()', () => {
     ];
     (runner as unknown as { stats: ScraperStats[] }).stats = stats;
 
-    // Mock JinaReader fails too
-    mockedAxios.get.mockRejectedValueOnce(new Error('ETIMEDOUT'));
+    // Mock JinaReader fails for ALL retry attempts (3x)
+    mockedAxios.get.mockRejectedValue(new Error('ETIMEDOUT'));
 
     const failedSources = (
       runner as unknown as { identifyFailedSources(): string[] }
@@ -1064,14 +1073,94 @@ describe('ScraperRunner — runJinaReaderFallbacks()', () => {
 
     const finalStats = (runner as unknown as { stats: ScraperStats[] }).stats;
 
-    // Should have fallen-back with error recorded
+    // Should have fallen-back with error recorded after all retries
     const jrLinkedinStats = finalStats.find((s) => s.scraper === 'jinareader-linkedin');
     expect(jrLinkedinStats).toBeDefined();
     expect(jrLinkedinStats!.success).toBe(false);
     expect(jrLinkedinStats!.error).toBe('ETIMEDOUT');
   });
 
-  it('should handle mixed fallback results (some succeed, some fail)', async () => {
+  it('should retry failed JinaReader fallback and recover on 2nd attempt', async () => {
+    const runner = new ScraperRunner({ query: 'engineer', maxJobs: 10 });
+
+    const stats: ScraperStats[] = [
+      { scraper: 'linkedin', success: false, jobCount: 0, duration: 500, error: 'blocked' },
+    ];
+    (runner as unknown as { stats: ScraperStats[] }).stats = stats;
+
+    // Attempt 1: fails with timeout
+    mockedAxios.get.mockRejectedValueOnce(new Error('ETIMEDOUT'));
+    // Attempt 2: succeeds with linkedin jobs
+    mockedAxios.get.mockResolvedValueOnce({
+      status: 200,
+      statusText: 'OK',
+      data: LINKEDIN_REALISTIC,
+    });
+
+    const failedSources = (
+      runner as unknown as { identifyFailedSources(): string[] }
+    ).identifyFailedSources();
+    await (
+      runner as unknown as { runJinaReaderFallbacks(sources: string[]): Promise<void> }
+    ).runJinaReaderFallbacks(failedSources);
+
+    const finalStats = (runner as unknown as { stats: ScraperStats[] }).stats;
+    const finalJobs = (runner as unknown as { allJobs: Job[] }).allJobs;
+
+    // Should have recovered on retry and recorded success with 5 jobs
+    const jrLinkedinStats = finalStats.find((s) => s.scraper === 'jinareader-linkedin');
+    expect(jrLinkedinStats).toBeDefined();
+    expect(jrLinkedinStats!.success).toBe(true);
+    expect(jrLinkedinStats!.jobCount).toBe(5);
+    expect(finalJobs.length).toBe(5);
+  });
+
+  it('should retry empty results and recover on 3rd attempt', async () => {
+    const runner = new ScraperRunner({ query: 'engineer', maxJobs: 10 });
+
+    const stats: ScraperStats[] = [
+      { scraper: 'linkedin', success: false, jobCount: 0, duration: 500, error: 'blocked' },
+    ];
+    (runner as unknown as { stats: ScraperStats[] }).stats = stats;
+
+    // Attempt 1: empty results
+    mockedAxios.get.mockResolvedValueOnce({
+      status: 200,
+      statusText: 'OK',
+      data: '# No jobs found\nSearch results are empty.',
+    });
+    // Attempt 2: empty again
+    mockedAxios.get.mockResolvedValueOnce({
+      status: 200,
+      statusText: 'OK',
+      data: '# No jobs found\nSearch results are empty.',
+    });
+    // Attempt 3: success!
+    mockedAxios.get.mockResolvedValueOnce({
+      status: 200,
+      statusText: 'OK',
+      data: LINKEDIN_REALISTIC,
+    });
+
+    const failedSources = (
+      runner as unknown as { identifyFailedSources(): string[] }
+    ).identifyFailedSources();
+    await (
+      runner as unknown as { runJinaReaderFallbacks(sources: string[]): Promise<void> }
+    ).runJinaReaderFallbacks(failedSources);
+
+    const finalStats = (runner as unknown as { stats: ScraperStats[] }).stats;
+    const finalJobs = (runner as unknown as { allJobs: Job[] }).allJobs;
+
+    // Should have recovered on 3rd attempt
+    const jrLinkedinStats = finalStats.find((s) => s.scraper === 'jinareader-linkedin');
+    expect(jrLinkedinStats).toBeDefined();
+    expect(jrLinkedinStats!.success).toBe(true);
+    expect(jrLinkedinStats!.jobCount).toBe(5);
+    expect(finalJobs.length).toBe(5);
+  });
+
+  it('should handle mixed fallback results (some succeed, some fail after 3 retries)', async () => {
     const runner = new ScraperRunner({ query: 'engineer', maxJobs: 10 });
 
     const stats: ScraperStats[] = [
@@ -1080,8 +1169,11 @@ describe('ScraperRunner — runJinaReaderFallbacks()', () => {
     ];
     (runner as unknown as { stats: ScraperStats[] }).stats = stats;
 
-    // Indeed succeeds, LinkedIn fails
+    // LinkedIn fails for all 3 retry attempts
     mockedAxios.get.mockRejectedValueOnce(new Error('LinkedIn blocked'));
+    mockedAxios.get.mockRejectedValueOnce(new Error('LinkedIn blocked'));
+    mockedAxios.get.mockRejectedValueOnce(new Error('LinkedIn blocked'));
+    // Indeed succeeds on first try (no retry needed)
     mockedAxios.get.mockResolvedValueOnce({
       status: 200,
       statusText: 'OK',
@@ -1209,18 +1301,16 @@ describe('ScraperRunner — getStats(), getJobs(), clearJobs()', () => {
     const runner1 = new ScraperRunner({ query: 'engineer', maxJobs: 10 });
     const runner2 = new ScraperRunner({ query: 'designer', maxJobs: 5 });
 
-    runner1
-      .getJobs()
-      .push({
-        id: '1',
-        title: 'Eng',
-        company: 'C1',
-        location: '',
-        link: '',
-        description: '',
-        source: 'test',
-        scrapedAt: new Date(),
-      });
+    runner1.getJobs().push({
+      id: '1',
+      title: 'Eng',
+      company: 'C1',
+      location: '',
+      link: '',
+      description: '',
+      source: 'test',
+      scrapedAt: new Date(),
+    });
 
     expect(runner1.getJobs()).toHaveLength(1);
     expect(runner2.getJobs()).toHaveLength(0);

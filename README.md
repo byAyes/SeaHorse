@@ -41,6 +41,35 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Jina Reader fallback → M
 
 ### Installation
 
+#### ⚡ One-command setup (Windows/PowerShell)
+
+**Opción A — Una línea (automático):**
+
+```powershell
+# Abre PowerShell y pega esto — descarga y ejecuta el setup:
+irm https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1 | iex
+```
+
+**Opción B — Descargar y ejecutar (recomendado):**
+
+```powershell
+# 1. Descarga el script:
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1" -OutFile "setup.ps1"
+# 2. Ejecútalo:
+.\setup.ps1
+```
+
+> El script `setup.ps1` clona el repo, instala npm + pip + Playwright/Patchright, crea `.env` y lo abre para que configures tus API keys.
+
+```powershell
+# Después de configurar .env, ejecuta el pipeline:
+.\scripts\run.ps1
+```
+
+> **Nota:** `run.ps1` es interactivo (menú con opciones). Se recomienda descargarlo y ejecutarlo localmente en vez de pipe por `iex`.
+
+#### Manual
+
 ```bash
 git clone https://github.com/byAyes/SeaHorse.git
 cd SeaHorse
@@ -93,6 +122,16 @@ JINA_READER_BASE_URL=http://localhost:3001
 ```
 
 ### First Run
+
+#### PowerShell (recomendado)
+
+```powershell
+.\scripts\run.ps1
+```
+
+Te guía por los modos: pipeline completo con CV, pipeline básico, dashboard UI, o test Jina Reader.
+
+#### Manual
 
 ```bash
 npx tsx scripts/run-profile-pipeline.ts path/to/your-cv.pdf
