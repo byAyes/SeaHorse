@@ -65,12 +65,24 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/byAyes/SeaHorse/main/s
 
 #### Linux / macOS
 
-```bash
-# Clonar manualmente (setup.sh próximamente):
-git clone https://github.com/byAyes/SeaHorse.git
-cd SeaHorse
+**Opción A — Una línea (automático):**
 
-# Ejecutar el pipeline interactivo:
+```bash
+bash <(curl -s https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh)
+```
+
+**Opción B — Descargar y ejecutar (recomendado):**
+
+```bash
+curl -O https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh
+chmod +x setup.sh
+./setup.sh
+```
+
+> El script `setup.sh` clona el repo, instala npm + pip + Playwright/Patchright, crea `.env` y lo abre para que configures tus API keys.
+
+```bash
+# Después de configurar .env, ejecuta el pipeline:
 ./scripts/run.sh
 
 # O directamente a un modo específico:
@@ -134,13 +146,27 @@ JINA_READER_BASE_URL=http://localhost:3001
 
 ### First Run
 
-#### PowerShell (recomendado)
+#### PowerShell (Windows — recomendado)
 
 ```powershell
 .\scripts\run.ps1
 ```
 
 Te guía por los modos: pipeline completo con CV, pipeline básico, dashboard UI, o test Jina Reader.
+
+#### Bash (Linux/macOS — recomendado)
+
+```bash
+./scripts/run.sh
+```
+
+Misma funcionalidad interactiva con 4 modos. También soporta flags directos:
+
+```bash
+./scripts/run.sh --dashboard   # Dashboard UI
+./scripts/run.sh --basic       # Pipeline básico
+./scripts/run.sh --cv CV.pdf   # Pipeline completo
+```
 
 #### Manual
 

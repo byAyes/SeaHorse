@@ -16,6 +16,12 @@
 7. [Stats & Dashboard](#7-stats--dashboard)
 8. [Configuration](#8-configuration)
 9. [Error Codes](#9-error-codes)
+10. [Scripts de Automatización](#10-scripts-de-automatización)
+    1. [setup.ps1](#101-setupps1--instalación-automática-windows)
+    2. [run.ps1](#102-runps1--runner-interactivo-windows)
+    3. [setup.sh](#103-setupsh--instalación-automática-linuxmacos)
+    4. [run.sh](#104-runsh--runner-interactivo-linuxmacos)
+    5. [Flujo típico](#105-flujo-típico)
 
 ---
 
@@ -669,6 +675,239 @@ Authorization: Bearer <your-token>
 ```
 
 When `ADMIN_API_TOKEN` is not set, authentication is skipped (development mode).
+
+---
+
+## 10. Scripts de Automatización
+
+Scripts copy-paste para instalación y ejecución del proyecto sin configuración manual.
+
+| Script      | Plataforma  | Propósito                                  |
+| ----------- | ----------- | ------------------------------------------ |
+| `setup.ps1` | Windows     | Instalación completa (clone + deps + .env) |
+| `run.ps1`   | Windows     | Runner interactivo (4 modos)               |
+| `setup.sh`  | Linux/macOS | Instalación completa (clone + deps + .env) |
+| `run.sh`    | Linux/macOS | Runner interactivo (4 modos, bash)         |
+
+---
+
+### 10.1 setup.ps1 — Instalación automática (Windows)
+
+Clona el repositorio, instala dependencias (npm + pip + Playwright/Patchright), crea `.env` desde `.env.example` y lo abre en Notepad para configuración.
+
+**Uso:**
+
+```powershell
+# Opción A — Una línea (descarga y ejecuta)
+irm https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1 | iex
+
+# Opción B — Descargar y ejecutar (recomendado)
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1" -OutFile "setup.ps1"
+.\setup.ps1
+```
+
+**Parámetros:**
+
+| Parámetro  | Tipo   | Default         | Descripción                      |
+| ---------- | ------ | --------------- | -------------------------------- |
+| `RepoPath` | string | `$PWD\SeaHorse` | Ruta donde clonar el repositorio |
+
+**Pasos que ejecuta:**
+
+|  #  | Paso                     | Descripción                                       |
+| :-: | ------------------------ | ------------------------------------------------- |
+|  1  | Verificar prerrequisitos | Node.js 20+, Python 3.12+, Git, Docker (opcional) |
+|  2  | Clonar / actualizar repo | `git clone` o `git pull --ff-only` si ya existe   |
+|  3  | Crear `.env`             | Copia `.env.example` → `.env`, abre en Notepad    |
+|  4  | `npm install`            | `--legacy-peer-deps` para compatibilidad          |
+|  5  | `pip install`            | Dependencias Python (`scrapers/requirements.txt`) |
+|  6  | Playwright + Patchright  | Instala navegadores Chromium                      |
+|  7  | Jina Reader (Docker)     | Pregunta si levantar el contenedor (opcional)     |
+
+**Comportamiento:**
+
+- Si el repo ya existe en `RepoPath`, hace `git pull --ff-only` en lugar de clonar
+- Si `.env` ya existe, lo conserva sin sobrescribir
+- Docker es opcional — si no está instalado, se salta el paso 7
+- Todos los comandos nativos verifican `$LASTEXITCODE` y fallan con mensaje claro
+
+---
+
+### 10.2 run.ps1 — Runner interactivo (Windows)
+
+[⇧ Volver al índice](#table-of-contents)
+
+Ejecuta el pipeline de scraping + matching + email, o inicia el dashboard. Valida `.env`, detecta CVs en `data/`, y presenta un menú interactivo.
+
+**Uso:**
+
+```powershell
+# Menú interactivo
+.\scripts\run.ps1
+
+# Modo directo
+.\scripts\run.ps1 -CvPath "C:\Users\Juan\Downloads\CV.pdf"
+.\scripts\run.ps1 -Dashboard
+.\scripts\run.ps1 -Basic
+```
+
+**Parámetros:**
+
+| Parámetro    | Tipo   | Descripción                                              |
+| ------------ | ------ | -------------------------------------------------------- |
+| `-CvPath`    | string | Ruta al archivo CV/PDF para extracción de perfil         |
+| `-Dashboard` | switch | Inicia el servidor de desarrollo Next.js                 |
+| `-Basic`     | switch | Pipeline básico (scrape → match → email, sin extracción) |
+
+**Modos interactivos:**
+
+| Opción | Modo              | Descripción                                                |
+| :----: | ----------------- | ---------------------------------------------------------- |
+|   1    | Pipeline completo | Extrae perfil desde CV → scrape → match → email (~60-90s)  |
+|   2    | Pipeline básico   | scrape → match → email (sin extracción de perfil)          |
+|   3    | Dashboard UI      | Servidor Next.js en `http://localhost:3000`                |
+|   4    | Solo Jina Reader  | Test headless Chrome fallback contra una fuente específica |
+
+**Validación:**
+
+- Verifica que `.env` existe y contiene `JSEARCH_API_KEY`, `GEMINI_API_KEY`, `GMAIL_RECIPIENT`
+- Valores tipo `your_key_here` se detectan como no configurados
+- Si faltan variables, ofrece abrir `.env` en Notepad
+- Detección automática de la carpeta del proyecto (dentro de `scripts/` o standalone)
+
+---
+
+### 10.3 setup.sh — Instalación automática (Linux/macOS)
+
+[⇧ Volver al índice](#table-of-contents)
+
+Equivalente en bash de `setup.ps1`. Clona el repositorio, instala dependencias (npm + pip + Playwright/Patchright), crea `.env` desde `.env.example` y lo abre en el editor.
+
+**Uso:**
+
+```bash
+# Opción A — Una línea (descarga y ejecuta)
+bash <(curl -s https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh)
+
+# Opción B — Descargar y ejecutar (recomendado)
+curl -O https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh
+chmod +x setup.sh
+./setup.sh
+```
+
+**Parámetros:**
+
+| Parámetro   | Tipo   | Default         | Descripción                      |
+| ----------- | ------ | --------------- | -------------------------------- |
+| `REPO_PATH` | string | `$PWD/SeaHorse` | Ruta donde clonar el repositorio |
+
+**Pasos que ejecuta:**
+
+|  #  | Paso                     | Descripción                                          |
+| :-: | ------------------------ | ---------------------------------------------------- |
+|  1  | Verificar prerrequisitos | Node.js 20+, Python 3.12+, Git, Docker (opcional)    |
+|  2  | Clonar / actualizar repo | `git clone` o `git pull --ff-only` si ya existe      |
+|  3  | Crear `.env`             | Copia `.env.example` → `.env`, abre en nano/vim/code |
+|  4  | `npm install`            | `--legacy-peer-deps` para compatibilidad             |
+|  5  | `pip install`            | Dependencias Python (`scrapers/requirements.txt`)    |
+|  6  | Playwright + Patchright  | Instala navegadores Chromium                         |
+|  7  | Jina Reader (Docker)     | Pregunta si levantar el contenedor (opcional)        |
+
+**Características:**
+
+- ANSI colors con helpers `step()` / `ok()` / `warn()` / `fail()` / `info()`
+- `run_cmd()`: wrapper que ejecuta comandos y reporta errores sin cortar el script
+- Detección inteligente de `pip` (`python3 -m pip` → `python -m pip` → `pip3` → `pip`)
+- Comparación de versiones Python pura con bash (sin dependencia de `bc`)
+- Editor fallback: `nano` → `vim` → `code`
+- Seguridad: `set -euo pipefail`, validación con `bash -n`
+
+---
+
+### 10.4 run.sh — Runner interactivo (Linux/macOS)
+
+[⇧ Volver al índice](#table-of-contents)
+
+Equivalente en bash de `run.ps1` con la misma funcionalidad e interfaz interactiva.
+
+**Uso:**
+
+```bash
+# Menú interactivo
+./scripts/run.sh
+
+# Modo directo
+./scripts/run.sh --cv ~/Downloads/CV.pdf
+./scripts/run.sh --dashboard
+./scripts/run.sh --basic
+./scripts/run.sh --help
+```
+
+**Argumentos:**
+
+| Argumento     | Descripción                                              |
+| ------------- | -------------------------------------------------------- |
+| `--cv RUTA`   | Ruta al archivo CV/PDF para extracción de perfil         |
+| `--dashboard` | Inicia el servidor de desarrollo Next.js                 |
+| `--basic`     | Pipeline básico (scrape → match → email, sin extracción) |
+| `--help`      | Muestra la ayuda                                         |
+
+**Características:**
+
+- ANSI colors con helpers `step()` / `ok()` / `warn()` / `fail()` / `info()`
+- `get_env_var()`: parsea `.env`, salta comentarios y placeholders (`your_.*_here`, `your_email`)
+- Detección de `data/*.pdf` con `find -print0` (soporta espacios en nombres de archivo)
+- Editor fallback: `nano` → `vim` → `code`
+- Seguridad: `set -euo pipefail`, validación de código con `bash -n`
+
+---
+
+### 10.5 Flujo típico
+
+**Windows (PowerShell):**
+
+```powershell
+# 1. Instalación (una vez)
+irm https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1 | iex
+
+# 2. Editar .env con tus API keys (se abre automáticamente)
+
+# 3. Ejecutar pipeline
+.\scripts\run.ps1 --cv "C:\Users\Juan\Downloads\CV.pdf"
+```
+
+**Linux/macOS (Bash):**
+
+```bash
+# 1. Instalación (una vez)
+bash <(curl -s https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh)
+
+# 2. Editar .env con tus API keys (se abre automáticamente)
+
+# 3. Ejecutar pipeline
+./scripts/run.sh --cv ~/Downloads/CV.pdf
+```
+
+**Flujo detallado (Linux/macOS, paso a paso):**
+
+```bash
+# 1. Clonar manualmente
+git clone https://github.com/byAyes/SeaHorse.git
+cd SeaHorse
+
+# 2. Copiar y editar .env
+cp .env.example .env
+nano .env
+
+# 3. Instalar dependencias
+npm install
+pip install -r scrapers/requirements.txt
+playwright install chromium
+patchright install chromium
+
+# 4. Ejecutar pipeline
+./scripts/run.sh --cv ~/Downloads/CV.pdf
+```
 
 ---
 
