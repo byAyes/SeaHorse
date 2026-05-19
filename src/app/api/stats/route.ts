@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import type { Job } from '@/lib/prisma';
 import { authenticate } from '@/lib/auth/middleware';
+import { LocalCollection } from '@/lib/local-data';
 
 export const dynamic = 'force-dynamic';
+
+// Direct collection access for in-memory aggregation (replaces prisma.$queryRaw)
+const jobCol = new LocalCollection<Job & { id: string }>('jobs');
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -13,104 +18,67 @@ export async function GET(request: NextRequest) {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // Run queries in parallel
-    const results = await Promise.all([
-      // Total jobs in the last 30 days
-      prisma.job.count({
-        where: { scrapedAt: { gte: thirtyDaysAgo } },
-      }),
+    // Load all jobs once for counting, chart, and skills
+    const allJobs = await jobCol.findMany();
+    const recentJobs = allJobs.filter((j) => j.scrapedAt >= thirtyDaysAgo);
+    const todayJobs = allJobs.filter((j) => j.scrapedAt >= todayStart);
 
-      // Today's jobs
-      prisma.job.count({
-        where: { scrapedAt: { gte: todayStart } },
-      }),
+    const totalJobs = recentJobs.length;
+    const totalJobsToday = todayJobs.length;
 
-      // Total user profiles
-      prisma.userProfile.count(),
+    // Total user profiles
+    const totalProfiles = (await prisma.userProfile.count()) as number;
 
-      // Recent jobs (last 5)
-      prisma.job.findMany({
-        take: 5,
-        orderBy: { scrapedAt: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          company: true,
-          location: true,
-          url: true,
-          salary: true,
-          scrapedAt: true,
-          skills: true,
-          description: true,
-          postedAt: true,
-          category: true,
-        },
-      }),
+    // Recent jobs (last 5)
+    const sortedJobs = [...allJobs].sort((a, b) => b.scrapedAt.getTime() - a.scrapedAt.getTime());
+    const recentJobRows = sortedJobs.slice(0, 5).map((j) => ({
+      id: j.id,
+      title: j.title,
+      company: j.company,
+      location: j.location,
+      description: j.description,
+      url: j.url,
+      salary: j.salary,
+      postedAt: j.postedAt,
+      scrapedAt: j.scrapedAt,
+      skills: j.skills,
+      category: j.category,
+    }));
 
-      // Jobs grouped by day for the chart
-      prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
-        SELECT
-          DATE(scraped_at) as date,
-          COUNT(*) as count
-        FROM "Job"
-        WHERE scraped_at >= ${thirtyDaysAgo}
-        GROUP BY DATE(scraped_at)
-        ORDER BY date ASC
-      `,
+    // Jobs grouped by day for chart (replaces $queryRaw GROUP BY)
+    const jobsByDayMap = new Map<string, number>();
+    for (const job of recentJobs) {
+      const dateKey = job.scrapedAt.toISOString().split('T')[0];
+      jobsByDayMap.set(dateKey, (jobsByDayMap.get(dateKey) || 0) + 1);
+    }
+    const jobsByDayResult = Array.from(jobsByDayMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({ date, count }));
 
-      // Email digests
-      prisma.emailDigest.findMany({
-        select: { id: true, sentAt: true, jobCount: true },
-        orderBy: { sentAt: 'desc' },
-        take: 1,
-      }),
+    // Email digests
+    const emailDigests = (await prisma.emailDigest.findMany({
+      select: { id: true, sentAt: true, jobCount: true },
+      orderBy: { sentAt: 'desc' },
+      take: 1,
+    })) as Array<{ id: string; sentAt: Date; jobCount: number }>;
 
-      // Total pipeline runs (completed + error)
-      prisma.pipelineRun.count({
-        where: { status: { in: ['completed', 'error'] } },
-      }),
+    // Pipeline runs
+    const pipelineRuns = (await prisma.pipelineRun.count({
+      where: { status: { in: ['completed', 'error'] } },
+    })) as number;
 
-      // Last pipeline run
-      prisma.pipelineRun.findFirst({
-        orderBy: { startedAt: 'desc' },
-        select: {
-          id: true,
-          status: true,
-          startedAt: true,
-          completedAt: true,
-          result: true,
-          error: true,
-        },
-      }),
-
-      // Top skills aggregated from recent 200 jobs
-      prisma.job.findMany({
-        take: 200,
-        orderBy: { scrapedAt: 'desc' },
-        select: { skills: true },
-      }),
-    ]);
-
-    const totalJobs = results[0] as number;
-    const totalJobsToday = results[1] as number;
-    const totalProfiles = results[2] as number;
-    const recentJobRows = results[3] as Array<{
-      id: string;
-      title: string;
-      company: string;
-      location: string | null;
-      description: string | null;
-      url: string;
-      salary: number | null;
-      postedAt: Date | null;
-      scrapedAt: Date;
-      skills: unknown;
-      category: string | null;
-    }>;
-    const jobsByDayResult = results[4] as Array<{ date: Date; count: bigint }>;
-    const emailDigests = results[5] as Array<{ id: string; sentAt: Date; jobCount: number }>;
-    const pipelineRuns = results[6] as number;
-    const lastPipelineRunRow = results[7] as {
+    // Last pipeline run
+    const lastPipelineRunRow = (await prisma.pipelineRun.findFirst({
+      orderBy: { startedAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        startedAt: true,
+        completedAt: true,
+        result: true,
+        error: true,
+      },
+    })) as {
       id: string;
       status: string;
       startedAt: Date;
@@ -118,13 +86,11 @@ export async function GET(request: NextRequest) {
       result: unknown;
       error: string | null;
     } | null;
-    const skillsResult = results[8] as Array<{ skills: string[] }>;
 
-    const lastDigest = emailDigests[0];
-
-    // Compute top skills from job records
+    // Top skills from recent 200 jobs
+    const skillsJobs = sortedJobs.slice(0, 200);
     const skillCount = new Map<string, number>();
-    for (const row of skillsResult) {
+    for (const row of skillsJobs) {
       const skills = Array.isArray(row.skills) ? (row.skills as string[]) : [];
       for (const skill of skills) {
         const trimmed = skill.trim();
@@ -138,22 +104,16 @@ export async function GET(request: NextRequest) {
       .slice(0, 15)
       .map(([skill, count]) => ({ skill, count }));
 
-    // Format jobs by day
-    const jobsByDay = (jobsByDayResult as Array<{ date: Date; count: bigint }>).map(
-      (row: { date: Date; count: bigint }) => ({
-        date: row.date.toISOString().split('T')[0],
-        count: Number(row.count),
-      }),
-    );
+    const lastDigest = Array.isArray(emailDigests) ? emailDigests[0] : undefined;
 
     // Compute trend: compare last 7 days vs previous 7 days
-    const last7 = jobsByDay
+    const last7 = jobsByDayResult
       .filter((d) => {
         const date = new Date(d.date);
         return date >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       })
       .reduce((sum, d) => sum + d.count, 0);
-    const prev7 = jobsByDay
+    const prev7 = jobsByDayResult
       .filter((d) => {
         const date = new Date(d.date);
         return (
@@ -164,48 +124,34 @@ export async function GET(request: NextRequest) {
       .reduce((sum, d) => sum + d.count, 0);
     const jobTrend = prev7 > 0 ? Math.round(((last7 - prev7) / prev7) * 100) : last7 > 0 ? 100 : 0;
 
-    // Format recent matches — try to estimate scores from skills overlap
-    const recentMatches = recentJobRows.map(
-      (job: {
-        id: string;
-        title: string;
-        company: string;
-        location: string | null;
-        description: string | null;
-        url: string;
-        salary: number | null;
-        postedAt: Date | null;
-        scrapedAt: Date;
-        skills: unknown;
-        category: string | null;
-      }) => {
-        const jobSkills = Array.isArray(job.skills) ? (job.skills as string[]) : [];
-        return {
-          job: {
-            id: job.id,
-            title: job.title,
-            company: job.company,
-            location: job.location,
-            description: job.description || '',
-            url: job.url,
-            salary: job.salary,
-            postedAt: job.postedAt?.toISOString() || null,
-            scrapedAt: job.scrapedAt.toISOString(),
-            skills: jobSkills,
-            category: job.category,
-          },
-          score: {
-            overall: 0,
-            skillMatch: 0,
-            interestMatch: 0,
-            locationMatch: 0,
-            salaryMatch: 0,
-            matchedSkills: [] as string[],
-            explanation: 'Visita la página de resultados para ver scores detallados.',
-          },
-        };
-      },
-    );
+    // Format recent matches
+    const recentMatches = recentJobRows.map((job) => {
+      const jobSkills = Array.isArray(job.skills) ? (job.skills as string[]) : [];
+      return {
+        job: {
+          id: job.id,
+          title: job.title,
+          company: job.company,
+          location: job.location,
+          description: job.description || '',
+          url: job.url,
+          salary: job.salary,
+          postedAt: job.postedAt?.toISOString() || null,
+          scrapedAt: job.scrapedAt.toISOString(),
+          skills: jobSkills,
+          category: job.category,
+        },
+        score: {
+          overall: 0,
+          skillMatch: 0,
+          interestMatch: 0,
+          locationMatch: 0,
+          salaryMatch: 0,
+          matchedSkills: [] as string[],
+          explanation: 'Visita la página de resultados para ver scores detallados.',
+        },
+      };
+    });
 
     // Format last pipeline run
     const formattedLastRun = lastPipelineRunRow
@@ -214,9 +160,9 @@ export async function GET(request: NextRequest) {
           status: lastPipelineRunRow.status,
           startedAt: lastPipelineRunRow.startedAt.toISOString(),
           completedAt: lastPipelineRunRow.completedAt?.toISOString() || null,
-          scraped: (lastPipelineRunRow.result as Record<string, unknown>)?.scraped || 0,
-          matched: (lastPipelineRunRow.result as Record<string, unknown>)?.matched || 0,
-          saved: (lastPipelineRunRow.result as Record<string, unknown>)?.saved || 0,
+          scraped: ((lastPipelineRunRow.result as Record<string, unknown>)?.scraped as number) || 0,
+          matched: ((lastPipelineRunRow.result as Record<string, unknown>)?.matched as number) || 0,
+          saved: ((lastPipelineRunRow.result as Record<string, unknown>)?.saved as number) || 0,
           error: lastPipelineRunRow.error || null,
         }
       : lastDigest
@@ -239,7 +185,7 @@ export async function GET(request: NextRequest) {
       totalProfiles,
       pipelinesRun: pipelineRuns,
       jobTrend,
-      jobsByDay,
+      jobsByDay: jobsByDayResult,
       topSkills,
       recentMatches,
       lastPipelineRun: formattedLastRun,

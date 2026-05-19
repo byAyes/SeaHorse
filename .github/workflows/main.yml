@@ -53,8 +53,6 @@ jobs:
       # AI Matching
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
-      # Database
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Checkout code
@@ -75,9 +73,6 @@ jobs:
 
       - name: Install Node dependencies
         run: npm ci
-
-      - name: Generate Prisma client
-        run: npx prisma generate
 
       - name: Install Python dependencies
         run: pip install -r scrapers/requirements.txt
