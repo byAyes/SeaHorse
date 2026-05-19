@@ -1,8 +1,9 @@
 # Feature: Jina Reader Headless Chrome Fallback Scraper
 
-**Issue:** #(abierta en GitHub)
+**Issue:** [#20 — Jina Reader Headless Chrome Fallback Scraper](https://github.com/byAyes/SeaHorse/issues/20)
 **Branch:** `byAyes/feature-posible-implementacion-de-jina-reader-y`
-**Status:** ✅ Implementado
+**Status:** 🔵 **Closed** ✅
+**Closed:** 2026-07-15 — Exhaustive testing passed (19/19 tests, live Computrabajo ✅, merge to main ✅)
 
 ---
 

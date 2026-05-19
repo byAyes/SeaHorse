@@ -17,7 +17,7 @@
 | 6   | ~~Supabase Database Integration~~ (IPv6 block) | 🔴 **Cancelado** → reemplazado por Fase 8                                               | #9 🔁 #10          |
 | 7   | Frontend UI Dashboard                          | React SPA for pipeline management                                                       | ✅ **Complete**    | #8 ✅  |
 | 8   | **Refactor: Almacenamiento Local JSON**        | Reemplazar Prisma + Supabase por archivos JSON locales, 0 config de DB                  | 🔜 **Planificado** | #10    |
-| 9   | **Jina Reader Fallback Scraper**               | Headless Chrome fallback via Jina Reader para LinkedIn, Indeed, Glassdoor, Computrabajo | ✅ **Complete**    | —      |
+| 9   | **Jina Reader Fallback Scraper**               | Headless Chrome fallback via Jina Reader para LinkedIn, Indeed, Glassdoor, Computrabajo | ✅ **Complete**    | #20 ✅ |
 
 ---
 
@@ -249,14 +249,14 @@ src/lib/local-data/
 
 ## Issues Overview
 
-| #      | Title                                | State                               | Phase   |
-| ------ | ------------------------------------ | ----------------------------------- | ------- |
-| **10** | [REFACTOR] Almacenamiento local JSON | 🟢 **Open**                         | Phase 8 |
-| **9**  | [BACKEND] Integración Supabase       | 🔵 **Closed** (reemplazado por #10) | Phase 6 |
-| **8**  | [FEATURE] Frontend UI Dashboard      | 🔵 **Closed** ✅                    | Phase 7 |
-| **9**  | [FEATURE] Jina Reader fallback       | ✅ **Implemented**                  | Phase 1 |
-| **7**  | [FEATURE] AI PDF profile extraction  | 🔵 **Closed** ✅                    | Phase 5 |
-| **6**  | [DEFERRED] process-cv pipeline       | 🔵 **Closed** — absorbed            | Phase 6 |
+| #      | Title                                          | State                               | Phase   |
+| ------ | ---------------------------------------------- | ----------------------------------- | ------- |
+| **20** | [FEATURE] Jina Reader Headless Chrome Fallback | 🔵 **Closed** ✅                    | Phase 1 |
+| **10** | [REFACTOR] Almacenamiento local JSON           | 🟢 **Open**                         | Phase 8 |
+| **9**  | [BACKEND] Integración Supabase                 | 🔵 **Closed** (reemplazado por #10) | Phase 6 |
+| **8**  | [FEATURE] Frontend UI Dashboard                | 🔵 **Closed** ✅                    | Phase 7 |
+| **7**  | [FEATURE] AI PDF profile extraction            | 🔵 **Closed** ✅                    | Phase 5 |
+| **6**  | [DEFERRED] process-cv pipeline                 | 🔵 **Closed** — absorbed            | Phase 6 |
 
 ---
 
