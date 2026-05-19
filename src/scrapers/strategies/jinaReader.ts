@@ -13,7 +13,7 @@
  */
 
 import axios from 'axios';
-import { fileURLToPath } from 'url';
+import path from 'path';
 import { Job, ScraperConfig, ScraperResult } from '../types';
 import { rateLimiter } from '../utils/rateLimiter';
 import { logger } from '../../lib/automation/logger';
@@ -297,7 +297,7 @@ function isValidTitle(title: string): boolean {
  */
 function extractField(text: string, fieldName: string): string | null {
   const patterns = [
-    new RegExp(`\\*\\*${fieldName}\\s*:\\*\\*\\s*(.+?)(?:\\n|$)`),
+    new RegExp(`\\*\\*${fieldName}\\s*:\\*\\*\\s*(.+?)(?:\\n|$)`, 'i'),
     new RegExp(`${fieldName}:\\s*(.+?)(?:\\n|$)`, 'i'),
     new RegExp(`\\*${fieldName}\\*:\\s*(.+?)(?:\\n|$)`, 'i'),
   ];
@@ -788,8 +788,8 @@ function parseGlassdoorMarkdown(markdown: string): Partial<Job>[] {
  */
 function extractGlassdoorSalary(text: string): string | null {
   const salaryPatterns = [
-    /\$([\d]+)(?:K|k|,000)?\s*(?:–|—|-|to)\s*\$?([\d]+)(?:K|k|,000)?(?:\s*\([^)]*\))?/i,
-    /\$([\d]+)(?:K|k|,000)?[\s+]*(?:\/|per)\s*(?:year|yr|hour|hr)/i,
+    /\$([\d]+(?:,\d{3})*)(?:K|k|,000)?\s*(?:–|—|-|to)\s*\$?([\d]+(?:,\d{3})*)(?:K|k|,000)?(?:\s*\([^)]*\))?/i,
+    /\$([\d]+(?:,\d{3})*)(?:K|k|,000)?[\s+]*(?:\/|per)\s*(?:year|yr|hour|hr)/i,
     /(?:salary|pay|range|estimate):\s*\$?([\d,]+(?:K|k)?(?:\s*–\s*\$?[\d,]+(?:K|k)?)?)/i,
   ];
 
@@ -906,9 +906,9 @@ export class JinaReaderScraper {
         if (seen.has(key)) continue;
         seen.add(key);
 
-        const id = this.generateId(partial.link || partial.title);
+        const id = this.generateId(partial.link || partial.title || '');
 
-        const job: Job = {
+        const job: Record<string, unknown> = {
           id,
           title: partial.title?.trim() || '',
           company: partial.company?.trim() || '',
@@ -919,8 +919,16 @@ export class JinaReaderScraper {
           scrapedAt: new Date(),
         };
 
+        // Preserve extra metadata from parsers (e.g., salary, rating)
+        const partialRaw = partial as Record<string, unknown>;
+        for (const key of Object.keys(partialRaw)) {
+          if (!(key in job)) {
+            job[key] = partialRaw[key];
+          }
+        }
+
         if (job.title && job.company) {
-          jobs.push(job);
+          jobs.push(job as unknown as Job);
         }
       }
 
@@ -943,15 +951,22 @@ export class JinaReaderScraper {
    * Generate a deterministic ID from a string.
    */
   private generateId(input: string): string {
-    const hash = Buffer.from(input).toString('base64').slice(0, 12);
+    const hash = Buffer.from(input, 'utf-8').toString('base64').slice(0, 12).replace(/[+/=]/g, '');
     return `jr-${hash}`;
   }
 }
 
 // ─── CLI Execution ─────────────────────────────────────────────────────────
 
-const __filename = fileURLToPath(import.meta.url);
-if (process.argv[1] === __filename) {
+// Check if this file is being executed directly (not imported by Jest or another module)
+// We use a string check instead of import.meta.url for Jest compatibility
+const isDirectExecution =
+  process.argv[1] &&
+  !process.env.JEST_WORKER_ID &&
+  (process.argv[1].replace(/\\/g, '/').endsWith('jinaReader.ts') ||
+    process.argv[1].replace(/\\/g, '/').endsWith('jinaReader.js'));
+
+if (isDirectExecution) {
   const source = process.argv[2] || 'linkedin';
   const query = process.argv[3] || 'software engineer';
   const maxJobs = parseInt(process.argv[4] || '10', 10);

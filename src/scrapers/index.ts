@@ -21,18 +21,19 @@ function loadPythonScraperConfigs(): PythonScraperConfig[] {
 
   if (!parsed?.scrapers) return [];
 
-  return Object.entries(parsed.scrapers as Record<string, unknown>).map(
-    ([name, cfg]: [string, Record<string, unknown>]) => ({
+  return Object.entries(parsed.scrapers as Record<string, unknown>).map(([name, cfg]) => {
+    const config = cfg as Record<string, unknown>;
+    return {
       name,
-      module: (cfg.module as string) || `scrapers.${name}`,
+      module: (config.module as string) || `scrapers.${name}`,
       className:
-        (cfg.className as string) || `${name.charAt(0).toUpperCase() + name.slice(1)}Scraper`,
-      enabled: (cfg.enabled as boolean) !== false,
-      maxJobs: (cfg.max_jobs as number) || 10,
-      rateLimitMs: (cfg.rate_limit_ms as number) || 5000,
-      extra: cfg as Record<string, unknown>,
-    }),
-  );
+        (config.className as string) || `${name.charAt(0).toUpperCase() + name.slice(1)}Scraper`,
+      enabled: (config.enabled as boolean) !== false,
+      maxJobs: (config.max_jobs as number) || 10,
+      rateLimitMs: (config.rate_limit_ms as number) || 5000,
+      extra: config,
+    };
+  });
 }
 
 export class ScraperRunner {
@@ -319,9 +320,13 @@ export async function runScrapers(config: ScraperConfig, outputPath?: string): P
   return jobs;
 }
 
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-if (process.argv[1] === __filename) {
+// CLI execution check — avoid import.meta.url for Jest compatibility
+if (
+  process.argv[1] &&
+  !process.env.JEST_WORKER_ID &&
+  (process.argv[1].replace(/\\/g, '/').endsWith('index.ts') ||
+    process.argv[1].replace(/\\/g, '/').endsWith('index.js'))
+) {
   const query = process.argv[2] || 'software engineer';
   const maxJobs = parseInt(process.argv[3] || '10', 10);
   const output = process.argv[4] || 'data/jobs.json';
