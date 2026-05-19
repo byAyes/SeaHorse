@@ -108,9 +108,14 @@ export class JSearchScraper {
 }
 
 // CLI execution
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-if (process.argv[1] === __filename) {
+// Check if this file is being executed directly (not imported by Jest)
+const isDirectExecutionJsearch =
+  process.argv[1] &&
+  !process.env.JEST_WORKER_ID &&
+  (process.argv[1].replace(/\\/g, '/').endsWith('jsearch.ts') ||
+    process.argv[1].replace(/\\/g, '/').endsWith('jsearch.js'));
+
+if (isDirectExecutionJsearch) {
   const query = process.argv[2] || 'software engineer';
   const maxJobs = parseInt(process.argv[3] || '10', 10);
 

@@ -124,6 +124,15 @@ export class ScraperRunner {
         });
         return result.data;
       }
+
+      // Record failed stats when JSearch returns gracefully with success:false
+      this.stats.push({
+        scraper: 'jsearch',
+        success: false,
+        jobCount: 0,
+        duration: 0,
+        error: result.error || 'No results',
+      });
     } catch (error) {
       logger.warning('JSearch API failed, continuing with other scrapers');
       this.stats.push({
@@ -203,6 +212,8 @@ export class ScraperRunner {
 
     for (const source of fallbackCandidates) {
       const sourceStats = this.stats.filter((s) => s.scraper === source);
+      // If no stats for this source, it wasn't tried — skip (not a failure)
+      if (sourceStats.length === 0) continue;
       // Fail if: all attempts failed OR all returned 0 jobs
       const allFailed = sourceStats.every((s) => !s.success);
       const allEmpty = sourceStats.every((s) => s.success && s.jobCount === 0);
