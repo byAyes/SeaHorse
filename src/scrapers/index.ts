@@ -2,6 +2,7 @@ import { Job, ScraperConfig, PythonScraperConfig, ScraperStats } from './types';
 import { rateLimiter } from './utils/rateLimiter';
 import { JSearchScraper } from './strategies/jsearch';
 import { IndeedScraper } from './strategies/indeed';
+import { JinaReaderScraper } from './strategies/jinaReader';
 import { spawnPythonScraper, PythonScraperResult } from './bridge/pythonBridge';
 import { logger } from '../lib/automation/logger';
 import * as fs from 'fs';
@@ -95,6 +96,13 @@ export class ScraperRunner {
       }
     }
 
+    // Step 3: JinaReader fallback for sources that returned 0 jobs
+    // LinkedIn and Indeed are the primary candidates — they're often blocked
+    const fallbackSources = this.identifyFailedSources();
+    if (fallbackSources.length > 0) {
+      await this.runJinaReaderFallbacks(fallbackSources);
+    }
+
     logger.info(
       `Scraping complete — total: ${this.allJobs.length} jobs from ${this.stats.length} scrapers`,
     );
@@ -181,6 +189,104 @@ export class ScraperRunner {
         duration: Date.now() - start,
         error: error instanceof Error ? error.message : 'Unknown error',
       };
+    }
+  }
+
+  /**
+   * Identify which sources returned 0 jobs and should use JinaReader fallback.
+   * Checks the stats from the current scrape run.
+   */
+  private identifyFailedSources(): string[] {
+    const fallbackCandidates = ['linkedin', 'indeed', 'computrabajo', 'glassdoor'];
+    const failed: string[] = [];
+
+    for (const source of fallbackCandidates) {
+      const sourceStats = this.stats.filter((s) => s.scraper === source);
+      // Fail if: all attempts failed OR all returned 0 jobs
+      const allFailed = sourceStats.every((s) => !s.success);
+      const allEmpty = sourceStats.every((s) => s.success && s.jobCount === 0);
+
+      if (allFailed || allEmpty) {
+        failed.push(source);
+        logger.info(
+          `[Fallback] ${source} needs fallback (failed: ${allFailed}, empty: ${allEmpty})`,
+        );
+      }
+    }
+
+    return failed;
+  }
+
+  /**
+   * Run JinaReader as fallback for sources that failed during normal scraping.
+   * Deduplicates results against already-collected jobs.
+   */
+  private async runJinaReaderFallbacks(sources: string[]): Promise<void> {
+    for (const source of sources) {
+      // Rebuild keys before each fallback to catch jobs added by previous fallbacks
+      const existingKeys = new Set(
+        this.allJobs.map((j) => `${j.title.toLowerCase()}|${j.company.toLowerCase()}`),
+      );
+      const start = Date.now();
+      try {
+        logger.info(`[Fallback] Trying JinaReader for: ${source}`);
+        const scraper = new JinaReaderScraper(source);
+        const result = await scraper.scrape(this.config);
+        const duration = Date.now() - start;
+
+        if (result.success && result.data && result.data.length > 0) {
+          // Add only jobs that don't already exist (dedup across sources)
+          const newJobs = result.data.filter((job) => {
+            const key = `${job.title.toLowerCase()}|${job.company.toLowerCase()}`;
+            return !existingKeys.has(key);
+          });
+
+          if (newJobs.length > 0) {
+            this.allJobs.push(...newJobs);
+            // Add newly seen keys
+            for (const job of newJobs) {
+              existingKeys.add(`${job.title.toLowerCase()}|${job.company.toLowerCase()}`);
+            }
+            logger.success(
+              `[Fallback] JinaReader-${source}: ${newJobs.length} new jobs (${result.data.length} total found, ${result.data.length - newJobs.length} duplicates skipped)`,
+            );
+          } else {
+            logger.info(
+              `[Fallback] JinaReader-${source}: ${result.data.length} found but all duplicates`,
+            );
+          }
+
+          this.stats.push({
+            scraper: `jinareader-${source}`,
+            success: true,
+            jobCount: newJobs.length,
+            duration,
+          });
+        } else {
+          logger.warning(
+            `[Fallback] JinaReader-${source} returned no results: ${result.error || 'empty'}`,
+          );
+          this.stats.push({
+            scraper: `jinareader-${source}`,
+            success: false,
+            jobCount: 0,
+            duration,
+            error: result.error,
+          });
+        }
+      } catch (error) {
+        const duration = Date.now() - start;
+        logger.warning(
+          `[Fallback] JinaReader-${source} threw: ${error instanceof Error ? error.message : 'Unknown'}`,
+        );
+        this.stats.push({
+          scraper: `jinareader-${source}`,
+          success: false,
+          jobCount: 0,
+          duration,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
     }
   }
 

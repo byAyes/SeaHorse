@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  jina-reader:
+    image: ghcr.io/jina-ai/reader:oss
+    container_name: seahorse-jina-reader
+    restart: unless-stopped
+    ports:
+      # h2c (HTTP/2 with prior knowledge) — use with curl --http2-prior-knowledge
+      - "3000:8080"
+      # HTTP/1.1 fallback — use for regular curl/axios
+      - "3001:8081"
+    environment:
+      # Optional: S3-compatible caching for fetched pages
+      # - GCP_STORAGE_ENDPOINT=https://s3.example.com
+      # - GCP_STORAGE_BUCKET=reader-cache
+      # - GCP_STORAGE_ACCESS_KEY=...
+      # - GCP_STORAGE_SECRET_KEY=...
+      - NODE_ENV=production
+    # Optional: health check
+    healthcheck:
+      test: ["CMD", "node", "--eval", "fetch('http://localhost:8081/health').then(r => process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

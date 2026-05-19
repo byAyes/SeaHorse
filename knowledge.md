@@ -102,6 +102,72 @@ Actualmente el pipeline usa un mock de PrismaClient que retorna defaults vacíos
 
 Total per run: **~15–20 jobs** — failed scrapers don't crash the pipeline.
 
+## Jina Reader Scraper (Fallback)
+
+**Jina Reader Scraper** (`src/scrapers/strategies/jinaReader.ts`) uses [Jina Reader](https://github.com/jina-ai/reader) headless Chrome API to extract job listings as fallback when direct scrapers fail.
+
+### Supported Sources
+
+| Source       | Status                          | Notes                                   |
+| ------------ | ------------------------------- | --------------------------------------- |
+| LinkedIn     | ❌ Blocked by Jina Reader TOS   | Returns HTTP 451                        |
+| Indeed       | ❌ Blocked by Cloudflare        | Cloudflare challenge blocks even Chrome |
+| Computrabajo | ✅ Should work (less protected) | Latin American job board                |
+
+### Self-Hosting with Docker
+
+Self-hosting bypasses Jina Reader's free-tier rate limits and IP blocks.
+
+```bash
+# Start the container
+docker compose up -d jina-reader
+
+# Or without docker-compose:
+docker run --rm -d -p 3000:8081 --name seahorse-jina-reader ghcr.io/jina-ai/reader:oss
+
+# The OSS image runs in stateless mode by default.
+# For caching, configure S3 bucket env vars in docker-compose.yml.
+```
+
+### Usage
+
+Set the `JINA_READER_BASE_URL` env var to point to your self-hosted instance:
+
+```bash
+# Local self-hosted instance (via docker-compose)
+export JINA_READER_BASE_URL=http://localhost:3001
+
+# Or point to a remote deployment
+export JINA_READER_BASE_URL=https://jina-reader.yourdomain.com
+```
+
+Test the scraper:
+
+```bash
+# Test with self-hosted instance
+JINA_READER_BASE_URL=http://localhost:3001 npx tsx src/scrapers/strategies/jinaReader.ts computrabajo "desarrollador full stack" 5
+
+# Test with default cloud instance
+npx tsx src/scrapers/strategies/jinaReader.ts computrabajo "ingeniero software" 5
+```
+
+### Computrabajo Configuration
+
+| Env Var                 | Default                              | Description                                       |
+| ----------------------- | ------------------------------------ | ------------------------------------------------- |
+| `COMPUTRABAJO_COUNTRY`  | `co`                                 | Country code (`co`, `mx`, `ar`, `cl`, `pe`, `ec`) |
+| `COMPUTRABAJO_BASE_URL` | `https://{country}.computrabajo.com` | Full base URL override                            |
+
+### Test Results
+
+| Endpoint                       | Result | Detail                         |
+| ------------------------------ | ------ | ------------------------------ |
+| `r.jina.ai` → LinkedIn         | ❌ 451 | Blocked legally by Jina Reader |
+| `r.jina.ai` → Indeed           | ❌ 403 | Cloudflare challenge           |
+| `r.jina.ai` → Google           | ⚠️ 429 | Google CAPTCHA                 |
+| `s.jina.ai` (Search)           | ❌ 401 | Requires API key               |
+| **Self-hosted** → Computrabajo | ✅     | Should work with own IP        |
+
 ## CI (GitHub Actions)
 
 - **Workflow:** `.github/workflows/main.yml` (consolidated — single workflow)
