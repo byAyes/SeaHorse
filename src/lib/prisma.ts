@@ -421,11 +421,6 @@ const storage = {
     },
   },
 
-  $queryRaw: async <T = unknown>(): Promise<T> => {
-    return [] as unknown as T;
-  },
-
-  _isMock: true,
   _isLocalStorage: true,
 };
 
