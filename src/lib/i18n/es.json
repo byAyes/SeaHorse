@@ -15,7 +15,8 @@
     "jobs": "Resultados",
     "pipeline": "Pipeline",
     "settings": "Configuración",
-    "collapse": "Colapsar"
+    "collapse": "Colapsar sidebar",
+    "expand": "Expandir sidebar"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -57,6 +58,8 @@
     "evaluated": "evaluados",
     "match": "coincide",
     "matches": "coinciden",
+    "noData": "Aún no hay jobs para comparar",
+    "noDataDesc": "Primero sube un CV y ejecuta el pipeline para ver resultados de matching",
     "noResults": "No se encontraron jobs coincidentes",
     "noResultsDesc": "Ajusta el filtro de puntuación o el término de búsqueda",
     "table": {
@@ -102,9 +105,13 @@
     "processing": {
       "title": "Procesando tu CV",
       "subtitle": "Analizando y extrayendo tu perfil profesional",
+      "uploading": "Subiendo archivo",
+      "uploadingDesc": "Subiendo tu CV al servidor",
       "extracting": "Extrayendo información...",
+      "extractingDesc": "Extrayendo información con IA",
       "analyzing": "Analizando habilidades y experiencia...",
-      "building": "Construyendo tu perfil..."
+      "building": "Construyendo tu perfil...",
+      "buildingDesc": "Construyendo tu perfil profesional"
     },
     "preview": {
       "title": "Perfil Extraído",
@@ -124,6 +131,7 @@
     "done": {
       "title": "¡Perfil Completado!",
       "subtitle": "Tu CV ha sido procesado y tu perfil está listo",
+      "successMessage": "Tu perfil está listo para la acción",
       "viewJobs": "Ver Jobs Coincidentes",
       "runPipeline": "Ejecutar Pipeline",
       "uploadAnother": "Subir Otro"
@@ -158,6 +166,7 @@
       "languages": "Idiomas",
       "languagesPlaceholder": "ej. Español, Inglés",
       "salary": "Rango Salarial (USD)",
+      "salaryRange": "Rango Salarial",
       "salaryMin": "Mínimo",
       "salaryMax": "Máximo",
       "remote": "Trabajo Remoto",
@@ -206,6 +215,15 @@
   "pipeline": {
     "title": "Pipeline",
     "subtitle": "Ejecuta el pipeline de scraping y matching de jobs",
+    "gettingStarted": "Primeros Pasos",
+    "guide": {
+      "uploadCv": "Sube tu CV",
+      "uploadCvDesc": "Extrae tu perfil profesional con IA para habilitar el matching inteligente",
+      "addKeys": "Configura las claves API",
+      "addKeysDesc": "Añade al menos una clave de proveedor de IA (Gemini, OpenRouter o NVIDIA NIM)",
+      "runPipeline": "Ejecuta el pipeline",
+      "runPipelineDesc": "Scrapea jobs de múltiples fuentes y compáralos con tu perfil"
+    },
     "apiKeyRequired": "API Key de IA Requerida",
     "apiKeyRequiredDesc": "Necesitas al menos una API Key de IA (Gemini, OpenRouter o NVIDIA NIM) para ejecutar el pipeline.",
     "goToSettings": "Ir a Ajustes",
@@ -214,19 +232,14 @@
     "reset": "Reiniciar",
     "steps": {
       "scraping": "Scraping",
-      "matching": "Matching",
-      "completion": "Finalización"
-    },
-    "progress": "Progreso",
-    "starting": "Iniciando...",
-    "steps": {
-      "scraping": "Scraping",
       "scrapingDesc": "Buscando jobs en múltiples fuentes",
       "matching": "Matching",
       "matchingDesc": "Evaluando coincidencias con tu perfil",
       "completion": "Finalización",
       "completionDesc": "Procesando resultados y limpiando datos"
     },
+    "progress": "Progreso",
+    "starting": "Iniciando...",
     "status": {
       "completed": "Completado",
       "error": "Error",

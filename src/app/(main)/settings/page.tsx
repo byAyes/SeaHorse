@@ -160,16 +160,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="space-y-6 relative">
-      {/* Ambient page accent */}
-      <div
-        className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 0%, rgba(79,70,229,0.06) 0%, transparent 70%)',
-        }}
-      />
-
+    <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-xl font-semibold">{t('settings.title')}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('settings.subtitle')}</p>
@@ -190,57 +181,72 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Input
-                  label={t('settings.profile.skills')}
-                  value={skillsInput}
-                  onChange={(e) => setSkillsInput(e.target.value)}
-                  placeholder={t('settings.profile.skillsPlaceholder')}
-                />
-                <p className="text-xs text-slate-400 mt-1">{t('settings.profile.skills')}</p>
-              </div>
+              {/* Skills — standalone */}
               <Input
-                label={t('settings.profile.locations')}
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder={t('settings.profile.locationsPlaceholder')}
+                label={t('settings.profile.skills')}
+                value={skillsInput}
+                onChange={(e) => setSkillsInput(e.target.value)}
+                placeholder={t('settings.profile.skillsPlaceholder')}
               />
-              <div className="flex items-center gap-3">
-                <label className="relative inline-flex cursor-pointer items-center">
-                  <input
-                    type="checkbox"
-                    checked={remoteOnly}
-                    onChange={(e) => setRemoteOnly(e.target.checked)}
-                    className="peer sr-only"
+
+              {/* Location & remote — grouped */}
+              <div className="pt-2">
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                  {t('settings.profile.locations')}
+                </p>
+                <div className="space-y-3">
+                  <Input
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder={t('settings.profile.locationsPlaceholder')}
                   />
-                  <div className="h-5 w-9 rounded-full bg-slate-300 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full dark:bg-slate-600" />
-                </label>
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  {t('settings.profile.remote')}
-                </span>
+                  <div className="flex items-center gap-3">
+                    <label className="relative inline-flex cursor-pointer items-center">
+                      <input
+                        type="checkbox"
+                        checked={remoteOnly}
+                        onChange={(e) => setRemoteOnly(e.target.checked)}
+                        className="peer sr-only"
+                      />
+                      <div className="h-5 w-9 rounded-full bg-slate-300 after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all peer-checked:bg-primary peer-checked:after:translate-x-full dark:bg-slate-600" />
+                    </label>
+                    <span className="text-sm text-slate-600 dark:text-slate-400">
+                      {t('settings.profile.remote')}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Input
-                  label={t('settings.profile.salaryMin')}
-                  type="number"
-                  value={minSalary}
-                  onChange={(e) => setMinSalary(e.target.value)}
-                  placeholder="30000"
-                />
-                <Input
-                  label={t('settings.profile.salaryMax')}
-                  type="number"
-                  value={maxSalary}
-                  onChange={(e) => setMaxSalary(e.target.value)}
-                  placeholder="80000"
-                />
+
+              {/* Salary range — grouped */}
+              <div className="pt-2">
+                <div className="h-px bg-slate-200 dark:bg-slate-700 -mx-6 mb-4" />
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                  {t('settings.profile.salaryRange')}
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    type="number"
+                    value={minSalary}
+                    onChange={(e) => setMinSalary(e.target.value)}
+                    placeholder="30000"
+                  />
+                  <Input
+                    type="number"
+                    value={maxSalary}
+                    onChange={(e) => setMaxSalary(e.target.value)}
+                    placeholder="80000"
+                  />
+                </div>
               </div>
-              <Button onClick={handleSaveProfile} disabled={updateProfile.isPending}>
-                <Save size={14} />
-                {updateProfile.isPending
-                  ? t('settings.profile.saving')
-                  : t('settings.profile.save')}
-              </Button>
+
+              <div className="pt-2">
+                <Button onClick={handleSaveProfile} disabled={updateProfile.isPending}>
+                  <Save size={14} />
+                  {updateProfile.isPending
+                    ? t('settings.profile.saving')
+                    : t('settings.profile.save')}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -259,54 +265,78 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Input
-                label={t('settings.email.host')}
-                value={emailHost}
-                onChange={(e) => setEmailHost(e.target.value)}
-                placeholder="smtp.gmail.com"
-              />
-              <Input
-                label={t('settings.email.port')}
-                type="number"
-                value={emailPort}
-                onChange={(e) => setEmailPort(e.target.value)}
-                placeholder="587"
-              />
-              <Input
-                label={t('settings.email.user')}
-                value={emailUser}
-                onChange={(e) => setEmailUser(e.target.value)}
-                placeholder="tu@email.com"
-              />
-              <Input
-                label={t('settings.email.password')}
-                type="password"
-                value={emailPass}
-                onChange={(e) => setEmailPass(e.target.value)}
-                placeholder="App Password"
-              />
-              <Input
-                label={t('settings.email.from')}
-                value={emailFrom}
-                onChange={(e) => setEmailFrom(e.target.value)}
-                placeholder="tu@email.com"
-              />
-              <Input
-                label={t('settings.email.recipient')}
-                value={emailTo}
-                onChange={(e) => setEmailTo(e.target.value)}
-                placeholder="destino@email.com"
-              />
-              <Input
-                label={t('settings.email.cc')}
-                value={emailCc}
-                onChange={(e) => setEmailCc(e.target.value)}
-                placeholder="otro@email.com"
-              />
-              <Button onClick={handleSaveEmail}>
-                <Save size={14} />
-                {t('settings.email.save')}
-              </Button>
+              {/* Server settings */}
+              <div>
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                  {t('settings.email.host')}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Input
+                    value={emailHost}
+                    onChange={(e) => setEmailHost(e.target.value)}
+                    placeholder="smtp.gmail.com"
+                  />
+                  <Input
+                    type="number"
+                    value={emailPort}
+                    onChange={(e) => setEmailPort(e.target.value)}
+                    placeholder="587"
+                  />
+                </div>
+              </div>
+
+              {/* Credentials */}
+              <div className="h-px bg-slate-200 dark:bg-slate-700 -mx-6" />
+              <div>
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                  {t('settings.email.password')}
+                </p>
+                <div className="space-y-3">
+                  <Input
+                    value={emailUser}
+                    onChange={(e) => setEmailUser(e.target.value)}
+                    placeholder="user@example.com"
+                  />
+                  <Input
+                    type="password"
+                    value={emailPass}
+                    onChange={(e) => setEmailPass(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              {/* Addresses */}
+              <div className="h-px bg-slate-200 dark:bg-slate-700 -mx-6" />
+              <div>
+                <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+                  {t('settings.email.recipient')}
+                </p>
+                <div className="space-y-3">
+                  <Input
+                    value={emailFrom}
+                    onChange={(e) => setEmailFrom(e.target.value)}
+                    placeholder="you@example.com"
+                  />
+                  <Input
+                    value={emailTo}
+                    onChange={(e) => setEmailTo(e.target.value)}
+                    placeholder="hr@company.com"
+                  />
+                  <Input
+                    value={emailCc}
+                    onChange={(e) => setEmailCc(e.target.value)}
+                    placeholder="bcc@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Button onClick={handleSaveEmail}>
+                  <Save size={14} />
+                  {t('settings.email.save')}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -325,43 +355,34 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Input
-                label={t('settings.apiKeys.jsearch')}
-                type={showKeys ? 'text' : 'password'}
-                value={jsearchKey}
-                onChange={(e) => setJsearchKey(e.target.value)}
-                placeholder="Ingresa tu API key de JSearch"
-              />
-              <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                <p className="text-xs font-medium text-slate-500 mb-3 uppercase tracking-wider">
-                  {t('settings.apiKeys.title')}
-                </p>
-                <p className="text-xs text-slate-400 mb-3">{t('settings.apiKeys.description')}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                {t('settings.apiKeys.description')}
+              </p>
+              <div className="space-y-3">
                 <Input
-                  label={t('settings.apiKeys.gemini')}
+                  type={showKeys ? 'text' : 'password'}
+                  value={jsearchKey}
+                  onChange={(e) => setJsearchKey(e.target.value)}
+                  placeholder="••••••••"
+                />
+                <Input
                   type={showKeys ? 'text' : 'password'}
                   value={geminiKey}
                   onChange={(e) => setGeminiKey(e.target.value)}
-                  placeholder="AIza... — Google Gemini"
+                  placeholder="AIza..."
                 />
-                <div className="mt-3">
-                  <Input
-                    label={t('settings.apiKeys.openrouter')}
-                    type={showKeys ? 'text' : 'password'}
-                    value={openrouterKey}
-                    onChange={(e) => setOpenrouterKey(e.target.value)}
-                    placeholder="sk-or-v1-... — OpenRouter"
-                  />
-                </div>
-                <div className="mt-3">
-                  <Input
-                    label={t('settings.apiKeys.nim')}
-                    type={showKeys ? 'text' : 'password'}
-                    value={nimKey}
-                    onChange={(e) => setNimKey(e.target.value)}
-                    placeholder="nvapi-... — NVIDIA NIM"
-                  />
-                </div>
+                <Input
+                  type={showKeys ? 'text' : 'password'}
+                  value={openrouterKey}
+                  onChange={(e) => setOpenrouterKey(e.target.value)}
+                  placeholder="sk-or-v1-..."
+                />
+                <Input
+                  type={showKeys ? 'text' : 'password'}
+                  value={nimKey}
+                  onChange={(e) => setNimKey(e.target.value)}
+                  placeholder="nvapi-..."
+                />
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setShowKeys(!showKeys)}>
@@ -384,7 +405,6 @@ export default function SettingsPage() {
                   </motion.span>
                 </Button>
               </div>
-              <p className="text-xs text-slate-400">{t('settings.apiKeys.description')}</p>
             </CardContent>
           </Card>
         </motion.div>

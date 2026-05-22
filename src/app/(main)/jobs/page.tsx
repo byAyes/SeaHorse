@@ -11,7 +11,11 @@ import {
   Calendar,
   Building2,
   SlidersHorizontal,
+  Briefcase,
+  Upload,
+  PlayCircle,
 } from 'lucide-react';
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,16 +96,7 @@ export default function JobsPage() {
   }, [data, search, sortKey, sortDir, scoreFilter]);
 
   return (
-    <div className="space-y-4 sm:space-y-6 relative">
-      {/* Ambient page accent */}
-      <div
-        className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 0%, rgba(79,70,229,0.06) 0%, transparent 70%)',
-        }}
-      />
-
+    <div className="space-y-4 sm:space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h2 className="text-xl font-semibold">{t('jobs.title')}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -109,47 +104,40 @@ export default function JobsPage() {
         </p>
       </motion.div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="relative w-full sm:flex-1 min-w-0">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('jobs.search')}
-                className="pl-9 w-full"
-              />
-            </div>
-            <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 -mx-1 px-1 sm:mx-0 sm:px-0">
-              <SlidersHorizontal size={14} className="text-slate-400 shrink-0" />
-              {[0, 40, 60, 80].map((v) => (
-                <motion.button
-                  key={v}
-                  onClick={() => setScoreFilter(v)}
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.92 }}
-                  animate={{
-                    scale: scoreFilter === v ? 1.05 : 1,
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                  className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
-                    scoreFilter === v
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-dark-surface-tertiary dark:text-slate-400'
-                  }`}
-                >
-                  {v === 0 ? t('jobs.score.all') : `${v}%+`}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filters — lightweight, no card wrapper */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface dark:bg-dark-surface-secondary p-4">
+        <div className="relative w-full sm:flex-1 min-w-0">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('jobs.search')}
+            className="pl-9 w-full"
+          />
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+          <SlidersHorizontal size={14} className="text-slate-400 shrink-0" />
+          {[0, 40, 60, 80].map((v) => (
+            <motion.button
+              key={v}
+              onClick={() => setScoreFilter(v)}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              animate={{
+                scale: scoreFilter === v ? 1.05 : 1,
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+              className={`rounded-full px-2.5 sm:px-3 py-1 text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
+                scoreFilter === v
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-dark-surface-tertiary dark:text-slate-400'
+              }`}
+            >
+              {v === 0 ? t('jobs.score.all') : `${v}%+`}
+            </motion.button>
+          ))}
+        </div>
+      </div>
 
       {/* Table */}
       <Card>
@@ -161,63 +149,89 @@ export default function JobsPage() {
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-dark-surface-tertiary mb-4">
-                <Search size={24} className="text-slate-400" />
+                {search ? (
+                  <Search size={24} className="text-slate-400" />
+                ) : (
+                  <Briefcase size={24} className="text-slate-400" />
+                )}
               </div>
               <p className="text-sm font-medium text-slate-500">
-                {search ? t('jobs.noResults') : t('jobs.noResults')}
+                {search ? t('jobs.noResults') : t('jobs.noData')}
               </p>
-              <p className="text-xs text-slate-400 mt-1">
-                {search ? t('jobs.noResultsDesc') : t('upload.subtitle')}
+              <p className="text-xs text-slate-400 mt-1 max-w-[240px]">
+                {search ? t('jobs.noResultsDesc') : t('jobs.noDataDesc')}
               </p>
+              {!search && !data?.total && (
+                <div className="flex gap-2 mt-4">
+                  <Link href="/upload">
+                    <Button size="sm" variant="outline">
+                      <Upload size={14} />
+                      {t('dashboard.actions.uploadCv')}
+                    </Button>
+                  </Link>
+                  <Link href="/pipeline">
+                    <Button size="sm">
+                      <PlayCircle size={14} />
+                      {t('dashboard.actions.runPipeline')}
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <table className="w-full text-sm min-w-[640px] sm:min-w-0">
+            <div className="table-responsive">
+              <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b dark:border-slate-800">
-                    <th
-                      className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort('title')}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {t('jobs.table.title')} <ArrowUpDown size={12} />
-                      </span>
-                    </th>
-                    <th
-                      className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort('company')}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {t('jobs.table.company')} <ArrowUpDown size={12} />
-                      </span>
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500">
-                      {t('jobs.table.location')}
-                    </th>
-                    <th
-                      className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort('score')}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {t('jobs.table.score')} <ArrowUpDown size={12} />
-                      </span>
-                    </th>
-                    <th
-                      className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort('salary')}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {t('jobs.table.salary')} <ArrowUpDown size={12} />
-                      </span>
-                    </th>
-                    <th
-                      className="cursor-pointer px-4 py-3 text-left text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                      onClick={() => toggleSort('date')}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {t('jobs.table.date')} <ArrowUpDown size={12} />
-                      </span>
-                    </th>
+                    {[
+                      {
+                        label: t('jobs.table.title'),
+                        sortable: true as const,
+                        sortKey: 'title' as SortKey,
+                        hideMobile: false,
+                      },
+                      {
+                        label: t('jobs.table.company'),
+                        sortable: true as const,
+                        sortKey: 'company' as SortKey,
+                        hideMobile: false,
+                      },
+                      {
+                        label: t('jobs.table.location'),
+                        sortable: false as const,
+                        sortKey: undefined,
+                        hideMobile: true,
+                      },
+                      {
+                        label: t('jobs.table.score'),
+                        sortable: true as const,
+                        sortKey: 'score' as SortKey,
+                        hideMobile: false,
+                      },
+                      {
+                        label: t('jobs.table.salary'),
+                        sortable: true as const,
+                        sortKey: 'salary' as SortKey,
+                        hideMobile: true,
+                      },
+                      {
+                        label: t('jobs.table.date'),
+                        sortable: true as const,
+                        sortKey: 'date' as SortKey,
+                        hideMobile: true,
+                      },
+                    ].map((col) => (
+                      <th
+                        key={col.label}
+                        onClick={col.sortable ? () => toggleSort(col.sortKey!) : undefined}
+                        className={`px-4 py-3 text-left text-xs font-medium text-slate-500 ${col.sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-300' : ''} ${col.hideMobile ? 'hidden sm:table-cell' : ''}`}
+                      >
+                        <span className="inline-flex items-center gap-1">
+                          {col.label}
+                          {col.sortable && <ArrowUpDown size={12} />}
+                        </span>
+                      </th>
+                    ))}
                     <th className="px-4 py-3" />
                   </tr>
                 </thead>
@@ -228,19 +242,21 @@ export default function JobsPage() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.025, type: 'spring', stiffness: 200, damping: 20 }}
-                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-dark-surface-tertiary/50 cursor-pointer transition-colors origin-left"
+                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-dark-surface-tertiary/50 cursor-pointer transition-colors"
                       onClick={() => setSelectedJob(match)}
                     >
-                      <td className="px-3 sm:px-4 py-3">
-                        <p className="font-medium truncate max-w-[140px] sm:max-w-[200px]">{match.job.title}</p>
+                      <td className="px-4 py-3">
+                        <p className="font-medium truncate max-w-[140px] sm:max-w-[200px]">
+                          {match.job.title}
+                        </p>
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
                         <span className="inline-flex items-center gap-1">
                           <Building2 size={12} />
                           {match.job.company}
                         </span>
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-slate-500 hidden sm:table-cell">
+                      <td className="px-4 py-3 text-slate-500 hidden sm:table-cell">
                         {match.job.location && (
                           <span className="inline-flex items-center gap-1">
                             <MapPin size={12} />
@@ -248,19 +264,19 @@ export default function JobsPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-3 sm:px-4 py-3">
+                      <td className="px-4 py-3">
                         <ScoreBadge score={match.score.overall} />
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
                         {match.job.salary ? formatSalary(match.job.salary) : '—'}
                       </td>
-                      <td className="px-3 sm:px-4 py-3 text-xs text-slate-500 hidden sm:table-cell">
+                      <td className="px-4 py-3 text-xs text-slate-500 hidden sm:table-cell">
                         <span className="inline-flex items-center gap-1">
                           <Calendar size={12} />
                           {formatDate(match.job.scrapedAt)}
                         </span>
                       </td>
-                      <td className="px-3 sm:px-4 py-3">
+                      <td className="px-4 py-3">
                         <Button
                           variant="ghost"
                           size="sm"

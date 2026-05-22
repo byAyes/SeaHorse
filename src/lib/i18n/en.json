@@ -15,7 +15,8 @@
     "jobs": "Results",
     "pipeline": "Pipeline",
     "settings": "Settings",
-    "collapse": "Collapse"
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -57,6 +58,8 @@
     "evaluated": "evaluated",
     "match": "match",
     "matches": "matches",
+    "noData": "No jobs to match yet",
+    "noDataDesc": "Upload a CV and run the pipeline first to see matching results",
     "noResults": "No matching jobs found",
     "noResultsDesc": "Try adjusting the score filter or search term",
     "table": {
@@ -102,9 +105,13 @@
     "processing": {
       "title": "Processing your CV",
       "subtitle": "Analyzing and extracting your professional profile",
+      "uploading": "Uploading file",
+      "uploadingDesc": "Uploading your CV to the server",
       "extracting": "Extracting information...",
+      "extractingDesc": "Extracting information with AI",
       "analyzing": "Analyzing skills and experience...",
-      "building": "Building your profile..."
+      "building": "Building your profile...",
+      "buildingDesc": "Building your professional profile"
     },
     "preview": {
       "title": "Extracted Profile",
@@ -124,6 +131,7 @@
     "done": {
       "title": "Profile Complete!",
       "subtitle": "Your CV has been processed and your profile is ready",
+      "successMessage": "Your profile is ready for action",
       "viewJobs": "View Matching Jobs",
       "runPipeline": "Run Pipeline",
       "uploadAnother": "Upload Another"
@@ -158,6 +166,7 @@
       "languages": "Languages",
       "languagesPlaceholder": "e.g. English, Spanish",
       "salary": "Salary Range (USD)",
+      "salaryRange": "Salary Range",
       "salaryMin": "Minimum",
       "salaryMax": "Maximum",
       "remote": "Remote Work",
@@ -206,6 +215,15 @@
   "pipeline": {
     "title": "Pipeline",
     "subtitle": "Run the job scraping and matching pipeline",
+    "gettingStarted": "Getting Started",
+    "guide": {
+      "uploadCv": "Upload your CV",
+      "uploadCvDesc": "Extract your professional profile with AI to enable smart matching",
+      "addKeys": "Configure API keys",
+      "addKeysDesc": "Add at least one AI provider key (Gemini, OpenRouter, or NVIDIA NIM)",
+      "runPipeline": "Run the pipeline",
+      "runPipelineDesc": "Scrape jobs from multiple sources and match them against your profile"
+    },
     "apiKeyRequired": "AI API Key Required",
     "apiKeyRequiredDesc": "You need at least one AI API key (Gemini, OpenRouter, or NVIDIA NIM) to run the pipeline.",
     "goToSettings": "Go to Settings",
@@ -214,19 +232,14 @@
     "reset": "Reset",
     "steps": {
       "scraping": "Scraping",
-      "matching": "Matching",
-      "completion": "Completion"
-    },
-    "progress": "Progress",
-    "starting": "Starting...",
-    "steps": {
-      "scraping": "Scraping",
       "scrapingDesc": "Searching jobs from multiple sources",
       "matching": "Matching",
       "matchingDesc": "Evaluating matches against your profile",
       "completion": "Completion",
       "completionDesc": "Processing results and cleaning data"
     },
+    "progress": "Progress",
+    "starting": "Starting...",
     "status": {
       "completed": "Completed",
       "error": "Error",

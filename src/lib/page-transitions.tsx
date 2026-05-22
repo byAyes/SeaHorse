@@ -4,6 +4,15 @@ import { createContext, useContext, useRef, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { Variants } from 'framer-motion';
 
+/**
+ * Check if the user prefers reduced motion via OS setting.
+ * Used to disable decorative animations while keeping functional transitions.
+ */
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export type NavDirection = 'forward' | 'backward' | 'none';
 
 interface PageTransitionContextValue {
@@ -58,11 +67,28 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
  * Shared page transition variants — direction-aware.
  * Forward: content enters from right, exits to left.
  * Backward: content enters from left, exits to right.
+ *
+ * Respects prefers-reduced-motion: when active, transitions are minimal.
  */
 export function getPageVariants(direction: NavDirection): Variants {
+  const reduced = prefersReducedMotion();
   const isForward = direction === 'forward' || direction === 'none';
   const xOffset = isForward ? 40 : -40;
   const xExitOffset = isForward ? -30 : 30;
+
+  if (reduced) {
+    return {
+      initial: { opacity: 0 },
+      animate: {
+        opacity: 1,
+        transition: { duration: 0.1 },
+      },
+      exit: {
+        opacity: 0,
+        transition: { duration: 0.08 },
+      },
+    };
+  }
 
   return {
     initial: {

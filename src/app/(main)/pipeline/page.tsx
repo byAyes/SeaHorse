@@ -243,16 +243,7 @@ export default function PipelinePage() {
   const topMatches = result?.matches?.slice(0, 5) || [];
 
   return (
-    <div className="space-y-6 relative">
-      {/* Ambient page accent */}
-      <div
-        className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 0%, rgba(79,70,229,0.06) 0%, transparent 70%)',
-        }}
-      />
-
+    <div className="space-y-6">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -550,34 +541,90 @@ export default function PipelinePage() {
             </Card>
           )}
 
-          {/* Last Execution Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('pipeline.results.lastExecution')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {statsLoading ? (
-                <Skeleton className="h-12 w-full" />
-              ) : stats?.lastPipelineRun ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {formatDate(stats.lastPipelineRun.startedAt)}
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    <Badge>{stats.totalJobs} jobs (30d)</Badge>
-                    <Badge variant="success">
-                      {stats.totalMatches} {t('pipeline.results.matched')}
-                    </Badge>
-                    {stats.pipelinesRun > 0 && (
-                      <Badge variant="default">{stats.pipelinesRun} pipelines</Badge>
-                    )}
-                  </div>
+          {/* Getting Started Guide (shown when no runs exist yet) */}
+          {!stats?.lastPipelineRun && !statsLoading && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('pipeline.gettingStarted')}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {[
+                    {
+                      step: '1',
+                      title: t('pipeline.guide.uploadCv'),
+                      desc: t('pipeline.guide.uploadCvDesc'),
+                      href: '/upload',
+                    },
+                    {
+                      step: '2',
+                      title: t('pipeline.guide.addKeys'),
+                      desc: t('pipeline.guide.addKeysDesc'),
+                      href: '/settings',
+                    },
+                    {
+                      step: '3',
+                      title: t('pipeline.guide.runPipeline'),
+                      desc: t('pipeline.guide.runPipelineDesc'),
+                    },
+                  ].map((guideItem, i) => (
+                    <div key={guideItem.step} className="flex items-start gap-3">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary dark:bg-primary/20 dark:text-primary-light">
+                        {guideItem.step}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{guideItem.title}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{guideItem.desc}</p>
+                        {'href' in guideItem && guideItem.href && (
+                          <Link href={guideItem.href}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="mt-1 h-auto px-0 text-xs text-primary hover:text-primary-dark hover:bg-transparent"
+                            >
+                              {guideItem.href === '/upload'
+                                ? t('upload.title')
+                                : t('settings.title')}{' '}
+                              &rarr;
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <p className="text-sm text-slate-500">{t('pipeline.results.noPreviousRuns')}</p>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Last Execution Summary */}
+          {stats?.lastPipelineRun && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('pipeline.results.lastExecution')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {statsLoading ? (
+                  <Skeleton className="h-12 w-full" />
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {formatDate(stats.lastPipelineRun.startedAt)}
+                    </p>
+                    <div className="flex gap-2 flex-wrap">
+                      <Badge>{stats.totalJobs} jobs (30d)</Badge>
+                      <Badge variant="success">
+                        {stats.totalMatches} {t('pipeline.results.matched')}
+                      </Badge>
+                      {stats.pipelinesRun > 0 && (
+                        <Badge variant="default">{stats.pipelinesRun} pipelines</Badge>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Log Viewer */}

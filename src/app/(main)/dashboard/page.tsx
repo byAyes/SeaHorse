@@ -71,16 +71,7 @@ export default function DashboardPage() {
   }, [refetch]);
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 relative">
-      {/* Ambient page accent */}
-      <div
-        className="absolute top-0 right-0 w-72 sm:w-96 h-72 sm:h-96 rounded-full blur-3xl pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 0%, rgba(79,70,229,0.06) 0%, transparent 70%)',
-        }}
-      />
-
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -280,7 +271,9 @@ export default function DashboardPage() {
                     )}
                   </Badge>
                   {stats.lastPipelineRun.error && (
-                    <span className="text-xs text-red-500 truncate max-w-[120px] sm:max-w-none">{stats.lastPipelineRun.error}</span>
+                    <span className="text-xs text-red-500 truncate max-w-[120px] sm:max-w-none">
+                      {stats.lastPipelineRun.error}
+                    </span>
                   )}
                   <ScoreBadge score={stats.lastPipelineRun.matched} />
                   <Badge variant="outline" className="gap-1">

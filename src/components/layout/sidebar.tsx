@@ -10,9 +10,9 @@ import {
   PlayCircle,
   Settings,
   ChevronLeft,
-  Ship,
   Sparkles,
 } from 'lucide-react';
+import { SeahorseLogo } from '@/components/brand/seahorse-logo';
 import { useTranslation } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
@@ -48,19 +48,13 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
         {/* Logo / Brand */}
-        <div className="relative flex h-16 items-center gap-3 border-b border-slate-200/50 px-4 dark:border-slate-800/50">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark text-white shadow-glow-primary">
-            <Ship size={18} />
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="text-[15px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
-                Seahorse
-              </span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-wide uppercase">
-                Pipeline
-              </span>
+        <div className="relative flex h-16 items-center border-b border-slate-200/50 px-4 dark:border-slate-800/50">
+          {collapsed ? (
+            <div className="flex items-center justify-center w-full">
+              <SeahorseLogo variant="icon" size={20} />
             </div>
+          ) : (
+            <SeahorseLogo variant="wordmark" />
           )}
         </div>
 
@@ -73,6 +67,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
                   isActive
@@ -127,8 +122,10 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
 
         {/* Collapse toggle */}
         <div className="relative border-t border-slate-200/50 p-3 dark:border-slate-800/50">
+          {' '}
           <button
             onClick={onToggle}
+            aria-label={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}
             className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-400 hover:bg-slate-100/80 dark:hover:bg-dark-surface-tertiary/80 transition-all duration-150 hover:text-slate-600 dark:hover:text-slate-300"
           >
             <motion.div
@@ -165,18 +162,8 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
         className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r bg-surface backdrop-blur-xl dark:bg-dark-surface dark:border-slate-800/60 show-mobile"
       >
         {/* Logo */}
-        <div className="relative flex h-16 items-center gap-3 border-b border-slate-200/50 px-4 dark:border-slate-800/50">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark text-white shadow-glow-primary">
-            <Ship size={18} />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[15px] font-bold tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>
-              Seahorse
-            </span>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-wide uppercase">
-              Pipeline
-            </span>
-          </div>
+        <div className="relative flex h-16 items-center px-4 border-b border-slate-200/50 dark:border-slate-800/50">
+          <SeahorseLogo variant="wordmark" />
         </div>
 
         {/* Mobile Nav */}
@@ -189,6 +176,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                 key={item.href}
                 href={item.href}
                 onClick={onMobileClose}
+                aria-current={isActive ? 'page' : undefined}
                 className={cn(
                   'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
                   isActive
@@ -219,6 +207,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'relative flex flex-col items-center gap-0.5 py-2 px-3 min-w-0 transition-colors',
                 isActive
@@ -248,7 +237,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
         {/* 5th item as "More" or Settings */}
         <Link
           href="/settings"
-          onClick={navItemKeys[4].href === '/settings' ? undefined : undefined}
+          aria-current={pathname.startsWith('/settings') ? 'page' : undefined}
           className={cn(
             'relative flex flex-col items-center gap-0.5 py-2 px-3 min-w-0 transition-colors',
             pathname.startsWith('/settings')
