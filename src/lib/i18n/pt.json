@@ -158,6 +158,7 @@
       "languages": "Idiomas",
       "languagesPlaceholder": "ex: Português, Inglês",
       "salary": "Faixa Salarial (USD)",
+      "salaryRange": "Faixa Salarial",
       "salaryMin": "Mínimo",
       "salaryMax": "Máximo",
       "remote": "Trabalho Remoto",
@@ -169,6 +170,9 @@
     "email": {
       "title": "Configuração de E-mail",
       "description": "Configurações SMTP para e-mails de resumo de vagas",
+      "server": "Configurações do Servidor",
+      "credentials": "Credenciais",
+      "addresses": "Endereços de E-mail",
       "host": "Servidor SMTP",
       "port": "Porta",
       "user": "Usuário",

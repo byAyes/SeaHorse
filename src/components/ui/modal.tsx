@@ -4,6 +4,7 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n';
 
 interface ModalProps {
   open: boolean;
@@ -99,6 +100,7 @@ export function Modal({
   }, [open, onClose]);
 
   // Generate unique IDs for aria attributes
+  const { t } = useTranslation();
   const titleId = React.useId();
   const descId = React.useId();
 
@@ -142,7 +144,7 @@ export function Modal({
             <button
               onClick={onClose}
               className="absolute right-4 top-4 rounded-full p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-dark-surface-tertiary transition-colors"
-              aria-label="Cerrar"
+              aria-label={t('common.close')}
             >
               <X size={18} />
             </button>

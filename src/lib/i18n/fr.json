@@ -158,6 +158,7 @@
       "languages": "Langues",
       "languagesPlaceholder": "ex: Français, Anglais",
       "salary": "Fourchette de Salaire (USD)",
+      "salaryRange": "Fourchette de Salaire",
       "salaryMin": "Minimum",
       "salaryMax": "Maximum",
       "remote": "Télétravail",
@@ -169,6 +170,9 @@
     "email": {
       "title": "Configuration E-mail",
       "description": "Paramètres SMTP pour les e-mails de résumé d'offres",
+      "server": "Paramètres du Serveur",
+      "credentials": "Identifiants",
+      "addresses": "Adresses E-mail",
       "host": "Serveur SMTP",
       "port": "Port",
       "user": "Utilisateur",
