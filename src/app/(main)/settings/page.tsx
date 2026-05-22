@@ -268,7 +268,7 @@ export default function SettingsPage() {
               {/* Server settings */}
               <div>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-                  {t('settings.email.host')}
+                  {t('settings.email.server')}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Input
@@ -289,7 +289,7 @@ export default function SettingsPage() {
               <div className="h-px bg-slate-200 dark:bg-slate-700 -mx-6" />
               <div>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-                  {t('settings.email.password')}
+                  {t('settings.email.credentials')}
                 </p>
                 <div className="space-y-3">
                   <Input
@@ -310,7 +310,7 @@ export default function SettingsPage() {
               <div className="h-px bg-slate-200 dark:bg-slate-700 -mx-6" />
               <div>
                 <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-                  {t('settings.email.recipient')}
+                  {t('settings.email.addresses')}
                 </p>
                 <div className="space-y-3">
                   <Input

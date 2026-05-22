@@ -4,6 +4,8 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
   Search,
+  ArrowDown,
+  ArrowUp,
   ArrowUpDown,
   ExternalLink,
   MapPin,
@@ -224,11 +226,30 @@ export default function JobsPage() {
                       <th
                         key={col.label}
                         onClick={col.sortable ? () => toggleSort(col.sortKey!) : undefined}
-                        className={`px-4 py-3 text-left text-xs font-medium text-slate-500 ${col.sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-300' : ''} ${col.hideMobile ? 'hidden sm:table-cell' : ''}`}
+                        aria-sort={
+                          col.sortable && sortKey === col.sortKey
+                            ? sortDir === 'asc'
+                              ? 'ascending'
+                              : 'descending'
+                            : undefined
+                        }
+                        className={`px-4 py-3 text-left text-xs font-medium transition-colors ${
+                          col.sortable && sortKey === col.sortKey
+                            ? 'text-slate-700 dark:text-slate-200 font-semibold'
+                            : 'text-slate-500'
+                        } ${col.sortable ? 'cursor-pointer hover:text-slate-700 dark:hover:text-slate-300' : ''} ${col.hideMobile ? 'hidden sm:table-cell' : ''}`}
                       >
                         <span className="inline-flex items-center gap-1">
                           {col.label}
-                          {col.sortable && <ArrowUpDown size={12} />}
+                          {col.sortable && sortKey === col.sortKey ? (
+                            sortDir === 'asc' ? (
+                              <ArrowUp size={12} />
+                            ) : (
+                              <ArrowDown size={12} />
+                            )
+                          ) : col.sortable ? (
+                            <ArrowUpDown size={12} className="text-slate-400" />
+                          ) : null}
                         </span>
                       </th>
                     ))}

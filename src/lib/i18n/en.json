@@ -109,7 +109,6 @@
       "uploadingDesc": "Uploading your CV to the server",
       "extracting": "Extracting information...",
       "extractingDesc": "Extracting information with AI",
-      "analyzing": "Analyzing skills and experience...",
       "building": "Building your profile...",
       "buildingDesc": "Building your professional profile"
     },
@@ -178,6 +177,9 @@
     "email": {
       "title": "Email Configuration",
       "description": "SMTP settings for job digest emails",
+      "server": "Server Settings",
+      "credentials": "Credentials",
+      "addresses": "Email Addresses",
       "host": "SMTP Host",
       "port": "Port",
       "user": "User",

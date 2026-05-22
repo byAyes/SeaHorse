@@ -135,14 +135,14 @@ export default function UploadPage() {
     setStep('done');
   }, []);
 
-  const renderStepIcon = (status: string) => {
+  const renderStepIcon = (status: ProcessStep['status']) => {
     switch (status) {
       case 'done':
         return <CheckCircle2 size={20} className="text-emerald-500" />;
       case 'active':
         return (
           <motion.div
-            animate={{ scale: [1, 1.15, 1] }}
+            animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Loader2 size={20} className="text-primary animate-spin" />
@@ -247,7 +247,7 @@ export default function UploadPage() {
                 {/* Step progression */}
                 <div className="w-full max-w-xs space-y-0">
                   {processSteps.map((ps, i) => (
-                    <div key={ps.id} className="relative flex gap-4 pb-7 last:pb-0">
+                    <div key={ps.id} className="relative flex gap-4 pb-8 last:pb-0">
                       {i < processSteps.length - 1 && (
                         <motion.div
                           className="absolute left-[10px] top-8 h-full w-px"
@@ -292,7 +292,7 @@ export default function UploadPage() {
                             {t(ps.descKey)}
                           </motion.p>
                         ) : (
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-slate-500 mt-0.5">
                             {ps.status === 'done'
                               ? t('pipeline.status.completed')
                               : t('pipeline.status.pending')}

@@ -109,7 +109,6 @@
       "uploadingDesc": "Subiendo tu CV al servidor",
       "extracting": "Extrayendo información...",
       "extractingDesc": "Extrayendo información con IA",
-      "analyzing": "Analizando habilidades y experiencia...",
       "building": "Construyendo tu perfil...",
       "buildingDesc": "Construyendo tu perfil profesional"
     },
@@ -178,6 +177,9 @@
     "email": {
       "title": "Configuración de Email",
       "description": "Configuración SMTP para los correos de jobs",
+      "server": "Configuración del Servidor",
+      "credentials": "Credenciales",
+      "addresses": "Direcciones de Correo",
       "host": "SMTP Host",
       "port": "Puerto",
       "user": "Usuario",
