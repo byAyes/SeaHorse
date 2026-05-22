@@ -93,34 +93,22 @@ export function getPageVariants(direction: NavDirection): Variants {
   return {
     initial: {
       opacity: 0,
-      x: xOffset,
-      y: 8,
-      scale: 0.98,
-      filter: 'blur(2px)',
+      y: 6,
     },
     animate: {
       opacity: 1,
-      x: 0,
       y: 0,
-      scale: 1,
-      filter: 'blur(0px)',
       transition: {
-        duration: 0.3,
+        duration: 0.2,
         ease: [0.23, 1, 0.32, 1],
-        opacity: { duration: 0.25 },
-        filter: { duration: 0.25 },
       },
     },
     exit: {
       opacity: 0,
-      x: xExitOffset,
-      y: -6,
-      scale: 0.97,
-      filter: 'blur(3px)',
+      y: -4,
       transition: {
-        duration: 0.15,
+        duration: 0.12,
         ease: 'easeOut',
-        opacity: { duration: 0.12 },
       },
     },
   };

@@ -76,44 +76,19 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                 )}
               >
                 {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active-bg"
-                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-50/80 to-primary-50/30 dark:from-primary-50/10 dark:to-transparent"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-50/80 to-primary-50/30 dark:from-primary-50/10 dark:to-transparent" />
                 )}
                 {isActive && (
-                  <motion.div
-                    layoutId="sidebar-glow"
-                    className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-primary to-primary-light shadow-lg shadow-primary/30"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
+                  <div className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-primary to-primary-light shadow-lg shadow-primary/30" />
                 )}
-                <motion.div
-                  className="relative z-10 shrink-0"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.92 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                >
+                <div className="relative z-10 shrink-0">
                   <Icon size={18} />
-                </motion.div>
-                {!collapsed && (
-                  <motion.span
-                    className="relative z-10"
-                    layout
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                  >
-                    {t(item.labelKey)}
-                  </motion.span>
-                )}
+                </div>
+                {!collapsed && <span className="relative z-10">{t(item.labelKey)}</span>}
                 {isActive && !collapsed && (
-                  <motion.div
-                    layoutId="sidebar-active-icon"
-                    className="relative z-10 ml-auto flex h-5 w-5 items-center justify-center rounded-md bg-primary/10 dark:bg-primary/20"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  >
+                  <div className="relative z-10 ml-auto flex h-5 w-5 items-center justify-center rounded-md bg-primary/10 dark:bg-primary/20">
                     <Sparkles size={10} className="text-primary" />
-                  </motion.div>
+                  </div>
                 )}
               </Link>
             );
@@ -216,18 +191,11 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
               )}
             >
               {isActive && (
-                <motion.div
-                  layoutId="mobile-nav-indicator"
-                  className="absolute -top-px left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary"
-                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                />
+                <div className="absolute -top-px left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
               )}
-              <motion.div
-                whileTap={{ scale: 0.85 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-              >
+              <div>
                 <Icon size={20} />
-              </motion.div>
+              </div>
               <span className="text-[10px] font-medium leading-tight truncate max-w-full">
                 {t(item.labelKey)}
               </span>
@@ -245,12 +213,9 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
               : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
           )}
         >
-          <motion.div
-            whileTap={{ scale: 0.85 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          >
+          <div>
             <Settings size={20} />
-          </motion.div>
+          </div>
           <span className="text-[10px] font-medium leading-tight truncate max-w-full">
             {t('sidebar.settings')}
           </span>

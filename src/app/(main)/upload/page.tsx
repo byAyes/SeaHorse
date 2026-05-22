@@ -333,20 +333,29 @@ export default function UploadPage() {
                 <CardContent>
                   {skills.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5">
-                      {skills.map((skill: string, si: number) => (
-                        <motion.span
-                          key={skill}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{
-                            delay: 0.1 + si * 0.025,
-                            type: 'spring',
-                            stiffness: 200,
-                          }}
-                        >
-                          <Badge variant={si < 3 ? 'success' : 'default'}>{skill}</Badge>
-                        </motion.span>
-                      ))}
+                      {skills.map((skill: string, si: number) => {
+                        const isFirstBatch = si < 20;
+                        return (
+                          <motion.span
+                            key={skill}
+                            initial={
+                              isFirstBatch ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }
+                            }
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={
+                              isFirstBatch
+                                ? {
+                                    delay: 0.1 + si * 0.025,
+                                    type: 'spring',
+                                    stiffness: 200,
+                                  }
+                                : { duration: 0 }
+                            }
+                          >
+                            <Badge variant={si < 3 ? 'success' : 'default'}>{skill}</Badge>
+                          </motion.span>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -375,23 +384,28 @@ export default function UploadPage() {
                 <CardContent>
                   {experience.length > 0 ? (
                     <ul className="space-y-3">
-                      {experience.map((exp: { role?: string; company?: string }, i: number) => (
-                        <motion.li
-                          key={i}
-                          initial={{ opacity: 0, x: -8 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.15 + i * 0.05 }}
-                          className="flex items-start gap-3"
-                        >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                            {exp.company?.charAt(0)?.toUpperCase() || '?'}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium">{exp.role}</p>
-                            {exp.company && <p className="text-xs text-slate-500">{exp.company}</p>}
-                          </div>
-                        </motion.li>
-                      ))}
+                      {experience.map((exp: { role?: string; company?: string }, i: number) => {
+                        const isFirstBatch = i < 10;
+                        return (
+                          <motion.li
+                            key={i}
+                            initial={isFirstBatch ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={isFirstBatch ? { delay: 0.15 + i * 0.05 } : { duration: 0 }}
+                            className="flex items-start gap-3"
+                          >
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                              {exp.company?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium">{exp.role}</p>
+                              {exp.company && (
+                                <p className="text-xs text-slate-500">{exp.company}</p>
+                              )}
+                            </div>
+                          </motion.li>
+                        );
+                      })}
                     </ul>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -421,27 +435,32 @@ export default function UploadPage() {
                   {education.length > 0 ? (
                     <ul className="space-y-3">
                       {(education as Array<{ degree?: string; institution?: string }>).map(
-                        (edu: { degree?: string; institution?: string }, i: number) => (
-                          <motion.li
-                            key={i}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 + i * 0.05 }}
-                            className="flex items-start gap-3"
-                          >
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                              {edu.institution?.charAt(0)?.toUpperCase() || 'E'}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium">
-                                {edu.degree || t('common.noData')}
-                              </p>
-                              {edu.institution && (
-                                <p className="text-xs text-slate-500">{edu.institution}</p>
-                              )}
-                            </div>
-                          </motion.li>
-                        ),
+                        (edu: { degree?: string; institution?: string }, i: number) => {
+                          const isFirstBatch = i < 10;
+                          return (
+                            <motion.li
+                              key={i}
+                              initial={isFirstBatch ? { opacity: 0, x: -8 } : { opacity: 1, x: 0 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={
+                                isFirstBatch ? { delay: 0.2 + i * 0.05 } : { duration: 0 }
+                              }
+                              className="flex items-start gap-3"
+                            >
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                {edu.institution?.charAt(0)?.toUpperCase() || 'E'}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium">
+                                  {edu.degree || t('common.noData')}
+                                </p>
+                                {edu.institution && (
+                                  <p className="text-xs text-slate-500">{edu.institution}</p>
+                                )}
+                              </div>
+                            </motion.li>
+                          );
+                        },
                       )}
                     </ul>
                   ) : (

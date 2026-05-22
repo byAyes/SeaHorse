@@ -257,60 +257,68 @@ export default function JobsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((match, i) => (
-                    <motion.tr
-                      key={match.job.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.025, type: 'spring', stiffness: 200, damping: 20 }}
-                      className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-dark-surface-tertiary/50 cursor-pointer transition-colors"
-                      onClick={() => setSelectedJob(match)}
-                    >
-                      <td className="px-4 py-3">
-                        <p className="font-medium truncate max-w-[140px] sm:max-w-[200px]">
-                          {match.job.title}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
-                        <span className="inline-flex items-center gap-1">
-                          <Building2 size={12} />
-                          {match.job.company}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-slate-500 hidden sm:table-cell">
-                        {match.job.location && (
+                  {filtered.map((match, i) => {
+                    // Only animate first 20 rows for performance; rest appear instantly
+                    const isFirstBatch = i < 20;
+                    return (
+                      <motion.tr
+                        key={match.job.id}
+                        initial={isFirstBatch ? { opacity: 0, y: 8 } : { opacity: 1, y: 0 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={
+                          isFirstBatch
+                            ? { delay: i * 0.025, type: 'spring', stiffness: 200, damping: 20 }
+                            : { duration: 0 }
+                        }
+                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-800/50 dark:hover:bg-dark-surface-tertiary/50 cursor-pointer transition-colors"
+                        onClick={() => setSelectedJob(match)}
+                      >
+                        <td className="px-4 py-3">
+                          <p className="font-medium truncate max-w-[140px] sm:max-w-[200px]">
+                            {match.job.title}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
                           <span className="inline-flex items-center gap-1">
-                            <MapPin size={12} />
-                            {match.job.location}
+                            <Building2 size={12} />
+                            {match.job.company}
                           </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <ScoreBadge score={match.score.overall} />
-                      </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
-                        {match.job.salary ? formatSalary(match.job.salary) : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-slate-500 hidden sm:table-cell">
-                        <span className="inline-flex items-center gap-1">
-                          <Calendar size={12} />
-                          {formatDate(match.job.scrapedAt)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(match.job.url, '_blank');
-                          }}
-                        >
-                          <ExternalLink size={14} />
-                        </Button>
-                      </td>
-                    </motion.tr>
-                  ))}
+                        </td>
+                        <td className="px-4 py-3 text-slate-500 hidden sm:table-cell">
+                          {match.job.location && (
+                            <span className="inline-flex items-center gap-1">
+                              <MapPin size={12} />
+                              {match.job.location}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <ScoreBadge score={match.score.overall} />
+                        </td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-400 hidden sm:table-cell">
+                          {match.job.salary ? formatSalary(match.job.salary) : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-slate-500 hidden sm:table-cell">
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar size={12} />
+                            {formatDate(match.job.scrapedAt)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(match.job.url, '_blank');
+                            }}
+                          >
+                            <ExternalLink size={14} />
+                          </Button>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

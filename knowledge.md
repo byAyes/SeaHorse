@@ -2,14 +2,15 @@
 
 ## Project Skills
 
-> 📖 **Always read `AGENTS.md` in the project root** — it defines the active skills for this project.
-> The AI assistant MUST load the listed skills when working on relevant tasks:
+> 📖 **Always read `AGENTS.md` in the project root** — it defines:
 >
-> | Skill            | Purpose                                                        |
-> | ---------------- | -------------------------------------------------------------- |
-> | `ui-ux-pro-max`  | Premium design system, semantic palettes, editorial typography |
-> | `superpowers`    | Discover and use available skills for development              |
-> | `agentic-skills` | Orchestrate multi-agent workflows and parallel agents          |
+> 1. The active skills table
+> 2. A comprehensive **Skill-to-Task Mapping** section covering frontend, backend, testing,
+>    scraping, CI/CD, security, code quality, and documentation tasks
+>
+> **Before starting any task, check AGENTS.md → Skill-to-Task Mapping** to find
+> which skill to load for your specific domain. The mapping table tells you exactly
+> which skill to load and why.
 
 ## What This Is
 

@@ -11,6 +11,82 @@
 
 ---
 
+# Skill-to-Task Mapping
+
+> Use this guide to determine which skill to load for each type of task.
+> The AI assistant SHOULD load the relevant skill before starting work in that domain.
+
+## 🎨 Frontend (UI / UX)
+
+| Task                                                | Skill to load       | Why                                                                                                           |
+| --------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Building new pages or components                    | `ui-ux-pro-max`     | Semantic palettes, typography, spacing system, shadcn/ui patterns                                             |
+| Designing landing pages, dashboards, visual layouts | `frontend-design`   | Creative visual design, layout composition, premium aesthetics                                                |
+| Animating with Framer Motion, micro-interactions    | `emil-design-eng`   | Animation decisions, interaction polish, motion design philosophy                                             |
+| UI audit, polish, consistency check                 | `impeccable`        | Comprehensive QA across 7 dimensions (UX, a11y, responsive, i18n, dark mode, loading states, CSS consistency) |
+| Adding React/Next.js patterns, state management     | `frontend-patterns` | React hooks, context, performance patterns, component architecture                                            |
+
+## ⚙️ Backend / API
+
+| Task                                          | Skill to load              | Why                                                      |
+| --------------------------------------------- | -------------------------- | -------------------------------------------------------- |
+| Building API routes, server logic, middleware | `backend-patterns`         | Next.js API routes, server architecture patterns         |
+| Designing REST endpoints, type contracts      | `api-and-interface-design` | Resource naming, error responses, pagination, versioning |
+| Writing TypeScript, enforcing code standards  | `coding-standards`         | TypeScript conventions, linting, best practices          |
+| Database schema changes, migrations           | `database-migrations`      | Safe schema evolution, rollback strategies               |
+| Email integration (SMTP, Resend, SendGrid)    | `backend-patterns`         | Email provider routing, template patterns                |
+
+## 🧪 Testing
+
+| Task                                    | Skill to load                  | Why                                                      |
+| --------------------------------------- | ------------------------------ | -------------------------------------------------------- |
+| Writing unit / integration tests (Jest) | `test-driven-development`      | TDD workflow, mocking, coverage targets                  |
+| Browser E2E tests (Playwright)          | `e2e-testing`                  | Page Object Model, CI integration, flaky test strategies |
+| Python scraper tests                    | `python-testing`               | pytest fixtures, parametrization, mocking                |
+| Debugging test failures                 | `debugging-and-error-recovery` | Systematic root-cause debugging                          |
+
+## 🕷️ Scraping & Data Collection
+
+| Task                                    | Skill to load        | Why                                                 |
+| --------------------------------------- | -------------------- | --------------------------------------------------- |
+| Building or modifying scrapers (Python) | `data-scraper-agent` | Web scraping architecture, anti-blocking strategies |
+| Writing Python scraper code (Scrapling) | `python-patterns`    | Pythonic idioms, Scrapling library usage            |
+| Configuring Jina Reader fallback        | `docker-patterns`    | Docker compose, headless Chrome configuration       |
+
+## 🔄 CI/CD & DevOps
+
+| Task                                   | Skill to load          | Why                                                      |
+| -------------------------------------- | ---------------------- | -------------------------------------------------------- |
+| Setting up GitHub Actions workflows    | `ci-cd-and-automation` | Workflow patterns, secrets, caching, matrix builds       |
+| Docker configuration (compose, images) | `docker-patterns`      | Multi-service orchestration, networking, health checks   |
+| Production deployment                  | `deployment-patterns`  | Rollback strategies, health checks, production readiness |
+
+## 🔒 Security
+
+| Task                                       | Skill to load            | Why                                                      |
+| ------------------------------------------ | ------------------------ | -------------------------------------------------------- |
+| Security audit, vulnerability check        | `cyber-neo`              | Full OWASP/CWE scan, dependency vulnerabilities, secrets |
+| Input validation, auth, secrets management | `security-and-hardening` | XSS/SQLi/CSRF prevention, secure config                  |
+| Code review with security focus            | `security-review`        | Security checklist for new endpoints, auth flows         |
+
+## 📐 Code Quality
+
+| Task                                | Skill to load              | Why                                                                    |
+| ----------------------------------- | -------------------------- | ---------------------------------------------------------------------- |
+| Code review (all domains)           | `code-review-and-quality`  | Multi-axis review: correctness, security, performance, maintainability |
+| Simplifying complex code            | `code-simplification`      | Reduce complexity without changing behavior                            |
+| Performance profiling, optimization | `performance-optimization` | Bundle size, rendering, caching, Core Web Vitals                       |
+
+## 📝 Documentation & i18n
+
+| Task                                 | Skill to load                     | Why                                                |
+| ------------------------------------ | --------------------------------- | -------------------------------------------------- |
+| Writing docs, specs, ADRs            | `documentation-and-adrs`          | Decision records, API docs, changelogs             |
+| i18n key management                  | `coding-standards` (for patterns) | Translation file structure, key naming conventions |
+| Writing articles, blog posts, guides | `article-writing`                 | Long-form content, voice consistency, tutorials    |
+
+---
+
 # Frontend Layout & Design Conventions
 
 > These conventions were established during the `impeccable layout` and `impeccable polish` sessions.

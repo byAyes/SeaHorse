@@ -72,7 +72,9 @@ function CustomTooltip({
   );
 }
 
-export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
+import { memo } from 'react';
+
+function JobsChartInner({ data, isLoading, trend }: JobsChartProps) {
   const [range, setRange] = useState<RangeKey>('30d');
 
   const filteredData = useMemo(() => filterDataByRange(data || [], range), [data, range]);
@@ -82,7 +84,6 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
 
   return (
     <Card className="lg:col-span-2 relative overflow-hidden">
-      {/* Subtle gradient border accent */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       <CardHeader>
         <div className="flex items-center justify-between flex-wrap gap-2">
@@ -99,7 +100,6 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
             )}
           </div>
         </div>
-        {/* Range selector */}
         <div className="flex gap-1 mt-2">
           {RANGES.map((r) => (
             <Button
@@ -185,13 +185,9 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
                   stroke="#4f46e5"
                   strokeWidth={2.5}
                   fill="url(#jobGradient)"
-                  animationDuration={800}
-                  activeDot={{
-                    r: 5,
-                    fill: '#4f46e5',
-                    stroke: 'white',
-                    strokeWidth: 2,
-                  }}
+                  animationDuration={400}
+                  isAnimationActive={true}
+                  activeDot={{ r: 5, fill: '#4f46e5', stroke: 'white', strokeWidth: 2 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -201,3 +197,5 @@ export function JobsChart({ data, isLoading, trend }: JobsChartProps) {
     </Card>
   );
 }
+
+export const JobsChart = memo(JobsChartInner);

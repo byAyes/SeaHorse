@@ -12,23 +12,27 @@ function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number })
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (hasAnimated.current || value === 0) {
-      setDisplayed(value);
+    // Skip animation for zero (initial state is already 0) or if already animated
+    if (value === 0) return;
+    if (hasAnimated.current) {
+      requestAnimationFrame(() => setDisplayed(value));
       return;
     }
     hasAnimated.current = true;
+
     // Scale duration proportionally to value magnitude for smooth counting
     const duration = Math.min(400 + value * 0.1, 2000);
     const startTime = Date.now() + delay * 1000;
     const targetValue = value;
 
     // Respect prefers-reduced-motion
-    const prefersReducedMotion = typeof window !== 'undefined'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false;
+    const prefersReducedMotion =
+      typeof window !== 'undefined'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false;
 
     if (prefersReducedMotion) {
-      setDisplayed(value);
+      requestAnimationFrame(() => setDisplayed(value));
       return;
     }
 
@@ -96,7 +100,9 @@ interface StatsGridProps {
   isLoading?: boolean;
 }
 
-export function StatsGrid({ data, isLoading }: StatsGridProps) {
+import { memo } from 'react';
+
+function StatsGridInner({ data, isLoading }: StatsGridProps) {
   if (isLoading) {
     return (
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -114,23 +120,15 @@ export function StatsGrid({ data, isLoading }: StatsGridProps) {
         return (
           <motion.div
             key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: index * 0.1,
-              duration: 0.4,
+              delay: index * 0.06,
+              duration: 0.3,
               ease: 'easeOut',
             }}
           >
             <Card hover className="relative overflow-hidden group">
-              {/* Gradient shine overlay */}
-              <div
-                className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out pointer-events-none"
-                style={{
-                  background:
-                    'linear-gradient(90deg, transparent, rgba(255,255,255,0.25) 50%, transparent)',
-                }}
-              />
               <div className="relative flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -138,18 +136,13 @@ export function StatsGrid({ data, isLoading }: StatsGridProps) {
                   </span>
                   <div className="flex items-baseline gap-2 mt-2">
                     <motion.span
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{
-                        delay: index * 0.1 + 0.2,
-                        type: 'spring',
-                        stiffness: 200,
-                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: index * 0.06 + 0.15, duration: 0.25 }}
                       className="text-2xl sm:text-3xl font-bold tracking-tight tabular-nums"
                     >
-                      <AnimatedNumber value={value} delay={index * 0.1 + 0.2} />
+                      <AnimatedNumber value={value} delay={index * 0.06 + 0.15} />
                     </motion.span>
-                    {/* Trend indicator for totalJobs */}
                     {stat.key === 'totalJobs' &&
                       data?.jobTrend !== undefined &&
                       data.jobTrend !== 0 && (
@@ -182,3 +175,5 @@ export function StatsGrid({ data, isLoading }: StatsGridProps) {
     </div>
   );
 }
+
+export const StatsGrid = memo(StatsGridInner);

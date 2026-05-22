@@ -61,9 +61,7 @@ export function Header({ onMobileToggle }: HeaderProps) {
       }`}
     >
       {/* Gradient accent bar */}
-      <div
-        className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r ${gradient}`}
-      />
+      <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r ${gradient}`} />
 
       <div className="flex flex-1 items-center justify-between px-4 lg:px-6">
         <div className="flex items-center gap-2 min-w-0">
@@ -81,9 +79,9 @@ export function Header({ onMobileToggle }: HeaderProps) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={rawPath}
-                initial={{ opacity: 0, x: -8, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, x: 8, filter: 'blur(4px)' }}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 8 }}
                 transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
               >
                 <h1

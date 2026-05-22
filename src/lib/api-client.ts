@@ -16,19 +16,29 @@ function getAuthHeaders(): Record<string, string> {
   return { Authorization: `Bearer ${token}` };
 }
 
+const DEFAULT_TIMEOUT_MS = 15_000;
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeaders(),
-    },
-    ...options,
-  });
-  if (!res.ok) {
-    const errorBody = await res.text().catch(() => 'Unknown error');
-    throw new Error(`HTTP ${res.status}: ${errorBody}`);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      ...options,
+    });
+    if (!res.ok) {
+      const errorBody = await res.text().catch(() => 'Unknown error');
+      throw new Error(`HTTP ${res.status}: ${errorBody}`);
+    }
+    return res.json();
+  } finally {
+    clearTimeout(timeout);
   }
-  return res.json();
 }
 
 // ── Types ──
@@ -111,7 +121,8 @@ export function useStats() {
   return useQuery<StatsResponse>({
     queryKey: ['stats'],
     queryFn: () => fetchJSON<StatsResponse>(`/api/stats`),
-    refetchInterval: 30_000,
+    staleTime: 60_000,
+    // No automatic polling — user refreshes manually via the refresh button
   });
 }
 

@@ -65,7 +65,7 @@ function InnerLayout({
         />
         <Header onMobileToggle={onMobileToggle} />
         <main className="flex-1 relative z-[1]">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             <motion.div
               key={transitionKey}
               variants={variants}
