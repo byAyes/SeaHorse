@@ -1,14 +1,30 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import type { Job } from '@/lib/prisma';
-import { authenticate } from '@/lib/auth/middleware';
 import { LocalCollection } from '@/lib/local-data';
+import type { Job } from '@/types/job';
+import { authenticate } from '@/lib/auth/middleware';
 
-export const dynamic = 'force-dynamic';
+// Cache de stats en memoria con TTL de 30 segundos
+// Previene reprocesar todo el dataset en cada request
+interface StatsCache {
+  data: Record<string, unknown>;
+  timestamp: number;
+}
 
-// Direct collection access for in-memory aggregation (replaces prisma.$queryRaw)
-const jobCol = new LocalCollection<Job & { id: string }>('jobs');
+let statsCache: StatsCache | null = null;
+const CACHE_TTL = 30_000; // 30 segundos
+
+function getCachedStats() {
+  if (statsCache && Date.now() - statsCache.timestamp < CACHE_TTL) {
+    return statsCache.data;
+  }
+  return null;
+}
+
+function setCachedStats(data: Record<string, unknown>) {
+  statsCache = { data, timestamp: Date.now() };
+}
 
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -19,7 +35,10 @@ export async function GET(request: NextRequest) {
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // Load all jobs once for counting, chart, and skills
+    // Only load last 500 jobs to avoid OOM
+    const jobCol = new LocalCollection<Job & { id: string }>('jobs');
     const allJobs = await jobCol.findMany();
+    const limitedJobs = allJobs.slice(-500);
     const recentJobs = allJobs.filter((j) => j.scrapedAt >= thirtyDaysAgo);
     const todayJobs = allJobs.filter((j) => j.scrapedAt >= todayStart);
 
@@ -30,7 +49,7 @@ export async function GET(request: NextRequest) {
     const totalProfiles = (await prisma.userProfile.count()) as number;
 
     // Recent jobs (last 5)
-    const sortedJobs = [...allJobs].sort((a, b) => b.scrapedAt.getTime() - a.scrapedAt.getTime());
+    const sortedJobs = [...limitedJobs].sort((a, b) => b.scrapedAt.getTime() - a.scrapedAt.getTime());
     const recentJobRows = sortedJobs.slice(0, 5).map((j) => ({
       id: j.id,
       title: j.title,

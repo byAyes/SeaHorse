@@ -11,6 +11,7 @@ function makeQueryClient() {
     defaultOptions: {
       queries: {
         staleTime: 30_000,
+        gcTime: 300_000, // Clean inactive queries from memory after 5 min (prevents OOM)
         retry: 2,
         refetchOnWindowFocus: false,
       },

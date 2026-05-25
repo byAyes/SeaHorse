@@ -15,7 +15,20 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { StatsGrid } from '@/components/dashboard/stats-grid';
-import { JobsChart } from '@/components/dashboard/jobs-chart';
+import dynamic from 'next/dynamic';
+const JobsChart = dynamic(() => import('@/components/dashboard/jobs-chart').then(m => m.JobsChart), {
+  ssr: false,
+  loading: () => (
+    <div className="lg:col-span-2 rounded-xl border bg-card p-6">
+      <div className="h-[280px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span className="text-xs text-slate-400">Cargando gráfico...</span>
+        </div>
+      </div>
+    </div>
+  ),
+});
 import { RecentMatches } from '@/components/dashboard/recent-matches';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
