@@ -12,17 +12,22 @@ import { sendEmail } from '../lib/email';
 import { ScraperRunner } from '../scrapers/index';
 import type { Job as ScrapedJob, ScraperStats } from '../scrapers/types';
 import { calculateMatchScore } from '../matching/scorer';
-import type { UserProfile } from '../types/user-profile';
+import type { UserProfile, ExperienceLevel } from '../types/user-profile';
 import type { Job } from '../types/job';
 
 /**
  * Convert scraped job to database job format
  */
 function convertToDbJob(scraped: ScrapedJob) {
-  const scrapedSalary = (scraped as ScrapedJob & Record<string, unknown>).salary ?? null;
-  const scrapedSkills = (scraped as ScrapedJob & Record<string, unknown>).skills ?? [];
-  const scrapedCategory = (scraped as ScrapedJob & Record<string, unknown>).category ?? null;
-  const scrapedPostedAt = (scraped as ScrapedJob & Record<string, unknown>).postedAt ?? null;
+  const scrapedSalary = (scraped as ScrapedJob & Record<string, unknown>).salary as number | null | undefined ?? null;
+  const scrapedSkills = (scraped as ScrapedJob & Record<string, unknown>).skills as string[] | undefined ?? [];
+  const scrapedCategory = (scraped as ScrapedJob & Record<string, unknown>).category as string | null | undefined ?? null;
+  const scrapedPostedAt = (scraped as ScrapedJob & Record<string, unknown>).postedAt as string | number | Date | null | undefined ?? null;
+  const postedAt: Date | null = scrapedPostedAt instanceof Date
+    ? scrapedPostedAt
+    : scrapedPostedAt
+      ? new Date(scrapedPostedAt)
+      : null;
 
   return {
     id: scraped.id,
@@ -32,7 +37,7 @@ function convertToDbJob(scraped: ScrapedJob) {
     description: scraped.description || null,
     url: scraped.link,
     salary: scrapedSalary,
-    postedAt: scrapedPostedAt,
+    postedAt,
     scrapedAt: scraped.scrapedAt,
     skills: Array.isArray(scrapedSkills) ? scrapedSkills : [],
     category: scrapedCategory,
@@ -52,8 +57,8 @@ interface DbJob {
   location: string | null;
   description: string | null;
   url: string;
-  salary: unknown;
-  postedAt: unknown;
+  salary: number | null;
+  postedAt: Date | null;
   scrapedAt: Date;
   skills: string[];
   category: string | null;
@@ -66,7 +71,7 @@ function filterByDate(jobs: DbJob[], days: number = 3): DbJob[] {
   return jobs.filter((job) => {
     // If job has postedAt, use it
     if (job.postedAt) {
-      const postedDate = new Date(job.postedAt);
+      const postedDate = new Date(job.postedAt as string | number | Date);
       return postedDate >= cutoffDate;
     }
     // If no date, include it (assume recent)
@@ -164,7 +169,7 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
           (profile.locations || []).some(
             (l) => l.toLowerCase().includes('remoto') || l.toLowerCase().includes('remote'),
           ) || false,
-        experienceLevel: (profile.experienceLevel as string) || null,
+        experienceLevel: (profile.experienceLevel as ExperienceLevel) || null,
         minSalary: null,
         maxSalary: null,
         skillWeight: 0.4,

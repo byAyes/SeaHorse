@@ -8,7 +8,7 @@ import { scoreAndSortJobs } from '@/matching/scorer';
 import { saveNewJobs, cleanupEmailedJobs, cleanupOldJobs } from '@/lib/automation/job-history';
 import { authenticate } from '@/lib/auth/middleware';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
-import type { UserProfile } from '@/types/user-profile';
+import type { UserProfile, ExperienceLevel } from '@/types/user-profile';
 import type { Job } from '@/types/job';
 import type { MatchedJob } from '@/types/job-match';
 
@@ -118,13 +118,13 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
     const scraperStats = runner.getStats();
 
     addLog(runId, `Scraping completado: ${scrapedJobs.length} jobs encontrados`);
-    scraperStats.forEach((s: { name: string; jobs: number; errors: number }) => {
-      addLog(runId, `  ${s.name}: ${s.jobs} jobs${s.errors > 0 ? ` (${s.errors} errores)` : ''}`);
+    scraperStats.forEach((s) => {
+      addLog(runId, `  ${s.scraper}: ${s.jobCount} jobs${s.error ? ` (${s.error})` : ''}`);
     });
     await saveToDb();
 
     // Step 2: Convert to Job format
-    const allJobs = (scrapedJobs as Array<Record<string, unknown>>).map(
+    const allJobs = (scrapedJobs as unknown as Array<Record<string, unknown>>).map(
       (j: Record<string, unknown>) => convertToJob(j),
     );
     addLog(runId, `${allJobs.length} jobs convertidos al formato interno`);
@@ -134,7 +134,7 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
     if (allJobs.length > 0) {
       addLog(runId, 'Guardando jobs en la base de datos...');
       try {
-        const savedIds = await saveNewJobs(allJobs as Array<Record<string, unknown>>);
+        const savedIds = await saveNewJobs(allJobs);
         savedCount = savedIds.length;
         addLog(runId, `${savedCount} jobs guardados en DB`);
       } catch (dbError) {
@@ -160,7 +160,7 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
         remoteOnly: ((profile.locations as string[]) || []).some(
           (l: string) => l.toLowerCase().includes('remoto') || l.toLowerCase().includes('remote'),
         ),
-        experienceLevel: (profile.experienceLevel as string) || null,
+        experienceLevel: (profile.experienceLevel as ExperienceLevel) || null,
         minSalary: null,
         maxSalary: null,
         skillWeight: 0.4,
@@ -216,10 +216,10 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
       cleaned,
       errors,
       scraperStats: scraperStats.map(
-        (s: { name: string; jobs: number; errors: number; duration?: number }) => ({
-          name: s.name,
-          jobs: s.jobs,
-          errors: s.errors,
+        (s) => ({
+          name: s.scraper,
+          jobs: s.jobCount,
+          errors: s.error ? 1 : 0,
           duration: s.duration || 0,
         }),
       ),

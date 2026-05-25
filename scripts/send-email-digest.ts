@@ -24,7 +24,7 @@ async function sendEmailDigest() {
 
     console.log(`Found ${digests.length} digests from the past week`);
 
-    const allJobs = digests.flatMap((d) => d.jobs);
+    const allJobs = digests.flatMap((d) => d.jobs || []);
 
     if (allJobs.length === 0) {
       console.log('No jobs found in recent digests');

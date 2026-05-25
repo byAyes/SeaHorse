@@ -15,7 +15,8 @@
     "jobs": "Ergebnisse",
     "pipeline": "Pipeline",
     "settings": "Einstellungen",
-    "collapse": "Einklappen"
+    "collapse": "Einklappen",
+    "expand": "Sidebar erweitern"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -57,6 +58,8 @@
     "evaluated": "bewertet",
     "match": "Treffer",
     "matches": "Treffer",
+    "noData": "Noch keine Jobs zum Vergleichen",
+    "noDataDesc": "Laden Sie zuerst einen CV hoch und führen Sie die Pipeline aus, um Matching-Ergebnisse zu sehen",
     "noResults": "Keine passenden Jobs gefunden",
     "noResultsDesc": "Passen Sie den Bewertungsfilter oder Suchbegriff an",
     "table": {
@@ -102,9 +105,12 @@
     "processing": {
       "title": "Verarbeite Ihren CV",
       "subtitle": "Analysiere und extrahiere Ihr Berufsprofil",
+      "uploading": "Datei wird hochgeladen",
+      "uploadingDesc": "Ihr CV wird auf den Server hochgeladen",
       "extracting": "Extrahiere Informationen...",
-      "analyzing": "Analysiere Fähigkeiten und Erfahrung...",
-      "building": "Erstelle Ihr Profil..."
+      "extractingDesc": "Extrahiere Informationen mit KI",
+      "building": "Erstelle Ihr Profil...",
+      "buildingDesc": "Erstelle Ihr Berufsprofil"
     },
     "preview": {
       "title": "Extrahiertes Profil",
@@ -124,6 +130,7 @@
     "done": {
       "title": "Profil Vollständig!",
       "subtitle": "Ihr CV wurde verarbeitet und Ihr Profil ist bereit",
+      "successMessage": "Ihr Profil ist bereit für die Aktion",
       "viewJobs": "Passende Jobs Ansehen",
       "runPipeline": "Pipeline Ausführen",
       "uploadAnother": "Weiteres Hochladen"
@@ -212,6 +219,15 @@
     "subtitle": "Führen Sie die Job-Scraping- und Matching-Pipeline aus",
     "apiKeyRequired": "KI-API-Schlüssel Erforderlich",
     "apiKeyRequiredDesc": "Sie benötigen mindestens einen KI-API-Schlüssel (Gemini, OpenRouter oder NVIDIA NIM), um die Pipeline auszuführen.",
+    "gettingStarted": "Erste Schritte",
+    "guide": {
+      "uploadCv": "CV hochladen",
+      "uploadCvDesc": "Extrahieren Sie Ihr Berufsprofil mit KI, um intelligentes Matching zu ermöglichen",
+      "addKeys": "API-Schlüssel konfigurieren",
+      "addKeysDesc": "Fügen Sie mindestens einen KI-Anbieter-Schlüssel hinzu (Gemini, OpenRouter oder NVIDIA NIM)",
+      "runPipeline": "Pipeline ausführen",
+      "runPipelineDesc": "Sammeln Sie Jobs aus mehreren Quellen und gleichen Sie sie mit Ihrem Profil ab"
+    },
     "goToSettings": "Zu den Einstellungen",
     "run": "Pipeline Ausführen",
     "running": "Wird ausgeführt...",

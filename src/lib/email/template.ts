@@ -51,7 +51,7 @@ export interface ProfileInfo {
   locations?: string[];
   experienceLevel?: string;
   summary?: string;
-  languages?: { language: string; level: string }[];
+  languages?: { language: string; level?: string }[];
 }
 
 // ── Design Tokens ──────────────────────────────────────────────────────
@@ -347,7 +347,7 @@ ${headerClose}`,
                           <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                               <td width="72" style="color:#8b5cf6;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;padding-top:2px;font-family:${FONT.ui};">🗣️ Languages</td>
-                              <td style="color:${TOKENS.textSecondary};font-size:13px;font-family:${FONT.ui};">${profile.languages.map((l) => `<span style="font-weight:500;color:${TOKENS.textPrimary};">${l.language}</span> (${l.level})`).join(' · ')}</td>
+                              <td style="color:${TOKENS.textSecondary};font-size:13px;font-family:${FONT.ui};">${profile.languages.map((l) => `<span style="font-weight:500;color:${TOKENS.textPrimary};">${l.language}</span>${l.level ? ' (' + l.level + ')' : ''}`).join(' · ')}</td>
                             </tr>
                           </table>
                         </td>

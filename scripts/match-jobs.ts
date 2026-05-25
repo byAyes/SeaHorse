@@ -25,7 +25,7 @@ async function matchJobs() {
 
     for (const user of users) {
       const interests = [...(user.interests || [])];
-      const cv = user.cvs[0];
+      const cv = user.cvs?.[0];
       if (cv) {
         interests.push(...(cv.skills || []));
       }

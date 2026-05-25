@@ -15,7 +15,8 @@
     "jobs": "Resultados",
     "pipeline": "Pipeline",
     "settings": "Configurações",
-    "collapse": "Recolher"
+    "collapse": "Recolher",
+    "expand": "Expandir sidebar"
   },
   "dashboard": {
     "title": "Painel",
@@ -57,6 +58,8 @@
     "evaluated": "avaliadas",
     "match": "correspondência",
     "matches": "correspondências",
+    "noData": "Ainda não há vagas para comparar",
+    "noDataDesc": "Envie primeiro um CV e execute o pipeline para ver os resultados de matching",
     "noResults": "Nenhuma vaga correspondente encontrada",
     "noResultsDesc": "Tente ajustar o filtro de pontuação ou termo de busca",
     "table": {
@@ -102,9 +105,12 @@
     "processing": {
       "title": "Processando seu CV",
       "subtitle": "Analisando e extraindo seu perfil profissional",
+      "uploading": "Enviando arquivo",
+      "uploadingDesc": "Enviando seu CV para o servidor",
       "extracting": "Extraindo informações...",
-      "analyzing": "Analisando habilidades e experiência...",
-      "building": "Construindo seu perfil..."
+      "extractingDesc": "Extraindo informações com IA",
+      "building": "Construindo seu perfil...",
+      "buildingDesc": "Construindo seu perfil profissional"
     },
     "preview": {
       "title": "Perfil Extraído",
@@ -124,6 +130,7 @@
     "done": {
       "title": "Perfil Completo!",
       "subtitle": "Seu CV foi processado e seu perfil está pronto",
+      "successMessage": "Seu perfil está pronto para ação",
       "viewJobs": "Ver Vagas Correspondentes",
       "runPipeline": "Executar Pipeline",
       "uploadAnother": "Enviar Outro"
@@ -212,6 +219,15 @@
     "subtitle": "Execute o pipeline de coleta e matching de vagas",
     "apiKeyRequired": "Chave de API de IA Necessária",
     "apiKeyRequiredDesc": "Você precisa de pelo menos uma chave de API de IA (Gemini, OpenRouter ou NVIDIA NIM) para executar o pipeline.",
+    "gettingStarted": "Primeiros Passos",
+    "guide": {
+      "uploadCv": "Envie seu CV",
+      "uploadCvDesc": "Extraia seu perfil profissional com IA para habilitar a correspondência inteligente",
+      "addKeys": "Configure as chaves de API",
+      "addKeysDesc": "Adicione pelo menos uma chave de provedor de IA (Gemini, OpenRouter ou NVIDIA NIM)",
+      "runPipeline": "Execute o pipeline",
+      "runPipelineDesc": "Colete vagas de várias fontes e compare-as com seu perfil"
+    },
     "goToSettings": "Ir para Configurações",
     "run": "Executar Pipeline",
     "running": "Executando...",

@@ -161,7 +161,7 @@ async function main() {
   console.log(`  Search Queries (${strategy.searchQueries.length}):`);
   strategy.searchQueries.forEach((q: string, i: number) => console.log(`    ${i + 1}. "${q}"`));
   console.log(`  Locations:         ${strategy.locations.join(', ') || '(any)'}`);
-  console.log(`  Priority Sources:  ${strategy.prioritizedSources.join(', ')}`);
+  console.log(`  Priority Sources:  ${(strategy.prioritizedSources || []).join(', ')}`);
   console.log(`  Experience Filter: ${strategy.experienceLevel}`);
   console.log(`  Combined Query:    "${getCombinedQueries(strategy)}"`);
 
