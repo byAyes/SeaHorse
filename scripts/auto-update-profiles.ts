@@ -67,7 +67,7 @@ async function autoUpdateProfiles() {
 
         // Agregar skills (sin duplicados)
         if (skills.length > 0) {
-          const existingSkills: string[] = cv.user.skills || [];
+          const existingSkills: string[] = cv.user?.skills || [];
           const newSkills = skills.filter(
             (skill) =>
               !existingSkills.some((existing) => existing.toLowerCase() === skill.toLowerCase()),
@@ -90,9 +90,8 @@ async function autoUpdateProfiles() {
 
         // Inferir experiencia desde la sección de experiencia del CV
         if (cvData.sections.experience) {
-          const yearsOfExperience = calculateYearsOfExperience(
-            cvData.sections.experience as Array<Record<string, string>>,
-          );
+          const yearMatch = cvData.sections.experience.match(/(\d+)\s*(year|año|yr)/i);
+          const yearsOfExperience = yearMatch ? parseInt(yearMatch[1]) : 0;
           if (yearsOfExperience > 0) {
             updateData.experienceLevel = inferExperienceLevel(yearsOfExperience);
             console.log(`✅ Inferred experience level: ${updateData.experienceLevel}`);
@@ -100,7 +99,7 @@ async function autoUpdateProfiles() {
             await trackProfileChange({
               userId: cv.userId,
               changeType: 'experienceLevel',
-              previousValue: cv.user.experienceLevel,
+              previousValue: cv.user?.experienceLevel ?? null,
               newValue: updateData.experienceLevel,
               source: 'cv_upload',
               cvId: cv.id,
@@ -117,7 +116,7 @@ async function autoUpdateProfiles() {
         // Aplicar actualizaciones
         if (Object.keys(updateData).length > 0) {
           await prisma.userProfile.update({
-            where: { id: cv.userId },
+            where: { userId: cv.userId },
             data: updateData,
           });
 

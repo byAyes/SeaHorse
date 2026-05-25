@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Convert Prisma jobs to Job type
-    const pdfJobs: Job[] = pdfJobsRaw.map((job: Record<string, unknown>) => ({
+    const pdfJobs: Job[] = pdfJobsRaw.map((job) => ({
       id: job.id,
       title: job.title,
       company: job.company,

@@ -33,7 +33,8 @@ export async function parsePDF(buffer: Buffer): Promise<PDFUploadResult> {
     parser = new PDFParse({ data: buffer });
 
     // Load the PDF document
-    await parser.load();
+    // The load() method exists at runtime but is typed as private
+    await (parser as unknown as { load: () => Promise<void> }).load();
 
     // Extract text from all pages (use newline as page separator)
     const textResult = await parser.getText({ pageJoiner: '\n' });

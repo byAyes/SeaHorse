@@ -43,15 +43,17 @@ export async function processPDFJobs(jobs: PDFJob[]): Promise<MatchedJob[]> {
         url: job.url,
         salary: job.salary,
         postedAt: job.postedAt,
+        scrapedAt: new Date(),
+        skills: [],
+        category: null,
       },
       score: {
         overall: 50,
-        skillScore: 0,
-        interestScore: 0,
-        locationScore: 0,
-        salaryScore: 0,
+        skillMatch: 0,
+        interestMatch: 0,
+        locationMatch: 0,
+        salaryMatch: 0,
         matchedSkills: [],
-        missingSkills: [],
       },
     }));
   }
@@ -61,9 +63,6 @@ export async function processPDFJobs(jobs: PDFJob[]): Promise<MatchedJob[]> {
     const jobSkills = extractSkills(job);
     const matchedSkills = userProfile.skills.filter((s) =>
       jobSkills.some((js) => js.toLowerCase().includes(s.toLowerCase())),
-    );
-    const missingSkills = userProfile.skills.filter(
-      (s) => !jobSkills.some((js) => js.toLowerCase().includes(s.toLowerCase())),
     );
 
     const skillScore =
@@ -81,15 +80,17 @@ export async function processPDFJobs(jobs: PDFJob[]): Promise<MatchedJob[]> {
         url: job.url,
         salary: job.salary,
         postedAt: job.postedAt,
+        scrapedAt: new Date(),
+        skills: [],
+        category: null,
       },
       score: {
         overall,
-        skillScore,
-        interestScore: 0,
-        locationScore: 0,
-        salaryScore: 0,
+        skillMatch: skillScore,
+        interestMatch: 0,
+        locationMatch: 0,
+        salaryMatch: 0,
         matchedSkills,
-        missingSkills,
       },
     };
   });

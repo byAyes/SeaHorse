@@ -15,7 +15,8 @@
     "jobs": "Résultats",
     "pipeline": "Pipeline",
     "settings": "Paramètres",
-    "collapse": "Réduire"
+    "collapse": "Réduire",
+    "expand": "Développer la sidebar"
   },
   "dashboard": {
     "title": "Tableau de Bord",
@@ -57,6 +58,8 @@
     "evaluated": "évaluées",
     "match": "correspondance",
     "matches": "correspondances",
+    "noData": "Pas encore d'offres à comparer",
+    "noDataDesc": "Importez d'abord un CV et lancez le pipeline pour voir les résultats de matching",
     "noResults": "Aucune offre correspondante trouvée",
     "noResultsDesc": "Essayez d'ajuster le filtre de score ou le terme de recherche",
     "table": {
@@ -102,9 +105,12 @@
     "processing": {
       "title": "Traitement de votre CV",
       "subtitle": "Analyse et extraction de votre profil professionnel",
+      "uploading": "Téléchargement du fichier",
+      "uploadingDesc": "Téléchargement de votre CV vers le serveur",
       "extracting": "Extraction des informations...",
-      "analyzing": "Analyse des compétences et de l'expérience...",
-      "building": "Construction de votre profil..."
+      "extractingDesc": "Extraction des informations avec l'IA",
+      "building": "Construction de votre profil...",
+      "buildingDesc": "Construction de votre profil professionnel"
     },
     "preview": {
       "title": "Profil Extrait",
@@ -124,6 +130,7 @@
     "done": {
       "title": "Profil Complet !",
       "subtitle": "Votre CV a été traité et votre profil est prêt",
+      "successMessage": "Votre profil est prêt pour l'action",
       "viewJobs": "Voir les Offres Correspondantes",
       "runPipeline": "Lancer le Pipeline",
       "uploadAnother": "Importer un Autre"
@@ -212,6 +219,15 @@
     "subtitle": "Lancez le pipeline de scraping et matching d'offres",
     "apiKeyRequired": "Clé API IA Requise",
     "apiKeyRequiredDesc": "Vous avez besoin d'au moins une clé API IA (Gemini, OpenRouter ou NVIDIA NIM) pour lancer le pipeline.",
+    "gettingStarted": "Pour Commencer",
+    "guide": {
+      "uploadCv": "Importer votre CV",
+      "uploadCvDesc": "Extrayez votre profil professionnel avec l'IA pour activer le matching intelligent",
+      "addKeys": "Configurer les clés API",
+      "addKeysDesc": "Ajoutez au moins une clé de fournisseur IA (Gemini, OpenRouter ou NVIDIA NIM)",
+      "runPipeline": "Lancer le pipeline",
+      "runPipelineDesc": "Collectez des offres depuis plusieurs sources et comparez-les à votre profil"
+    },
     "goToSettings": "Aller aux Paramètres",
     "run": "Lancer le Pipeline",
     "running": "En cours...",

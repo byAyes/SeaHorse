@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { createContext, useContext, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, AlertTriangle, Info, X, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /* ── Types ── */
@@ -322,7 +322,6 @@ export function ToastContainer({ toasts, onDismiss, onPause, onResume }: ToastCo
                           : 'bg-white/60 text-current hover:bg-white/80 dark:bg-white/10 dark:hover:bg-white/20',
                       )}
                     >
-                      {toast.action.destructive ? null : <RotateCcw size={12} />}
                       {toast.action.label}
                     </button>
                   )}

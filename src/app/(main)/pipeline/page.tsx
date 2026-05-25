@@ -485,14 +485,14 @@ export default function PipelinePage() {
                             <div className="flex items-center gap-2">
                               <Badge
                                 variant={
-                                  m.score?.overall >= 80
+                                  (m.score?.overall ?? 0) >= 80
                                     ? 'success'
-                                    : m.score?.overall >= 60
+                                    : (m.score?.overall ?? 0) >= 60
                                       ? 'warning'
                                       : 'default'
                                 }
                               >
-                                {m.score?.overall || 0}%
+                                {m.score?.overall ?? 0}%
                               </Badge>
                               {m.job.url && (
                                 <a

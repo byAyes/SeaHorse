@@ -70,8 +70,8 @@ export class JSearchScraper {
         throw new Error(data.message || 'JSearch API error');
       }
 
-      const jobs: Job[] = (((data as Record<string, unknown>).data as unknown[]) || []).map(
-        (job: Record<string, unknown>) => this.convertJob(job),
+      const jobs: Job[] = (((data as Record<string, unknown>).data as Record<string, unknown>[]) || []).map(
+        (job) => this.convertJob(job),
       );
 
       console.log(`[JSearch] Found ${jobs.length} jobs`);
@@ -95,12 +95,12 @@ export class JSearchScraper {
    */
   private convertJob(job: Record<string, unknown>): Job {
     return {
-      id: job.job_id || '',
-      title: job.job_title || '',
-      company: job.employer_name || '',
-      location: job.job_location || '',
-      link: job.job_apply_link || job.job_apply_is_valid || '',
-      description: job.job_description || '',
+      id: String(job.job_id ?? ''),
+      title: String(job.job_title ?? ''),
+      company: String(job.employer_name ?? ''),
+      location: String(job.job_location ?? ''),
+      link: String(job.job_apply_link ?? job.job_apply_is_valid ?? ''),
+      description: String(job.job_description ?? ''),
       source: 'jsearch',
       scrapedAt: new Date(),
     };

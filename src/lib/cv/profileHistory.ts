@@ -39,7 +39,7 @@ export async function trackProfileChange(input: ProfileChangeInput): Promise<voi
         previousValue: input.previousValue ? JSON.stringify(input.previousValue) : null,
         newValue: JSON.stringify(input.newValue),
         source: input.source,
-        cvId: input.cvId,
+        cvId: input.cvId ?? null,
       },
     });
   } catch (error) {
