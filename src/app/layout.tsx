@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
 import { Providers } from './providers';
-import Script from 'next/script';
+import WebVitalsReporter from '@/components/layout/web-vitals-reporter';
 import './globals.css';
 
 const inter = Inter({
@@ -42,10 +42,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="es" suppressHydrationWarning className={`${inter.variable} ${jakarta.variable}`}>
       <head />
       <body className={`${inter.className} min-h-screen antialiased`}>
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
+        {/* 
+          Theme init: raw <script> with suppressHydrationWarning to avoid React
+          nonce-mismatch errors. The nonce from the server is only available
+          during SSR; by suppressing hydration, React won't try to reconcile
+          the nonce attribute on the client.
+        */}
+        <script
           nonce={nonce}
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -58,6 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             `,
           }}
         />
+        <WebVitalsReporter />
         <Providers>{children}</Providers>
       </body>
     </html>

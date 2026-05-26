@@ -2,15 +2,17 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import en from './en.json';
-import es from './es.json';
-import pt from './pt.json';
-import fr from './fr.json';
-import de from './de.json';
 
 type Locale = 'en' | 'es' | 'pt' | 'fr' | 'de';
 type TranslationMap = typeof en;
 
-const translations: Record<Locale, TranslationMap> = { en, es, pt, fr, de };
+// Static map of dynamic locale loaders — only used for non-en locales
+const localeLoaders: Record<string, () => Promise<{ default: TranslationMap }>> = {
+  es: () => import('./es.json'),
+  pt: () => import('./pt.json'),
+  fr: () => import('./fr.json'),
+  de: () => import('./de.json'),
+};
 
 function getNested(obj: unknown, path: string): string {
   const keys = path.split('.');
@@ -32,13 +34,17 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en');
+  const [translations, setTranslations] = useState<TranslationMap>(en);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') as Locale | null;
-    if (saved === 'en' || saved === 'es' || saved === 'pt' || saved === 'fr' || saved === 'de') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (saved === 'es' || saved === 'pt' || saved === 'fr' || saved === 'de') {
       setLocaleState(saved);
+      // Load the saved locale's translations dynamically
+      localeLoaders[saved]()
+        .then((mod) => setTranslations(mod.default))
+        .catch(() => setTranslations(en));
     }
     setMounted(true);
   }, []);
@@ -46,18 +52,26 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
     localStorage.setItem('locale', newLocale);
+
+    if (newLocale === 'en') {
+      setTranslations(en);
+    } else {
+      localeLoaders[newLocale]()
+        .then((mod) => setTranslations(mod.default))
+        .catch(() => setTranslations(en));
+    }
   }, []);
 
   const t = useCallback(
     (key: string): string => {
-      return getNested(translations[locale], key);
+      return getNested(translations, key);
     },
-    [locale],
+    [translations],
   );
 
-  // Before mount: render with 'en' defaults, no persistence
+  // Before mount: render with 'en' defaults (static import, always available)
   if (!mounted) {
-    const fallbackT = (key: string): string => getNested(translations['en'], key);
+    const fallbackT = (key: string): string => getNested(en, key);
     return (
       <LanguageContext.Provider value={{ locale: 'en', setLocale: () => {}, t: fallbackT }}>
         {children}

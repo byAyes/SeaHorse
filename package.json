@@ -52,6 +52,7 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.2",
+    "web-vitals": "^5.2.0",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
