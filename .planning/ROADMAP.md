@@ -319,4 +319,5 @@ _Maintained by AI assistant — last updated 2026-07-15_
 | 7   | Frontend UI Dashboard                   | ✅ Complete  | #8 ✅  |
 | 8   | Local JSON Storage (0 config DB)        | ✅ Complete  | #14 ✅ |
 | 9   | **Jina Reader Chrome Fallback Scraper** | ✅ Complete  | #20 ✅ |
+| 10  | **Performance Optimization**            | 🔄 **In Progress** | #32, #33 |
 | 6   | ~~Supabase Database~~                   | 🔴 Cancelled | #9 🔁  |

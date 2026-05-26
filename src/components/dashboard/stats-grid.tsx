@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Target, PlayCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -12,10 +12,10 @@ function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number })
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    // Skip animation for zero (initial state is already 0) or if already animated
+    // Skip animation for zero or if already animated
     if (value === 0) return;
     if (hasAnimated.current) {
-      requestAnimationFrame(() => setDisplayed(value));
+      setDisplayed(value);
       return;
     }
     hasAnimated.current = true;
@@ -32,14 +32,16 @@ function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number })
         : false;
 
     if (prefersReducedMotion) {
-      requestAnimationFrame(() => setDisplayed(value));
+      setDisplayed(value);
       return;
     }
+
+    let rafId: number;
 
     const tick = () => {
       const elapsed = Date.now() - startTime;
       if (elapsed <= 0) {
-        requestAnimationFrame(tick);
+        rafId = requestAnimationFrame(tick);
         return;
       }
       const progress = Math.min(elapsed / duration, 1);
@@ -47,11 +49,15 @@ function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number })
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplayed(Math.round(eased * targetValue));
       if (progress < 1) {
-        requestAnimationFrame(tick);
+        rafId = requestAnimationFrame(tick);
       }
     };
 
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+    };
   }, [value, delay]);
 
   return <>{formatNumber(displayed)}</>;
@@ -99,8 +105,6 @@ interface StatsGridProps {
   };
   isLoading?: boolean;
 }
-
-import { memo } from 'react';
 
 function StatsGridInner({ data, isLoading }: StatsGridProps) {
   if (isLoading) {

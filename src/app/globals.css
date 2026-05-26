@@ -105,6 +105,19 @@ body::after {
     radial-gradient(ellipse 500px 500px at 85% 80%, rgb(5 150 105 / 0.04) 0%, transparent 70%);
 }
 
+/* ── Dark mode color contrast fix ── */
+/* 
+ * Override slate-500 in dark mode to use a lighter shade (slate-400 ~#94a3b8)
+ * so text remains WCAG AA compliant (4.5:1) on dark backgrounds like
+ * dark-surface (#0b1120) and dark-surface-secondary (#111827).
+ *
+ * Fixes 5+ Lighthouse color-contrast violations across sidebar, header,
+ * dashboard cards, and empty states.
+ */
+.dark {
+  --color-slate-500: oklch(0.708 0.023 259.733); /* Tailwind slate-400 */
+}
+
 /* ── prefers-reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
   *,

@@ -1,10 +1,23 @@
 'use client';
 
 import * as React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
-import { PageTransitionProvider, usePageTransition, getPageVariants } from '@/lib/page-transitions';
+import { PageTransitionProvider } from '@/lib/page-transitions';
+
+/**
+ * Lazy-load the motion wrapper to keep framer-motion (~93KB) out of the
+ * critical bundle. The wrapper is only fetched on the first navigation
+ * that triggers a page transition, not on initial load.
+ */
+const MotionPageWrapper = dynamic(
+  () => import('@/components/layout/motion-page-wrapper').then((mod) => mod.MotionPageWrapper),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 sm:p-6">{/* Skeleton handled by parent */}</div>,
+  },
+);
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -40,9 +53,6 @@ function InnerLayout({
   onMobileClose: () => void;
   children: React.ReactNode;
 }) {
-  const { direction, transitionKey } = usePageTransition();
-  const variants = getPageVariants(direction);
-
   return (
     <div className="flex min-h-screen mobile-nav-spacer">
       <Sidebar
@@ -65,18 +75,7 @@ function InnerLayout({
         />
         <Header onMobileToggle={onMobileToggle} />
         <main className="flex-1 relative z-[1]">
-          <AnimatePresence mode="popLayout">
-            <motion.div
-              key={transitionKey}
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="p-4 sm:p-6"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          <MotionPageWrapper>{children}</MotionPageWrapper>
         </main>
       </div>
     </div>
