@@ -36,7 +36,7 @@ function readCollection<T extends { id: string }>(collection: string): Map<strin
   if (!fs.existsSync(fp)) return new Map();
   try {
     const raw = fs.readFileSync(fp, 'utf-8');
-    const arr: T[] = JSON.parse(raw);
+    const arr: T[] = JSON.parse(raw, reviveDates);
     const map = new Map<string, T>();
     for (const item of arr) {
       map.set(item.id, item);
@@ -45,6 +45,15 @@ function readCollection<T extends { id: string }>(collection: string): Map<strin
   } catch {
     return new Map();
   }
+}
+
+function reviveDates(key: string, value: unknown): unknown {
+  if (typeof value === 'string' && /(At|Date)$/.test(key) && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? value : date;
+  }
+
+  return value;
 }
 
 function writeCollection<T extends { id: string }>(collection: string, map: Map<string, T>): void {

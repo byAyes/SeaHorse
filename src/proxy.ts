@@ -1,5 +1,5 @@
 /**
- * Next.js Middleware — Security Headers with Nonce-based CSP
+ * Next.js Proxy - Security Headers with Nonce-based CSP
  *
  * Generates a unique nonce per request, replaces 'unsafe-inline' in script-src,
  * and conditionally allows 'unsafe-eval' only in development mode (needed for HMR).
@@ -10,7 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const nonce = crypto.randomUUID();
   const isDev = process.env.NODE_ENV === 'development';
 
@@ -47,13 +47,13 @@ export function middleware(request: NextRequest) {
   return response;
 }
 
-// Only run on page routes — skip API, static assets, and Next.js internals
+// Only run on page routes - skip API, static assets, and Next.js internals
 export const config = {
   matcher: [
     /*
      * Match all request paths except:
-     * - /api/*           (API routes — CSP not relevant)
-     * - /_next/static/*  (static files — served by CDN)
+     * - /api/*           (API routes - CSP not relevant)
+     * - /_next/static/*  (static files - served by CDN)
      * - /_next/image/*   (image optimization)
      * - /favicon.ico     (favicon)
      */

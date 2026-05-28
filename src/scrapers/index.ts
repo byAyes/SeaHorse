@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 
 function loadPythonScraperConfigs(): PythonScraperConfig[] {
-  const yamlPath = path.resolve(process.cwd(), 'scrapers.yaml');
+  const yamlPath = path.join(process.cwd(), 'scrapers.yaml');
   if (!fs.existsSync(yamlPath)) {
     logger.warning('scrapers.yaml not found, no Python scrapers configured');
     return [];

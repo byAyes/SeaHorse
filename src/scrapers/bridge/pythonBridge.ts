@@ -55,9 +55,8 @@ export async function spawnPythonScraper(
   const startTime = Date.now();
 
   return new Promise((resolve) => {
-    const cwd = path.resolve(process.cwd());
     const proc = spawn('python', args, {
-      cwd,
+      cwd: process.cwd(),
       timeout: options.timeout ?? 60000,
     });
 
