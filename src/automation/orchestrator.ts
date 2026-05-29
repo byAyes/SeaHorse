@@ -12,22 +12,54 @@ import { sendEmail } from '../lib/email';
 import { ScraperRunner } from '../scrapers/index';
 import type { Job as ScrapedJob, ScraperStats } from '../scrapers/types';
 import { calculateMatchScore } from '../matching/scorer';
+import { analyzeJob, isValidJobUrl } from '../matching/jobAnalyzer';
 import type { UserProfile, ExperienceLevel } from '../types/user-profile';
 import type { Job } from '../types/job';
 
 /**
- * Convert scraped job to database job format
+ * Extended scraped job type with optional fields
+ * Some scrapers provide salary/skills/category, others don't.
  */
-function convertToDbJob(scraped: ScrapedJob) {
-  const scrapedSalary = (scraped as ScrapedJob & Record<string, unknown>).salary as number | null | undefined ?? null;
-  const scrapedSkills = (scraped as ScrapedJob & Record<string, unknown>).skills as string[] | undefined ?? [];
-  const scrapedCategory = (scraped as ScrapedJob & Record<string, unknown>).category as string | null | undefined ?? null;
-  const scrapedPostedAt = (scraped as ScrapedJob & Record<string, unknown>).postedAt as string | number | Date | null | undefined ?? null;
+interface ScrapedJobWithMeta extends ScrapedJob {
+  salary?: number | null;
+  skills?: string[];
+  category?: string | null;
+  postedAt?: string | number | Date | null;
+}
+
+/**
+ * Convert scraped job to database job format with enrichment:
+ * - Extracts skills, category, and salary from description when missing
+ * - Validates job URLs
+ */
+function convertToDbJob(scraped: ScrapedJob): DbJob | null {
+  // Filter out jobs with invalid/empty URLs
+  if (!isValidJobUrl(scraped.link)) {
+    logger.warning(`Filtered job "${scraped.title}" at ${scraped.company}: invalid URL`);
+    return null;
+  }
+
+  // Extended scraped data (some scrapers provide extra fields)
+  const ext = scraped as ScrapedJobWithMeta;
+  const scrapedSalary = ext.salary ?? null;
+  const scrapedSkills = ext.skills ?? [];
+  const scrapedCategory = ext.category ?? null;
+  const scrapedPostedAt = ext.postedAt ?? null;
   const postedAt: Date | null = scrapedPostedAt instanceof Date
     ? scrapedPostedAt
     : scrapedPostedAt
       ? new Date(scrapedPostedAt)
       : null;
+
+  // Analyze description to enrich missing fields
+  const analysis = analyzeJob(scraped.title, scraped.description || null);
+
+  // Use scraped data if available, fall back to analysis
+  const skills = Array.isArray(scrapedSkills) && scrapedSkills.length > 0
+    ? scrapedSkills
+    : analysis.skills;
+  const category = scrapedCategory || analysis.category;
+  const salary = scrapedSalary ?? analysis.salary;
 
   return {
     id: scraped.id,
@@ -36,11 +68,11 @@ function convertToDbJob(scraped: ScrapedJob) {
     location: scraped.location || null,
     description: scraped.description || null,
     url: scraped.link,
-    salary: scrapedSalary,
+    salary,
     postedAt,
     scrapedAt: scraped.scrapedAt,
-    skills: Array.isArray(scrapedSkills) ? scrapedSkills : [],
-    category: scrapedCategory,
+    skills,
+    category,
   };
 }
 
@@ -128,11 +160,12 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
     result.scraperStats = runner.getStats();
     logger.scraperSummary(result.scraperStats);
 
-    // Convert scraped jobs to database format
-    const allJobs = scrapedJobs.map(convertToDbJob);
+    // Convert scraped jobs to database format (filters out invalid URLs)
+    const allJobs = scrapedJobs.map(convertToDbJob).filter(Boolean) as DbJob[];
 
+    const filteredCount = scrapedJobs.length - allJobs.length;
     result.scraped = allJobs.length;
-    logger.success(`Scraped ${allJobs.length} jobs from all boards`);
+    logger.success(`Scraped ${allJobs.length} jobs from all boards${filteredCount > 0 ? ` (${filteredCount} filtered out for invalid URLs)` : ''}`);
 
     // Step 1.5: Filter jobs from last 3 days
     const daysBack = parseInt(process.env.JOB_DAYS_FILTER || '3', 10);
@@ -176,6 +209,11 @@ export async function executePipeline(profile?: ProfileInfo): Promise<PipelineRe
         interestWeight: 0.3,
         locationWeight: 0.2,
         salaryWeight: 0.1,
+        summary: null,
+        languages: [],
+        jobTitles: [],
+        industries: [],
+        education: [],
       };
       logger.info(
         `Building profile for matching: ${profile.skills?.length || 0} skills, ${profile.jobTitles?.length || 0} target roles`,

@@ -4,6 +4,7 @@ import * as React from 'react';
 import dynamic from 'next/dynamic';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { FirstVisitRedirect } from '@/components/layout/first-visit-redirect';
 import { PageTransitionProvider } from '@/lib/page-transitions';
 
 /**
@@ -75,7 +76,9 @@ function InnerLayout({
         />
         <Header onMobileToggle={onMobileToggle} />
         <main className="flex-1 relative z-[1]">
-          <MotionPageWrapper>{children}</MotionPageWrapper>
+          <MotionPageWrapper>
+            <FirstVisitRedirect>{children}</FirstVisitRedirect>
+          </MotionPageWrapper>
         </main>
       </div>
     </div>

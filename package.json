@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "bash scripts/dev.sh || pwsh -ExecutionPolicy Bypass -File scripts/dev.ps1",
     "build": "next build",
     "start": "next start",
     "test": "jest",

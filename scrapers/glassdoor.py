@@ -74,14 +74,38 @@ class GlassdoorScraper(ScraplingBaseScraper):
                 if location:
                     break
 
-            link_els = el.css("a[data-test='job-link']") or el.css("a[href*='/Job/']") or el.css("a")
-
             if not title:
                 return None
 
-            link = link_els[0].attrib.get("href", "") if link_els else ""
+            # Link — aggressive multi-strategy extraction
+            link = ""
+            link_selectors = [
+                "a[data-test='job-link']",
+                "a[href*='/Job/']",
+                "a[href*='job']",
+                "a[class*='jobLink']",
+                "a[href*='partner/jobs']",
+            ]
+            for sel in link_selectors:
+                found = el.css(sel)
+                if found:
+                    href = found[0].attrib.get("href", "")
+                    if href:
+                        link = href
+                        break
+
+            # Fallback: any anchor with a job-related href in the card
+            if not link:
+                all_links = el.css("a[href]")
+                for a in all_links:
+                    href = a.attrib.get("href", "")
+                    if href and ("/Job/" in href or "/job" in href.lower() or "partner/jobs" in href):
+                        link = href
+                        break
+
             if link and not link.startswith("http"):
-                link = f"https://www.glassdoor.com{link}"
+                prefix = "" if link.startswith("/") else "/"
+                link = f"https://www.glassdoor.com{prefix}{link}"
 
             return Job(
                 id=self._generate_id(link),

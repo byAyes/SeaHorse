@@ -18,8 +18,8 @@ import { MatchScore, MatchedJob } from '../types/job-match';
  * @returns MatchScore with individual and overall scores
  */
 export function calculateMatchScore(user: UserProfile, job: Job): MatchScore {
-  // Calculate individual scores
-  const skillOverlap = calculateSkillOverlap(user.skills, job.skills);
+  // Calculate individual scores — pass job description for fallback text matching
+  const skillOverlap = calculateSkillOverlap(user.skills, job.skills, job.description);
   const skillMatch = skillOverlap.score / 100; // Normalize to 0-1
 
   const interestMatchRaw = calculateInterestMatch(user.interests, job.category || '') / 100;
@@ -35,11 +35,11 @@ export function calculateMatchScore(user: UserProfile, job: Job): MatchScore {
     salaryMatchRaw * user.salaryWeight;
 
   // Convert back to 0-100 scale
-  const overallPercent = Math.round(overall * 100 * 100) / 100;
-  const skillPercent = Math.round(skillMatch * 100 * 100) / 100;
-  const interestPercent = Math.round(interestMatchRaw * 100 * 100) / 100;
-  const locationPercent = Math.round(locationMatchRaw * 100 * 100) / 100;
-  const salaryPercent = Math.round(salaryMatchRaw * 100 * 100) / 100;
+  const overallPercent = Math.round(overall * 100) / 100;
+  const skillPercent = Math.round(skillMatch * 100);
+  const interestPercent = Math.round(interestMatchRaw * 100);
+  const locationPercent = Math.round(locationMatchRaw * 100);
+  const salaryPercent = Math.round(salaryMatchRaw * 100);
 
   return {
     overall: overallPercent,

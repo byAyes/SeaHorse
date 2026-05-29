@@ -11,6 +11,11 @@ export interface PDFUploadResult {
   text: string;
   pageCount: number;
   error?: string;
+  /**
+   * Extraction confidence score (0.0–1.0)
+   * Only available when using pdfmux extraction
+   */
+  confidence?: number;
 }
 
 /**

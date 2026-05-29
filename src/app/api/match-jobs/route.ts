@@ -34,7 +34,12 @@ export async function GET(request: NextRequest) {
     });
 
     if (!userProfile) {
-      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
+      return NextResponse.json({
+        matches: [],
+        total: 0,
+        threshold,
+        userId,
+      });
     }
 
     // Fetch jobs (only recent ones from last 30 days)
@@ -79,6 +84,11 @@ export async function GET(request: NextRequest) {
       interestWeight: userProfile.interestWeight,
       locationWeight: userProfile.locationWeight,
       salaryWeight: userProfile.salaryWeight,
+      summary: userProfile.summary || null,
+      languages: userProfile.languages || [],
+      jobTitles: userProfile.jobTitles || [],
+      industries: userProfile.industries || [],
+      education: userProfile.education || [],
     };
 
     // Score and sort jobs

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { MapPin, DollarSign, Briefcase } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge, ScoreBadge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +15,7 @@ interface RecentMatchesProps {
 }
 
 export function RecentMatches({ data, isLoading }: RecentMatchesProps) {
+  const { t } = useTranslation();
   const matches = data?.slice(0, 5) || [];
 
   return (
@@ -21,7 +23,7 @@ export function RecentMatches({ data, isLoading }: RecentMatchesProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Briefcase size={16} />
-          Matches Recientes
+          {t('dashboard.recentMatches')}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -44,10 +46,10 @@ export function RecentMatches({ data, isLoading }: RecentMatchesProps) {
               <Briefcase size={22} className="text-slate-400" />
             </div>
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              No hay matches aún
+              {t('dashboard.noMatchData')}
             </p>
             <p className="text-xs text-slate-400 mt-1 max-w-[200px]">
-              Sube un CV o ejecuta el pipeline para ver resultados aquí
+              {t('dashboard.noMatchDataDesc')}
             </p>
           </div>
         ) : (

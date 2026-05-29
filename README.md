@@ -28,6 +28,8 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Jina Reader fallback → M
 |  5   | **Email** curated digest        | Premium HTML with emojis, scores, stats, CC support                                         |
 |  6   | **Cleanup** old jobs            | 3-month retention policy                                                                    |
 
+> **PDF Extraction:** Seahorse uses **pdfmux** (auto-detected Python library) for enhanced PDF text extraction with OCR fallback and confidence scoring. Falls back to pdf-parse automatically if pdfmux is not installed. No Docker required — just `pip install -r scrapers/requirements.txt`.
+
 ---
 
 ## Quick Start
@@ -37,58 +39,30 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Jina Reader fallback → M
 - **Node.js 20+** and **Python 3.12+**
 - **Gmail account** with App Password (for SMTP) — or Resend/Gmail API key
 - **No database needed** — local JSON storage, zero config
+- **Enhanced PDF extraction** — pdfmux auto-detected (Python), no config needed
 - **Docker** (optional) — for self-hosted Jina Reader fallback with full LinkedIn/Indeed support
 
-### Installation
+### Setup Scripts
+
+The setup scripts install dependencies, clone the repo, and create `.env`. API keys and profile are configured afterward from the **web wizard** at `http://localhost:3000/setup`.
 
 #### Windows / PowerShell
 
-**Opción A — Una línea (automático):**
-
 ```powershell
 irm https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1 | iex
-```
-
-**Opción B — Descargar y ejecutar (recomendado):**
-
-```powershell
+# Or download and run:
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.ps1" -OutFile "setup.ps1"
 .\setup.ps1
 ```
 
-> El script `setup.ps1` clona el repo, instala npm + pip + Playwright/Patchright, crea `.env` y lo abre para que configures tus API keys.
-
-```powershell
-# Después de configurar .env, ejecuta el pipeline:
-.\scripts\run.ps1
-```
-
 #### Linux / macOS
-
-**Opción A — Una línea (automático):**
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh)
-```
-
-**Opción B — Descargar y ejecutar (recomendado):**
-
-```bash
+# Or download and run:
 curl -O https://raw.githubusercontent.com/byAyes/SeaHorse/main/scripts/setup.sh
 chmod +x setup.sh
 ./setup.sh
-```
-
-> El script `setup.sh` clona el repo, instala npm + pip + Playwright/Patchright, crea `.env` y lo abre para que configures tus API keys.
-
-```bash
-# Después de configurar .env, ejecuta el pipeline:
-./scripts/run.sh
-
-# O directamente a un modo específico:
-./scripts/run.sh --dashboard
-./scripts/run.sh --basic
-./scripts/run.sh --cv ~/Downloads/CV.pdf
 ```
 
 #### Manual
@@ -98,11 +72,9 @@ git clone https://github.com/byAyes/SeaHorse.git
 cd SeaHorse
 
 npm install
-
 pip install -r scrapers/requirements.txt
 playwright install chromium
 patchright install chromium
-
 cp .env.example .env
 ```
 
@@ -134,43 +106,42 @@ JSEARCH_API_KEY=your-key-here        # RapidAPI/JSearch
 GEMINI_API_KEY=your-key-here         # Google Gemini (profile extraction)
 ```
 
-**Jina Reader (optional — for blocked sites like LinkedIn):**
+**Jina Reader (optional):**
 
 ```env
-# Self-hosted via Docker (recommended for full functionality)
 JINA_READER_BASE_URL=http://localhost:3001
-
-# Or use cloud version (rate-limited, blocks LinkedIn)
-# JINA_READER_BASE_URL=https://r.jina.ai
 ```
 
 ### First Run
 
-#### PowerShell (Windows — recomendado)
+#### Dashboard (default — recommended)
 
-```powershell
+```bash
+# Bash
+./scripts/run.sh
+
+# PowerShell
 .\scripts\run.ps1
 ```
 
-Te guía por los modos: pipeline completo con CV, pipeline básico, dashboard UI, o test Jina Reader.
+Open `http://localhost:3000/setup` for the **setup wizard** where you can:
+1. Configure API keys (Gemini, JSearch, etc.) from the UI
+2. Edit your professional profile (skills, experience, location)
+3. Configure email (SMTP, Resend, etc.)
 
-#### Bash (Linux/macOS — recomendado)
+Then visit these sections:
+- **Profile** (`/profile`) — Full professional profile view
+- **Pipeline** (`/pipeline`) — Run scraping + matching manually
+- **Upload** (`/upload`) — Upload CV/PDF for automatic profile extraction
 
-```bash
-./scripts/run.sh
-```
-
-Misma funcionalidad interactiva con 4 modos. También soporta flags directos:
-
-```bash
-./scripts/run.sh --dashboard   # Dashboard UI
-./scripts/run.sh --basic       # Pipeline básico
-./scripts/run.sh --cv CV.pdf   # Pipeline completo
-```
-
-#### Manual
+#### Pipeline only (no dashboard)
 
 ```bash
+./scripts/run.sh --cv path/to/cv.pdf   # Full pipeline
+./scripts/run.sh --basic                # Scrape → match → email (no CV)
+./scripts/run.sh --jina-reader          # Test Jina Reader standalone
+
+# Or manually:
 npx tsx scripts/run-profile-pipeline.ts path/to/your-cv.pdf
 ```
 
@@ -179,6 +150,16 @@ In ~60-90 seconds you'll get an HTML email with jobs matched to your profile.
 ---
 
 ## Features
+
+### PDF Extraction
+
+| Feature                     | Method                         | File                                |
+| --------------------------- | ------------------------------ | ----------------------------------- |
+| **pdfmux** enhanced extract | Python library (auto-detect)   | `scripts/pdfmux_extract.py`         |
+| pdf-parse fallback          | Node.js library                | `src/lib/pdf/pdfParser.ts`          |
+| pdfmux HTTP server (Docker) | FastAPI server (optional)      | `scripts/pdfmux_server.py`          |
+
+pdfmux is **auto-detected** — no env vars needed. If installed, it's used automatically via Python subprocess with OCR fallback and confidence scoring.
 
 ### AI PDF Profile Extraction
 
@@ -197,8 +178,10 @@ In ~60-90 seconds you'll get an HTML email with jobs matched to your profile.
 | **Computrabajo**       | Python Scrapling    | ✅ Reliable         |   ~10    |
 | **Indeed**             | Python Scrapling    | ⚠️ Intermittent     |   0-10   |
 | **Glassdoor**          | Python Scrapling    | ⚠️ Intermittent     |   0-10   |
-| **LinkedIn**           | Python Scrapling    | ❌ Blocked          |    0     |
-| **Jina Reader**        | Headless Chrome API | ✅ Fallback rescuer |  +1-10   |
+| **LinkedIn**           | Python Scrapling    | ❌ Blocked          |    0     || **pdfmux**         | Python (auto subprocess)       | ✅ Auto-detected    |    —     |
+| **Jina Reader**     | Headless Chrome API            | ✅ Fallback rescuer |  +1-10   |
+
+> **pdfmux** enhances CV/PDF extraction with auto-healing, OCR fallback, and confidence scoring. Installed automatically with `pip install -r scrapers/requirements.txt`. No config needed.
 
 > **Jina Reader** acts as an automatic fallback. When `JINA_READER_BASE_URL` is set, `ScraperRunner` detects failed sources (e.g., LinkedIn blocked, Indeed intermittent) and fires Jina Reader's headless Chrome to scrape them. With **self-hosting via Docker**, LinkedIn yields **10 jobs**, Glassdoor and Computrabajo work fully.
 
@@ -248,11 +231,13 @@ JINA_READER_BASE_URL=http://localhost:3001 npx tsx src/scrapers/index.ts "desarr
 
 ### Dashboard UI
 
-- Stats: total jobs, today's jobs, matches, trend, top skills
-- Jobs table: search, filter by score, sort, score breakdown modal
-- Pipeline page: manual trigger, real-time progress
-- Settings: profile, email config, API keys, theme, language
-- Upload page: drag-and-drop CV with AI processing preview
+- **Dashboard** (`/dashboard`) — Stats grid, job trend chart, recent matches, pipeline health card
+- **Profile** (`/profile`) — Full professional profile view with skills, experience, languages, matching weights
+- **Jobs** (`/jobs`) — Job table with search, score filter, sort, score breakdown modal
+- **Pipeline** (`/pipeline`) — Manual trigger with real-time progress, pipeline history stats
+- **Upload** (`/upload`) — Drag-and-drop CV upload with AI processing preview (3-step wizard)
+- **Settings** (`/settings`) — Profile editor, email config, API keys (with auto-refresh status), theme, language
+- **Setup Wizard** (`/setup`) — 5-step onboarding: welcome, API keys, profile, email, finish
 - Dark/light mode + multilingual (EN/ES/PT/FR/DE)
 
 ### REST API
@@ -354,6 +339,11 @@ Full API reference at [`docs/API.md`](docs/API.md). Quick overview:
 
 ```
 seahorse/
+├── pdfmux.Dockerfile              # Docker image for pdfmux HTTP server (optional)
+├── docker-compose.yml             # Jina Reader + pdfmux services (optional)
+├── scripts/
+│   ├── pdfmux_server.py           # FastAPI server for pdfmux (optional, Docker)
+│   ├── pdfmux_extract.py          # Standalone pdfmux extraction (auto subprocess)
 ├── .github/workflows/
 │   └── main.yml                  # Primary pipeline (incl. optional JINA_READER_BASE_URL)
 ├── .planning/                    # Roadmap, specs, refactoring plans
@@ -367,12 +357,19 @@ seahorse/
 ├── docs/
 │   └── API.md                    # ★ Full REST API reference
 ├── src/
+│   ├── lib/
+│   │   ├── pdf/
+│   │   │   ├── pdfParser.ts       # PDF parser entry point (auto-selects pdfmux)
+│   │   │   ├── pdfmuxParser.ts    # pdfmux client (HTTP + subprocess + fallback)
+├── src/
 │   ├── app/
 │   │   ├── (main)/               # Dashboard pages
 │   │   │   ├── dashboard/        # Stats, charts, recent matches
+│   │   │   ├── profile/          # Full professional profile view
 │   │   │   ├── jobs/             # Job table with scores
 │   │   │   ├── pipeline/         # Run pipeline manually
 │   │   │   ├── settings/         # Profile, email, API keys, i18n
+│   │   │   ├── setup/            # 5-step onboarding wizard
 │   │   │   ├── upload/           # CV drag & drop
 │   │   │   └── layout.tsx        # Sidebar + header layout
 │   │   └── api/                  # REST API routes (docs/API.md)
@@ -421,15 +418,35 @@ seahorse/
 ## Available Commands
 
 ```bash
-# ─── Pipeline ──────────────────────────────────────
+# ─── Dev Server ────────────────────────────────────
+# Clean start (kills zombie servers first, then starts)
+npm run dev:clean
+# Or:
+./scripts/dev.sh           # Bash (Linux/macOS)
+.\scripts\dev.ps1          # PowerShell (Windows)
+
+# Quick start (assumes no stale server)
+npm run dev
+
+# ─── Runner Scripts ────────────────────────────────
+# Dashboard (default)
+./scripts/run.sh
+
+# Full pipeline with CV
+./scripts/run.sh --cv path/to/cv.pdf
+
+# Pipeline basic (scrape → match → email)
+./scripts/run.sh --basic
+
+# Test Jina Reader
+./scripts/run.sh --jina-reader
+
+# ─── Pipeline (direct) ─────────────────────────────
 # Full pipeline with CV/PDF extraction
 npx tsx scripts/run-profile-pipeline.ts path/to/cv.pdf
 
 # Basic pipeline (scrape → match → email)
 npm run automate
-
-# Dev server (Next.js dashboard)
-npm run dev
 
 # ─── Jina Reader (Headless Chrome Fallback) ────────
 # Test Jina Reader against a specific source
@@ -531,8 +548,12 @@ npx jest tests/pdfProfileExtractor.test.ts
 
 | Variable          | Description           |         Required          |
 | ----------------- | --------------------- | :-----------------------: |
-| `JSEARCH_API_KEY` | RapidAPI JSearch key  |    For JSearch scraper    |
-| `GEMINI_API_KEY`  | Google Gemini API key | For AI profile extraction |
+| Variable            | Description                      | Required                     |
+| ------------------- | -------------------------------- | :--------------------------: |
+| `PDFMUX_QUALITY`    | fast / standard / premium        | Optional (default: standard) |
+| `PDFMUX_URL`        | pdfmux HTTP server endpoint      | Optional (Docker mode only)  |
+| `JSEARCH_API_KEY`   | RapidAPI JSearch key             | For JSearch scraper          |
+| `GEMINI_API_KEY`    | Google Gemini API key            | For AI profile extraction    |
 
 ### Alternative Email Providers
 
@@ -635,6 +656,40 @@ on:
 | 7   | Frontend UI Dashboard               | Complete               |
 | 8   | Local JSON Storage (0 config DB)    | Complete               |
 | 9   | **Jina Reader Chrome Fallback**     | **Complete**           |
+| 10  | **pdfmux Enhanced PDF Extraction**  | **Complete**           |
+
+---
+
+## pdfmux — Enhanced PDF Extraction
+
+pdfmux is an orchestrated PDF extraction library that auto-detects and extracts text with OCR fallback and confidence scoring.
+
+**No setup needed** — just `pip install -r scrapers/requirements.txt` (already in setup scripts).
+
+### Quality Modes
+
+| Mode      | Use Case                        | Speed |
+| --------- | ------------------------------- | ----- |
+| `fast`    | Clean digital PDFs              | High  |
+| `standard` | Mixed documents/tables         | Moderate |
+| `premium` | Scans, handwriting, complex layouts | Lower |
+
+### Configuration
+
+```env
+# Optional: default is standard
+PDFMUX_QUALITY=standard
+
+# Optional: use HTTP server mode (Docker) instead of subprocess
+# PDFMUX_URL=http://localhost:3100
+```
+
+### Self-Hosting with Docker (optional)
+
+```bash
+docker compose build pdfmux
+docker compose up -d pdfmux
+```
 
 ---
 

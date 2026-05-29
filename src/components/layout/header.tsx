@@ -15,6 +15,7 @@ const pageTitleKeys: Record<string, string> = {
   '/jobs': 'header.jobs',
   '/pipeline': 'header.pipeline',
   '/settings': 'header.settings',
+  '/setup': 'setup.title',
 };
 
 // Map paths to gradient accents
@@ -24,6 +25,7 @@ const pageGradients: Record<string, string> = {
   '/jobs': 'from-amber-500/20 via-amber-500/5 to-transparent',
   '/pipeline': 'from-violet-500/20 via-violet-500/5 to-transparent',
   '/settings': 'from-sky-500/20 via-sky-500/5 to-transparent',
+  '/setup': 'from-emerald-500/20 via-emerald-500/5 to-transparent',
 };
 
 const pageSubtitles: Record<string, string> = {
@@ -32,6 +34,7 @@ const pageSubtitles: Record<string, string> = {
   '/jobs': 'header.jobsSub',
   '/pipeline': 'header.pipelineSub',
   '/settings': 'header.settingsSub',
+  '/setup': 'setup.subtitle',
 };
 
 interface HeaderProps {

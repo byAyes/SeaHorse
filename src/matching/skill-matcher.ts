@@ -114,13 +114,22 @@ function skillsMatch(userSkill: string, jobSkill: string): boolean {
 
 /**
  * Calculate skill overlap between user skills and job requirements
+ *
+ * Matches in priority order:
+ * 1. Direct overlap between user skills and job-extracted skills
+ * 2. If that yields &lt; 50%, fallback to matching user skills against raw job description text
+ *    (handles non-technical profiles — writers, marketers, etc. — whose skills may not
+ *     be in the SKILL_CATALOG but are mentioned in the job description)
+ *
  * @param userSkills - Array of user's skills
- * @param jobSkills - Array of job's required skills
+ * @param jobSkills - Array of job's required skills (from jobAnalyzer or scrapers)
+ * @param jobDescription - Raw job description text for fallback matching (optional)
  * @returns Object with score (0-100) and array of matched skills
  */
 export function calculateSkillOverlap(
   userSkills: string[],
   jobSkills: string[],
+  jobDescription?: string | null,
 ): { score: number; matchedSkills: string[] } {
   if (userSkills.length === 0) {
     return { score: 100, matchedSkills: [] }; // No user skills = neutral
@@ -141,7 +150,34 @@ export function calculateSkillOverlap(
   }
 
   // Calculate percentage: matchedSkills / totalUserSkills
-  const score = (matchedSkills.length / userSkills.length) * 100;
+  let score = (matchedSkills.length / userSkills.length) * 100;
+
+  // If overlap is below 50%, try fallback against raw job description
+  // This allows non-technical profiles (writers, marketers, etc.) to match
+  // even when their skills aren't in the SKILL_CATALOG
+  if (score < 50 && jobDescription) {
+    const lowerDesc = jobDescription.toLowerCase();
+    const fallbackMatchedSkills: string[] = [];
+
+    for (const userSkill of normalizedUserSkills) {
+      // Normalize: remove common stop words, normalize spaces
+      const skillPattern = userSkill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      // Try whole-word matching: e.g. "content writing" should match if the description
+      // contains "content writing" as a phrase
+      const phraseRegex = new RegExp(skillPattern, 'i');
+      if (phraseRegex.test(lowerDesc)) {
+        fallbackMatchedSkills.push(userSkill);
+      }
+    }
+
+    if (fallbackMatchedSkills.length > matchedSkills.length) {
+      const fallbackScore = (fallbackMatchedSkills.length / userSkills.length) * 100;
+      return {
+        score: Math.round(fallbackScore * 100) / 100,
+        matchedSkills: [...new Set(fallbackMatchedSkills)],
+      };
+    }
+  }
 
   return {
     score: Math.round(score * 100) / 100,

@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Settings,
   Shield,
+  Zap,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import { formatDate } from '@/lib/utils';
 import { useRunPipeline, usePipelineStatus, useStats } from '@/lib/api-client';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n';
+import { useAiStatus } from '@/lib/hooks/use-ai-status';
 
 type StepStatus = 'pending' | 'running' | 'done' | 'error';
 
@@ -40,21 +42,21 @@ const initialSteps: PipelineStep[] = [
   {
     id: 'scrape',
     label: 'Scraping',
-    description: 'Searching jobs from multiple sources',
+    description: '',
     icon: <Search size={16} />,
     status: 'pending',
   },
   {
     id: 'match',
     label: 'Matching',
-    description: 'Evaluating matches against your profile',
+    description: '',
     icon: <BarChart3 size={16} />,
     status: 'pending',
   },
   {
     id: 'email',
     label: 'Completion',
-    description: 'Processing results and cleaning data',
+    description: '',
     icon: <Send size={16} />,
     status: 'pending',
   },
@@ -113,19 +115,8 @@ export default function PipelinePage() {
     `⚡ ${t('pipeline.logs.ready')} ${t('pipeline.logs.configureKey')}`,
   ]);
 
-  // Check if any AI API key is configured (server-side)
-  const [hasAiKey, setHasAiKey] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    fetch('/api/config/keys')
-      .then((res) => res.json())
-      .then((data) => {
-        setHasAiKey(!!data.activeProvider);
-      })
-      .catch(() => {
-        setHasAiKey(false);
-      });
-  }, []);
+  // Centralized check for AI API key status
+  const { hasAiKey, loading: aiLoading } = useAiStatus();
 
   const isRunning = pipelineStatus?.status === 'running';
   const isCompleted = pipelineStatus?.status === 'completed';
@@ -612,12 +603,12 @@ export default function PipelinePage() {
                       {formatDate(stats.lastPipelineRun.startedAt)}
                     </p>
                     <div className="flex gap-2 flex-wrap">
-                      <Badge>{stats.totalJobs} jobs (30d)</Badge>
+                      <Badge>{stats.totalJobs} {t('dashboard.jobs30d')}</Badge>
                       <Badge variant="success">
                         {stats.totalMatches} {t('pipeline.results.matched')}
                       </Badge>
                       {stats.pipelinesRun > 0 && (
-                        <Badge variant="default">{stats.pipelinesRun} pipelines</Badge>
+                        <Badge variant="default">{stats.pipelinesRun} {t('dashboard.stats.pipelines')}</Badge>
                       )}
                     </div>
                   </div>

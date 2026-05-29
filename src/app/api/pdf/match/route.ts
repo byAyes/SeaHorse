@@ -5,16 +5,16 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
-import { scoreAndSortJobs } from '../../../../matching/scorer';
-import { Job } from '../../../../types/job';
-import { UserProfile, ExperienceLevel } from '../../../../types/user-profile';
-import { MatchedJob } from '../../../../types/job-match';
-import { ExtractedJob } from '../../../../types/pdf';
-import { authenticate } from '../../../../lib/auth/middleware';
-import { processPDFJobs } from '../../../../lib/pdf/pdfIntegration';
-import { parsePDF } from '../../../../lib/pdf/pdfParser';
-import { extractJobsFromText } from '../../../../lib/pdf/jobExtractor';
+import { prisma } from '@/lib/prisma';
+import { scoreAndSortJobs } from '@/matching/scorer';
+import { Job } from '@/types/job';
+import { UserProfile, ExperienceLevel } from '@/types/user-profile';
+import { MatchedJob } from '@/types/job-match';
+import { ExtractedJob } from '@/types/pdf';
+import { authenticate } from '@/lib/auth/middleware';
+import { processPDFJobs } from '@/lib/pdf/pdfIntegration';
+import { parsePDF } from '@/lib/pdf/pdfParser';
+import { extractJobsFromText } from '@/lib/pdf/jobExtractor';
 
 /**
  * GET handler for matching PDF jobs
@@ -94,6 +94,11 @@ export async function GET(request: NextRequest) {
       interestWeight: userProfile.interestWeight,
       locationWeight: userProfile.locationWeight,
       salaryWeight: userProfile.salaryWeight,
+      summary: userProfile.summary || null,
+      languages: userProfile.languages || [],
+      jobTitles: userProfile.jobTitles || [],
+      industries: userProfile.industries || [],
+      education: userProfile.education || [],
     };
 
     // Score and sort PDF jobs

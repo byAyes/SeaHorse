@@ -4,16 +4,26 @@
   },
   "header": {
     "dashboard": "Dashboard",
+    "dashboardSub": "Overview and statistics",
     "upload": "Upload CV",
+    "uploadSub": "Upload and extract your profile",
+    "profile": "Profile",
+    "profileSub": "Your complete professional profile",
     "jobs": "Matching Results",
+    "jobsSub": "Jobs scored against your profile",
     "pipeline": "Pipeline",
-    "settings": "Settings"
+    "pipelineSub": "Automated scraping and matching",
+    "settings": "Settings",
+    "settingsSub": "Profile, email & API keys",
+    "setupSub": "Get started in 5 steps"
   },
   "sidebar": {
     "dashboard": "Dashboard",
     "upload": "Upload CV",
+    "profile": "Profile",
     "jobs": "Results",
     "pipeline": "Pipeline",
+    "setup": "Setup Wizard",
     "settings": "Settings",
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar"
@@ -49,7 +59,33 @@
     "matched": "matched",
     "noRuns": "No previous runs",
     "noRunsDesc": "Run the pipeline to see results here",
-    "execute": "Run"
+    "execute": "Run",
+    "setupWizard": "Setup Wizard",
+    "apiKeyRequired": "AI API Key Required",
+    "apiKeyRequiredDesc": "Configure an AI API Key to enable profile extraction and smart matching.",
+    "recentMatches": "Recent Matches",
+    "noMatchData": "No matches yet",
+    "noMatchDataDesc": "Upload a CV or run the pipeline to see results here",
+    "stats": {
+      "totalJobs": "Total Jobs",
+      "last30Days": "Last 30 days",
+      "jobsToday": "Jobs Today",
+      "scrapedToday": "Scraped today",
+      "matches": "Matches",
+      "found": "Found",
+      "pipelines": "Pipelines",
+      "executed": "Executed"
+    },
+    "chart": {
+      "trend": "Job Trend",
+      "7d": "7 days",
+      "30d": "30 days",
+      "90d": "90 days",
+      "jobsPerDay": "~{count} jobs/day",
+      "noData": "No trend data",
+      "noDataDesc": "Data will appear after the first scrape",
+      "jobsCount": "{count} jobs"
+    }
   },
   "jobs": {
     "title": "Matching Results",
@@ -90,7 +126,10 @@
       "good": "Good",
       "potential": "Potential"
     },
-    "loading": "Loading jobs..."
+    "loading": "Loading jobs...",
+    "noLink": "No link available",
+    "apiKeyRequired": "AI API Key Required",
+    "apiKeyRequiredDesc": "An AI API key is needed to extract your professional profile from the CV."
   },
   "upload": {
     "title": "Upload CV",
@@ -147,6 +186,12 @@
     "title": "Settings",
     "subtitle": "Configure your profile, email, and API keys",
     "saved": "Settings saved successfully",
+    "setupIncomplete": "Setup Incomplete",
+    "setupComplete": "Setup Complete",
+    "rerunSetup": "Re-run Setup",
+    "configSummary": {
+      "title": "Configuration Summary"
+    },
     "saveError": "Error saving settings",
     "profile": {
       "title": "Professional Profile",
@@ -275,6 +320,106 @@
       "failed": "Failed"
     }
   },
+  "setup": {
+    "title": "Get Started",
+    "subtitle": "Configure Seahorse in a few steps",
+    "preconfigured": "✓ Already configured — you can modify it below",
+    "skip": "Skip",
+    "finish": "Finish Setup",
+    "goToDashboard": "Go to Dashboard",
+    "saved": "Configuration saved!",
+    "step": {
+      "welcome": "Welcome",
+      "ai-key": "AI Key",
+      "jsearch": "JSearch",
+      "profile": "Profile",
+      "done": "Done"
+    },
+    "welcome": {
+      "title": "Welcome to Seahorse",
+      "desc": "Let's set up your job automation in just a few steps.",
+      "step1": "Add AI API key",
+      "step1Desc": "For intelligent profile extraction",
+      "step2": "Add JSearch key",
+      "step2Desc": "For job board scraping (optional)",
+      "step3": "Set your profile",
+      "step3Desc": "Define your skills and location",
+      "step4": "Start matching",
+      "step4Desc": "Get matched jobs sent to you"
+    },
+    "aiKey": {
+      "title": "AI API Key",
+      "desc": "Add a Gemini API key for AI-powered profile extraction and smart matching.",
+      "recommended": "Recommended",
+      "recommendedDesc": "Gemini 2.0 Flash is free and fast. Get your key from Google AI Studio.",
+      "howTo": "How to get your Gemini API key:",
+      "howTo1": "Go to aistudio.google.com",
+      "howTo2": "Click 'Get API Key' in the left sidebar",
+      "howTo3": "Create a new key and paste it here"
+    },
+    "jsearch": {
+      "title": "JSearch API Key (Optional)",
+      "desc": "Add a JSearch API key for job scraping from multiple boards.",
+      "optional": "This step is optional. The pipeline also works with Python scrapers.",
+      "free": "Get a free JSearch API key at",
+      "getKey": "RapidAPI / JSearch"
+    },
+    "profile": {
+      "title": "Your Profile",
+      "desc": "Tell us about your professional profile so we can match jobs to you.",
+      "skills": "Skills (comma separated)",
+      "skillsPlaceholder": "e.g. JavaScript, Python, Content Writing, Marketing",
+      "location": "Preferred Location",
+      "locationPlaceholder": "e.g. Remote, New York, Madrid",
+      "optionalDesc": "You can also upload a CV later to automatically extract your skills.",
+      "canEditLater": "All settings can be changed later from the Settings page."
+    },
+    "done": {
+      "title": "You're all set!",
+      "desc": "Your configuration is complete.",
+      "nextSteps": "Upload a CV, run the pipeline, and start finding your next opportunity.",
+      "aiConfigured": "AI configured",
+      "jsearchConfigured": "JSearch configured",
+      "skillsAdded": "skills added"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Your professional profile at a glance",
+    "lastUpdated": "Last updated",
+    "noProfile": "No profile data yet",
+    "noProfileDesc": "Upload a CV or configure your profile in Settings to see it here",
+    "skills": "Skills",
+    "experienceLevel": "Experience Level",
+    "location": "Location",
+    "salaryRange": "Salary Range",
+    "remote": "Remote Work",
+    "remoteYes": "Yes",
+    "remoteNo": "No",
+    "languages": "Languages",
+    "noSkills": "No skills registered",
+    "noSkillsDesc": "Will appear after extracting your profile from a CV",
+    "noSummary": "No professional summary",
+    "noSummaryDesc": "Will appear after extracting your profile from a CV",
+    "noLanguages": "No languages registered",
+    "noLanguagesDesc": "Add languages in Settings",
+    "interests": "Interests",
+    "summary": "Professional Summary",
+    "jobTitles": "Target Roles",
+    "industries": "Industries",
+    "education": "Education",
+    "noEducation": "No education entries",
+    "noEducationDesc": "Education details will appear after extracting your profile from a CV",
+    "noJobTitles": "No job titles registered",
+    "noJobTitlesDesc": "Job titles will appear after extracting your profile from a CV",
+    "noIndustries": "No industries registered",
+    "noIndustriesDesc": "Industries will appear after extracting your profile from a CV",
+    "degree": "Degree",
+    "institution": "Institution",
+    "graduationYear": "Year",
+    "matchingWeights": "Matching Weights",
+    "salaryName": "Salary"
+  },
   "common": {
     "loading": "Loading...",
     "saving": "Saving...",
@@ -293,6 +438,8 @@
     "retry": "Retry",
     "yes": "Yes",
     "no": "No",
+    "configured": "Configured",
+    "notConfigured": "Not configured",
     "days": "days",
     "hours": "hours",
     "minutes": "minutes",

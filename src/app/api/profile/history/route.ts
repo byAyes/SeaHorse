@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
-import { authenticate } from '../../../../lib/auth/middleware';
+import { prisma } from '@/lib/prisma';
+import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * GET /api/profile/history

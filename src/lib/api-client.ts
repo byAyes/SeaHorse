@@ -111,6 +111,11 @@ interface UpdateProfilePayload {
   minSalary?: number;
   maxSalary?: number;
   experienceLevel?: string;
+  summary?: string;
+  languages?: Array<{ language: string; level?: string }>;
+  jobTitles?: string[];
+  industries?: string[];
+  education?: Array<{ degree: string; institution: string; graduationYear?: string }>;
 }
 
 const DEFAULT_USER_ID = 'default-user';
@@ -180,7 +185,7 @@ export function useUploadCv() {
         headers: getAuthHeaders(), // Don't set Content-Type — browser sets multipart boundary
       });
       if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-      return res.json() as Promise<{ id: string }>;
+      return res.json() as Promise<{ success: boolean; cvId: string }>;
     },
   });
 }

@@ -16,6 +16,9 @@ import {
   Briefcase,
   Upload,
   PlayCircle,
+  Shield,
+  Zap,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,6 +30,7 @@ import { TableSkeleton } from '@/components/ui/skeleton';
 import { formatDate, formatSalary } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
 import { useMatchJobs } from '@/lib/api-client';
+import { useAiStatus } from '@/lib/hooks/use-ai-status';
 import type { MatchedJob } from '@/types/job-match';
 
 type SortKey = 'score' | 'title' | 'company' | 'salary' | 'date';
@@ -34,6 +38,7 @@ type SortDir = 'asc' | 'desc';
 
 export default function JobsPage() {
   const { t } = useTranslation();
+  const { hasAiKey, loading: aiLoading } = useAiStatus();
   const { data, isLoading } = useMatchJobs();
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('score');
@@ -105,6 +110,43 @@ export default function JobsPage() {
           {data?.total || 0} {t('jobs.evaluated')} — {filtered.length} {t('jobs.matches')}
         </p>
       </motion.div>
+
+      {/* API Key Warning */}
+      {!aiLoading && !hasAiKey && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-800/40 flex-shrink-0">
+                  <Shield size={20} className="text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                    {t('jobs.apiKeyRequired')}
+                  </p>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                    {t('jobs.apiKeyRequiredDesc')}
+                  </p>
+                  <div className="mt-3 flex gap-3 flex-wrap">
+                    <Link href="/setup">
+                      <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                        <Zap size={14} />
+                        {t('dashboard.setupWizard')}
+                      </Button>
+                    </Link>
+                    <Link href="/settings">
+                      <Button size="sm" variant="outline" className="border-amber-300 dark:border-amber-700">
+                        <SettingsIcon size={14} />
+                        {t('pipeline.goToSettings')}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Filters — lightweight, no card wrapper */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface dark:bg-dark-surface-secondary p-4">
@@ -306,12 +348,17 @@ export default function JobsPage() {
                         </td>
                         <td className="px-4 py-3">
                           <Button
-                            variant="ghost"
+                            variant={match.job.url ? 'ghost' : 'ghost'}
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              window.open(match.job.url, '_blank');
+                              if (match.job.url) {
+                                window.open(match.job.url, '_blank');
+                              }
                             }}
+                            title={match.job.url || t('jobs.noLink')}
+                            disabled={!match.job.url}
+                            className={!match.job.url ? 'opacity-30 cursor-not-allowed' : ''}
                           >
                             <ExternalLink size={14} />
                           </Button>
@@ -417,9 +464,18 @@ export default function JobsPage() {
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button onClick={() => window.open(selectedJob.job.url, '_blank')} className="flex-1">
+              <Button
+                onClick={() => {
+                  if (selectedJob.job.url) {
+                    window.open(selectedJob.job.url, '_blank');
+                  }
+                }}
+                className="flex-1"
+                disabled={!selectedJob.job.url}
+                title={selectedJob.job.url ? undefined : t('jobs.noLink')}
+              >
                 <ExternalLink size={14} />
-                {t('jobs.modal.viewJob')}
+                {selectedJob.job.url ? t('jobs.modal.viewJob') : t('jobs.noLink')}
               </Button>
               <Button variant="outline" onClick={() => setSelectedJob(null)}>
                 {t('jobs.modal.close')}

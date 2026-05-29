@@ -1,18 +1,18 @@
 /**
  * API route for PDF CV profile extraction
- * POST /api/profile/extract
- *
- * Accepts a PDF file and returns structured profile data extracted via AI.
+ * GET  /api/profile/extract?userId=xxx  — returns stored user profile
+ * POST /api/profile/extract              — accepts PDF/text, extracts profile via AI
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 import { extractProfileFromPDF, extractProfileFromText } from '@/lib/ai';
 import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * GET /api/profile/extract?userId=xxx
- * Returns the user profile for the dashboard settings page.
- * In mock mode, returns default empty profile data.
+ * Returns the stored user profile from the local data store.
+ * Previously returned hardcoded empty data — now queries the actual store.
  */
 export async function GET(request: NextRequest) {
   const auth = await authenticate(request);
@@ -22,6 +22,37 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') || 'default-user';
 
+    // Query the actual local store (`.data/userProfiles.json`)
+    const stored = await prisma.userProfile.findUnique({
+      where: { userId },
+    });
+
+    if (stored) {
+      return NextResponse.json({
+        id: stored.id,
+        userId: stored.userId,
+        skills: stored.skills || [],
+        interests: stored.interests || [],
+        location: stored.location || null,
+        remoteOnly: stored.remoteOnly ?? false,
+        minSalary: stored.minSalary ?? null,
+        maxSalary: stored.maxSalary ?? null,
+        experienceLevel: stored.experienceLevel || null,
+        skillWeight: stored.skillWeight ?? 40,
+        interestWeight: stored.interestWeight ?? 30,
+        locationWeight: stored.locationWeight ?? 20,
+        salaryWeight: stored.salaryWeight ?? 10,
+        summary: stored.summary || null,
+        languages: stored.languages || [],
+        jobTitles: stored.jobTitles || [],
+        industries: stored.industries || [],
+        education: stored.education || [],
+        createdAt: stored.createdAt.toISOString(),
+        updatedAt: stored.updatedAt.toISOString(),
+      });
+    }
+
+    // No profile stored yet — return empty defaults
     return NextResponse.json({
       id: userId,
       userId,
@@ -32,13 +63,17 @@ export async function GET(request: NextRequest) {
       minSalary: null,
       maxSalary: null,
       experienceLevel: null,
+      skillWeight: 40,
+      interestWeight: 30,
+      locationWeight: 20,
+      salaryWeight: 10,
+      summary: null,
+      languages: [],
+      jobTitles: [],
+      industries: [],
+      education: [],
       createdAt: new Date().toISOString(),
-      weightings: {
-        skills: 0.4,
-        interests: 0.3,
-        location: 0.2,
-        salary: 0.1,
-      },
+      updatedAt: new Date().toISOString(),
     });
   } catch (error) {
     console.error('Profile GET error:', error);

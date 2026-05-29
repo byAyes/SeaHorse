@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # =============================================================================
 # SeaHorse — Setup automatizado (Linux / macOS)
-# Clona el repo, instala dependencias (npm + pip), instala navegadores
-# Playwright/Patchright, y crea .env desde .env.example.
+# Instala dependencias (npm + pip), instala navegadores Playwright/Patchright,
+# y crea .env desde .env.example.
+#
+# La configuración de API keys y perfil se realiza desde el wizard web
+# en http://localhost:3000/setup después de iniciar el dashboard.
 #
 # Uso:
 #   ./scripts/setup.sh
@@ -38,7 +41,7 @@ run_cmd() {
 }
 
 # ─── 1. Check Prerequisites ──────────────────────────────────────────────────
-step "1/7  Verificando prerrequisitos"
+step "1/6  Verificando prerrequisitos"
 
 ALL_GOOD=true
 
@@ -60,27 +63,12 @@ fi
 # Python
 if command -v python3 &>/dev/null; then
     PY_VER=$(python3 --version 2>&1)
-    PY_NUM=$(echo "$PY_VER" | sed -n 's/Python \([0-9]\+\.[0-9]\+\).*/\1/p')
-    IFS='.' read -ra PY_VER_PARTS <<< "$PY_NUM"
-    if [ "${PY_VER_PARTS[0]:-0}" -gt 3 ] || ([ "${PY_VER_PARTS[0]:-0}" -eq 3 ] && [ "${PY_VER_PARTS[1]:-0}" -ge 12 ]); then
-        ok "Python3 $PY_VER"
-    else
-        warn "Python $PY_VER — se requiere >= 3.12. Descarga: https://python.org"
-        ALL_GOOD=false
-    fi
+    ok "Python3 $PY_VER"
 elif command -v python &>/dev/null; then
     PY_VER=$(python --version 2>&1)
-    PY_NUM=$(echo "$PY_VER" | sed -n 's/Python \([0-9]\+\.[0-9]\+\).*/\1/p')
-    IFS='.' read -ra PY_VER_PARTS <<< "$PY_NUM"
-    if [ "${PY_VER_PARTS[0]:-0}" -gt 3 ] || ([ "${PY_VER_PARTS[0]:-0}" -eq 3 ] && [ "${PY_VER_PARTS[1]:-0}" -ge 12 ]); then
-        ok "Python $PY_VER"
-    else
-        warn "Python $PY_VER — se requiere >= 3.12. Descarga: https://python.org"
-        ALL_GOOD=false
-    fi
+    ok "Python $PY_VER"
 else
-    fail "Python no encontrado. Descarga: https://python.org"
-    ALL_GOOD=false
+    warn "Python no encontrado (opcional — necesario solo para scrapers Python). Descarga: https://python.org"
 fi
 
 # Git
@@ -93,13 +81,11 @@ else
 fi
 
 # Docker (optional)
-HAS_DOCKER=false
 if command -v docker &>/dev/null; then
     DOCKER_VER=$(docker --version)
-    ok "Docker $DOCKER_VER"
-    HAS_DOCKER=true
+    ok "Docker $DOCKER_VER (opcional — Jina Reader self-hosted)"
 else
-    warn "Docker no encontrado (opcional — necesario solo para Jina Reader self-hosted)"
+    info "Docker no encontrado (opcional)"
 fi
 
 if [ "$ALL_GOOD" = false ]; then
@@ -108,7 +94,7 @@ if [ "$ALL_GOOD" = false ]; then
 fi
 
 # ─── 2. Clone / Pull repo ───────────────────────────────────────────────────
-step "2/7  Clonando repositorio"
+step "2/6  Clonando repositorio"
 
 if [ -d "$REPO_PATH" ]; then
     ok "Carpeta '$REPO_PATH' ya existe — haciendo git pull..."
@@ -123,7 +109,7 @@ fi
 cd "$REPO_PATH"
 
 # ─── 3. .env ─────────────────────────────────────────────────────────────────
-step "3/7  Creando archivo .env"
+step "3/6  Creando archivo .env"
 
 if [ -f ".env" ]; then
     ok ".env ya existe — se mantiene"
@@ -131,35 +117,14 @@ else
     cp ".env.example" ".env"
     ok ".env creado desde .env.example"
     echo ""
-    echo "    ╔══════════════════════════════════════════════════════╗"
-    echo "    ║  ABRE .env Y COMPLETA LAS VARIABLES OBLIGATORIAS:  ║"
-    echo "    ║                                                    ║"
-    echo "    ║  JSEARCH_API_KEY ← RapidAPI key (requerido)       ║"
-    echo "    ║  GEMINI_API_KEY  ← Google AI key (requerido)      ║"
-    echo "    ║  SMTP_USER      ← tu correo Gmail                 ║"
-    echo "    ║  SMTP_PASSWORD  ← App Password de Gmail           ║"
-    echo "    ║  GMAIL_RECIPIENT← destino del digest              ║"
-    echo "    ║                                                    ║"
-    echo "    ║  Luego ejecuta: ./scripts/run.sh                  ║"
-    echo "    ╚══════════════════════════════════════════════════════╝"
+    echo "    ℹ️  Las API keys (Gemini, JSearch, etc.) se configuran desde el"
+    echo "    wizard web en http://localhost:3000/setup después de iniciar el dashboard."
+    echo "    También puedes editar .env manualmente si lo prefieres."
     echo ""
-    # Open editor
-    if command -v nano &>/dev/null; then
-        echo "    Abriendo nano para editar .env..."
-        nano ".env"
-    elif command -v vim &>/dev/null; then
-        echo "    Abriendo vim para editar .env..."
-        vim ".env"
-    elif command -v code &>/dev/null; then
-        echo "    Abriendo VS Code para editar .env..."
-        code ".env"
-    else
-        echo "    Edita .env con tu editor favorito: nano .env"
-    fi
 fi
 
 # ─── 4. npm install ──────────────────────────────────────────────────────────
-step "4/7  Instalando dependencias Node.js (npm install)"
+step "4/6  Instalando dependencias Node.js (npm install)"
 
 if run_cmd "npm install --legacy-peer-deps" "npm install falló. Revisa la conexión a internet y vuelve a intentar."; then
     ok "npm install completado"
@@ -167,10 +132,9 @@ else
     exit 1
 fi
 
-# ─── 5. pip install ──────────────────────────────────────────────────────────
-step "5/7  Instalando dependencias Python (pip)"
+# ─── 5. pip install (opcional) ────────────────────────────────────────────────
+step "5/6  Instalando dependencias Python (pip)"
 
-# Try python3 -m pip, then python -m pip, then pip3, then pip
 PIP_CMD=""
 if python3 -m pip --version &>/dev/null 2>&1; then
     PIP_CMD="python3 -m pip"
@@ -186,18 +150,14 @@ if [ -n "$PIP_CMD" ]; then
     if run_cmd "$PIP_CMD install -r scrapers/requirements.txt" "pip install falló. Activa tu virtualenv o revisa la instalación de Python."; then
         ok "pip install completado"
     else
-        warn "Si usas Python virtualenv, actívalo antes de ejecutar este script."
-        exit 1
+        warn "pip install falló — los scrapers Python no estarán disponibles"
     fi
 else
-    warn "pip no encontrado. Instala pip para Python 3.12+ y vuelve a intentar."
-    info "  En Debian/Ubuntu: sudo apt install python3-pip python3-venv"
-    info "  En macOS:         brew install python (ya incluye pip)"
-    exit 1
+    warn "pip no encontrado — los scrapers Python no estarán disponibles (opcional)"
 fi
 
 # ─── 6. Playwright + Patchright browsers ─────────────────────────────────────
-step "6/7  Instalando navegadores (Playwright + Patchright)"
+step "6/6  Instalando navegadores (Playwright + Patchright)"
 
 echo "    Instalando Playwright Chromium..."
 if command -v npx &>/dev/null; then
@@ -229,32 +189,16 @@ else
     fi
 fi
 
-# ─── 7. Docker Jina Reader (optional) ────────────────────────────────────────
-step "7/7  Jina Reader (Docker — opcional)"
-
-if [ "$HAS_DOCKER" = true ]; then
-    echo ""
-    read -rp "    ¿Levantar Jina Reader via Docker? (s/n): " DOCKER_RESPONSE
-    if [ "$DOCKER_RESPONSE" = "s" ] || [ "$DOCKER_RESPONSE" = "S" ]; then
-        if run_cmd "docker compose up -d jina-reader" "docker compose up falló"; then
-            ok "Jina Reader corriendo en http://localhost:3001"
-        else
-            warn "docker compose up falló"
-        fi
-    else
-        ok "Jina Reader omitido. Para iniciarlo luego: docker compose up -d jina-reader"
-    fi
-else
-    ok "Docker no disponible — Jina Reader saltado (opcional, no crítico)"
-fi
-
 # ─── Finish ───────────────────────────────────────────────────────────────────
 step "✅  Instalación completada"
 echo ""
-echo "    Para ejecutar el pipeline:"
-echo "        ./scripts/run.sh"
-echo "    O directamente:"
+echo "    Para iniciar el dashboard:"
+echo "        ./scripts/dev.sh"
+echo "        # o: npm run dev"
+echo ""
+echo "    Luego abre http://localhost:3000/setup para configurar"
+echo "    tus API keys y perfil desde el wizard web."
+echo ""
+echo "    Para ejecutar el pipeline desde terminal:"
 echo "        npx tsx scripts/run-profile-pipeline.ts ruta/al/cv.pdf"
-echo "    O el dashboard:"
-echo "        npm run dev"
 echo ""

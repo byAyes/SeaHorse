@@ -86,8 +86,6 @@ class ComputrabajoScraper(ScraplingBaseScraper):
             self._log("warning", f"Error parsing card: {exc}")
             return None
 
-        return jobs
-
 
 if __name__ == "__main__":
     run_scraper_cli(ComputrabajoScraper)

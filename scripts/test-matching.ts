@@ -43,6 +43,11 @@ async function testMatching() {
       interestWeight: dbProfile.interestWeight,
       locationWeight: dbProfile.locationWeight,
       salaryWeight: dbProfile.salaryWeight,
+      summary: dbProfile.summary || null,
+      languages: dbProfile.languages || [],
+      jobTitles: dbProfile.jobTitles || [],
+      industries: dbProfile.industries || [],
+      education: dbProfile.education || [],
     };
 
     const dbJobs = await prisma.job.findMany({ take: 10 });

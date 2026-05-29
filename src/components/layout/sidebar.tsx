@@ -11,6 +11,7 @@ import {
   Settings,
   ChevronLeft,
   Sparkles,
+  User,
 } from 'lucide-react';
 import { SeahorseLogo } from '@/components/brand/seahorse-logo';
 import { useTranslation } from '@/lib/i18n';
@@ -19,8 +20,10 @@ import { cn } from '@/lib/utils';
 const navItemKeys = [
   { href: '/dashboard', labelKey: 'sidebar.dashboard', icon: LayoutDashboard },
   { href: '/upload', labelKey: 'sidebar.upload', icon: Upload },
+  { href: '/profile', labelKey: 'sidebar.profile', icon: User },
   { href: '/jobs', labelKey: 'sidebar.jobs', icon: Briefcase },
   { href: '/pipeline', labelKey: 'sidebar.pipeline', icon: PlayCircle },
+  { href: '/setup', labelKey: 'sidebar.setup', icon: Sparkles },
   { href: '/settings', labelKey: 'sidebar.settings', icon: Settings },
 ];
 

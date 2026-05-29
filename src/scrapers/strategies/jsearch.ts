@@ -99,7 +99,7 @@ export class JSearchScraper {
       title: String(job.job_title ?? ''),
       company: String(job.employer_name ?? ''),
       location: String(job.job_location ?? ''),
-      link: String(job.job_apply_link ?? job.job_apply_is_valid ?? ''),
+      link: String(job.job_apply_link ?? ''),
       description: String(job.job_description ?? ''),
       source: 'jsearch',
       scrapedAt: new Date(),

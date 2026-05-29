@@ -16,6 +16,9 @@ import {
   BarChart3,
   PlayCircle,
   RefreshCw,
+  Shield,
+  Settings as SettingsIcon,
+  Zap,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n';
@@ -25,6 +28,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { useUploadCv, useProcessCv, useMatchJobs, DEFAULT_USER_ID } from '@/lib/api-client';
+import { useAiStatus } from '@/lib/hooks/use-ai-status';
 
 type UploadStep = 'upload' | 'processing' | 'preview' | 'done';
 
@@ -38,6 +42,7 @@ interface ProcessStep {
 
 export default function UploadPage() {
   const { t } = useTranslation();
+  const { hasAiKey, loading: aiLoading } = useAiStatus();
   const [file, setFile] = useState<File | null>(null);
   const [uploadedCvId, setUploadedCvId] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<Record<string, unknown> | null>(null);
@@ -87,7 +92,7 @@ export default function UploadPage() {
           file: selectedFile,
           userId: DEFAULT_USER_ID,
         });
-        setUploadedCvId(uploadResult.id);
+        setUploadedCvId(uploadResult.cvId);
 
         // Step 2: Extract
         setProcessStepIdx(1);
@@ -95,7 +100,7 @@ export default function UploadPage() {
 
         showToast('info', t('upload.processing.extracting'));
         const processResult = await processCv.mutateAsync({
-          cvId: uploadResult.id,
+          cvId: uploadResult.cvId,
         });
 
         // Step 3: Build
@@ -197,6 +202,43 @@ export default function UploadPage() {
           </div>
         )}
       </motion.div>
+
+      {/* ── AI Key Warning ── */}
+      {!aiLoading && !hasAiKey && (step === 'upload' || step === 'done') && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-800/40 flex-shrink-0">
+                  <Shield size={20} className="text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                    {t('upload.apiKeyRequired')}
+                  </p>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                    {t('upload.apiKeyRequiredDesc')}
+                  </p>
+                  <div className="mt-3 flex gap-3 flex-wrap">
+                    <Link href="/setup">
+                      <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                        <Zap size={14} />
+                        {t('dashboard.setupWizard')}
+                      </Button>
+                    </Link>
+                    <Link href="/settings">
+                      <Button size="sm" variant="outline" className="border-amber-300 dark:border-amber-700">
+                        <SettingsIcon size={14} />
+                        {t('pipeline.goToSettings')}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* ── STEP 1: Dropzone ── */}
       {(step === 'upload' || (step === 'processing' && !file)) && (

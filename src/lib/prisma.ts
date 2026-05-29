@@ -89,6 +89,20 @@ export interface UserProfile {
   interestWeight: number;
   locationWeight: number;
   salaryWeight: number;
+  /** Professional summary / objective statement */
+  summary: string | null;
+  /** Languages with proficiency levels */
+  languages: Array<{ language: string; level?: string }>;
+  /** Target job titles / roles */
+  jobTitles: string[];
+  /** Industries the candidate has experience in */
+  industries: string[];
+  /** Education entries */
+  education: Array<{
+    degree: string;
+    institution: string;
+    graduationYear?: string;
+  }>;
 }
 
 /** @internal CV record with optional included user profile */
@@ -572,6 +586,11 @@ const storage = {
         interestWeight: 30,
         locationWeight: 20,
         salaryWeight: 10,
+        summary: null,
+        languages: [],
+        jobTitles: [],
+        industries: [],
+        education: [],
         ...args.data,
       };
       return userProfileCol.create(profile);
@@ -604,6 +623,11 @@ const storage = {
         interestWeight: 30,
         locationWeight: 20,
         salaryWeight: 10,
+        summary: null,
+        languages: [],
+        jobTitles: [],
+        industries: [],
+        education: [],
         ...args.create,
       };
       return userProfileCol.create(newProfile);

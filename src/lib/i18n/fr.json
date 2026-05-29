@@ -4,16 +4,26 @@
   },
   "header": {
     "dashboard": "Tableau de Bord",
+    "dashboardSub": "Aperçu et statistiques",
     "upload": "Importer CV",
+    "uploadSub": "Importer et extraire votre profil",
     "jobs": "Résultats",
+    "jobsSub": "Offres notées selon votre profil",
     "pipeline": "Pipeline",
-    "settings": "Paramètres"
+    "pipelineSub": "Scraping et matching automatisés",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "profileSub": "Votre profil professionnel complet",
+    "settingsSub": "Profil, e-mail & clés API",
+    "setupSub": "Configurez en 5 étapes"
   },
   "sidebar": {
     "dashboard": "Tableau de Bord",
     "upload": "Importer CV",
     "jobs": "Résultats",
     "pipeline": "Pipeline",
+    "profile": "Profil",
+    "setup": "Assistant",
     "settings": "Paramètres",
     "collapse": "Réduire",
     "expand": "Développer la sidebar"
@@ -49,7 +59,33 @@
     "matched": "correspondantes",
     "noRuns": "Aucune exécution précédente",
     "noRunsDesc": "Lancez le pipeline pour voir les résultats ici",
-    "execute": "Lancer"
+    "execute": "Lancer",
+    "setupWizard": "Assistant de Configuration",
+    "apiKeyRequired": "Clé API IA Requise",
+    "apiKeyRequiredDesc": "Configurez une clé API IA pour activer l'extraction de profil et le matching intelligent.",
+    "recentMatches": "Correspondances Récentes",
+    "noMatchData": "Pas encore de correspondances",
+    "noMatchDataDesc": "Importez un CV ou lancez le pipeline pour voir les résultats ici",
+    "stats": {
+      "totalJobs": "Total Offres",
+      "last30Days": "30 derniers jours",
+      "jobsToday": "Offres Aujourd'hui",
+      "scrapedToday": "Collectées aujourd'hui",
+      "matches": "Correspondances",
+      "found": "Trouvées",
+      "pipelines": "Pipelines",
+      "executed": "Exécutés"
+    },
+    "chart": {
+      "trend": "Tendance des Offres",
+      "7d": "7 jours",
+      "30d": "30 jours",
+      "90d": "90 jours",
+      "jobsPerDay": "~{count} offres/jour",
+      "noData": "Aucune donnée de tendance",
+      "noDataDesc": "Les données apparaîtront après le premier scraping",
+      "jobsCount": "{count} offres"
+    }
   },
   "jobs": {
     "title": "Résultats de Matching",
@@ -90,7 +126,10 @@
       "good": "Bon",
       "potential": "Potentiel"
     },
-    "loading": "Chargement des offres..."
+    "loading": "Chargement des offres...",
+    "noLink": "Aucun lien disponible",
+    "apiKeyRequired": "Clé API IA Requise",
+    "apiKeyRequiredDesc": "Une clé API IA est nécessaire pour extraire votre profil professionnel du CV."
   },
   "upload": {
     "title": "Importer CV",
@@ -147,6 +186,12 @@
     "title": "Paramètres",
     "subtitle": "Configurez votre profil, e-mail et clés API",
     "saved": "Paramètres enregistrés avec succès",
+    "setupIncomplete": "Configuration incomplète",
+    "setupComplete": "Configuration terminée",
+    "rerunSetup": "Relancer l'assistant",
+    "configSummary": {
+      "title": "Résumé de Configuration"
+    },
     "saveError": "Erreur lors de l'enregistrement",
     "profile": {
       "title": "Profil Professionnel",
@@ -275,6 +320,106 @@
       "failed": "Échoué"
     }
   },
+  "setup": {
+    "title": "Configuration",
+    "subtitle": "Configurez Seahorse en quelques étapes",
+    "preconfigured": "✓ Déjà configuré — vous pouvez le modifier ci-dessous",
+    "skip": "Passer",
+    "finish": "Terminer la Configuration",
+    "goToDashboard": "Aller au Tableau de Bord",
+    "saved": "Configuration enregistrée !",
+    "step": {
+      "welcome": "Bienvenue",
+      "ai-key": "Clé IA",
+      "jsearch": "JSearch",
+      "profile": "Profil",
+      "done": "Terminé"
+    },
+    "welcome": {
+      "title": "Bienvenue sur Seahorse",
+      "desc": "Configurons votre automatisation d'emploi en quelques étapes.",
+      "step1": "Ajouter une clé API IA",
+      "step1Desc": "Pour l'extraction intelligente de profil",
+      "step2": "Ajouter une clé JSearch",
+      "step2Desc": "Pour le scraping d'offres (optionnel)",
+      "step3": "Configurer votre profil",
+      "step3Desc": "Définissez vos compétences et votre localisation",
+      "step4": "Commencer le matching",
+      "step4Desc": "Recevez des offres qui vous correspondent"
+    },
+    "aiKey": {
+      "title": "Clé API IA",
+      "desc": "Ajoutez une clé API Gemini pour l'extraction de profil par IA et le matching intelligent.",
+      "recommended": "Recommandé",
+      "recommendedDesc": "Gemini 2.0 Flash est gratuit et rapide. Obtenez votre clé sur Google AI Studio.",
+      "howTo": "Comment obtenir votre clé API Gemini :",
+      "howTo1": "Allez sur aistudio.google.com",
+      "howTo2": "Cliquez sur 'Get API Key' dans la barre latérale",
+      "howTo3": "Créez une nouvelle clé et collez-la ici"
+    },
+    "jsearch": {
+      "title": "Clé API JSearch (Optionnelle)",
+      "desc": "Ajoutez une clé API JSearch pour le scraping d'offres depuis plusieurs sources.",
+      "optional": "Cette étape est optionnelle. Le pipeline fonctionne aussi avec les scrapers Python.",
+      "free": "Obtenez une clé JSearch gratuite sur",
+      "getKey": "RapidAPI / JSearch"
+    },
+    "profile": {
+      "title": "Votre Profil",
+      "desc": "Parlez-nous de votre profil professionnel pour que nous puissions vous recommander des offres.",
+      "skills": "Compétences (séparées par des virgules)",
+      "skillsPlaceholder": "ex: JavaScript, Python, Rédaction, Marketing",
+      "location": "Localisation Préférée",
+      "locationPlaceholder": "ex: Télétravail, Paris, Lyon",
+      "optionalDesc": "Vous pouvez aussi importer un CV plus tard pour extraire automatiquement vos compétences.",
+      "canEditLater": "Tous les paramètres peuvent être modifiés depuis la page Paramètres."
+    },
+    "done": {
+      "title": "Tout est prêt !",
+      "desc": "Votre configuration est terminée.",
+      "nextSteps": "Importez un CV, lancez le pipeline et commencez à trouver votre prochaine opportunité.",
+      "aiConfigured": "IA configurée",
+      "jsearchConfigured": "JSearch configuré",
+      "skillsAdded": "compétences ajoutées"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Votre profil professionnel en un coup d'œil",
+    "lastUpdated": "Dernière mise à jour",
+    "noProfile": "Pas encore de données de profil",
+    "noProfileDesc": "Importez un CV ou configurez votre profil dans les Paramètres pour le voir ici",
+    "skills": "Compétences",
+    "experienceLevel": "Niveau d'Expérience",
+    "location": "Localisation",
+    "salaryRange": "Fourchette de Salaire",
+    "remote": "Télétravail",
+    "remoteYes": "Oui",
+    "remoteNo": "Non",
+    "languages": "Langues",
+    "noSkills": "Aucune compétence enregistrée",
+    "noSkillsDesc": "Apparaîtra après l'extraction de votre profil depuis un CV",
+    "noSummary": "Aucun résumé professionnel",
+    "noSummaryDesc": "Apparaîtra après l'extraction de votre profil depuis un CV",
+    "noLanguages": "Aucune langue enregistrée",
+    "noLanguagesDesc": "Ajoutez des langues dans les Paramètres",
+    "interests": "Intérêts",
+    "summary": "Résumé Professionnel",
+    "jobTitles": "Postes Recherchés",
+    "industries": "Secteurs",
+    "education": "Formation",
+    "matchingWeights": "Pondération du Matching",
+    "salaryName": "Salaire",
+    "noJobTitles": "Aucun poste cible pour l'instant",
+    "noJobTitlesDesc": "Apparaîtra après l'extraction de votre profil depuis un CV",
+    "noIndustries": "Aucun secteur pour l'instant",
+    "noIndustriesDesc": "Apparaîtra après l'extraction de votre profil depuis un CV",
+    "noEducation": "Aucune formation enregistrée",
+    "noEducationDesc": "Apparaîtra après l'extraction de votre profil depuis un CV",
+    "degree": "Diplôme",
+    "institution": "Établissement",
+    "graduationYear": "Année"
+  },
   "common": {
     "loading": "Chargement...",
     "saving": "Enregistrement...",
@@ -293,6 +438,8 @@
     "retry": "Réessayer",
     "yes": "Oui",
     "no": "Non",
+    "configured": "Configuré",
+    "notConfigured": "Non configuré",
     "days": "jours",
     "hours": "heures",
     "minutes": "minutes",

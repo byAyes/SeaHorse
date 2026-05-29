@@ -16,3 +16,10 @@ tsconfig.tsbuildinfo
 
 # Husky internal binaries (not committed)
 .husky/_
+
+# Logs
+logs/
+*.log
+
+# Uploaded CVs
+public/cvs/

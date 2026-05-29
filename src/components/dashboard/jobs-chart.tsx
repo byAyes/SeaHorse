@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import {
   AreaChart,
   Area,
@@ -15,6 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from '@/lib/i18n';
 
 interface JobsChartProps {
   data?: Array<{ date: string; count: number }>;
@@ -24,34 +25,32 @@ interface JobsChartProps {
 
 type RangeKey = '7d' | '30d' | '90d';
 
-const RANGES: { key: RangeKey; label: string }[] = [
-  { key: '7d', label: '7 días' },
-  { key: '30d', label: '30 días' },
-  { key: '90d', label: '90 días' },
-];
-
 function filterDataByRange(data: Array<{ date: string; count: number }>, range: RangeKey) {
   const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
   const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   return data.filter((d) => new Date(d.date) >= cutoff);
 }
 
-function formatDateLabel(dateStr: string, range: RangeKey) {
+function formatDateLabel(dateStr: string, range: RangeKey, locale: string) {
   const d = new Date(dateStr);
   if (range === '7d') {
-    return d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
+    return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' });
   }
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
 }
 
 function CustomTooltip({
   active,
   payload,
   label,
+  locale,
+  t,
 }: {
   active?: boolean;
   payload?: Array<{ value: number }>;
   label?: string;
+  locale: string;
+  t: (key: string) => string;
 }) {
   if (!active || !payload?.length) return null;
   return (
@@ -61,21 +60,26 @@ function CustomTooltip({
       className="rounded-xl border bg-white p-3 shadow-xl dark:bg-slate-900 dark:border-slate-700"
     >
       <p className="text-xs text-slate-500 mb-1">
-        {new Date(label || '').toLocaleDateString('es-ES', {
+        {new Date(label || '').toLocaleDateString(locale, {
           weekday: 'long',
           day: 'numeric',
           month: 'long',
         })}
       </p>
-      <p className="text-lg font-bold text-primary">{payload[0].value} jobs</p>
+      <p className="text-lg font-bold text-primary">{t('dashboard.chart.jobsCount').replace('{count}', String(payload[0].value))}</p>
     </motion.div>
   );
 }
 
-import { memo } from 'react';
-
 function JobsChartInner({ data, isLoading, trend }: JobsChartProps) {
+  const { t, locale } = useTranslation();
   const [range, setRange] = useState<RangeKey>('30d');
+
+  const RANGES: { key: RangeKey; label: string }[] = [
+    { key: '7d', label: t('dashboard.chart.7d') },
+    { key: '30d', label: t('dashboard.chart.30d') },
+    { key: '90d', label: t('dashboard.chart.90d') },
+  ];
 
   const filteredData = useMemo(() => filterDataByRange(data || [], range), [data, range]);
 
@@ -89,10 +93,10 @@ function JobsChartInner({ data, isLoading, trend }: JobsChartProps) {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="flex items-center gap-2">
             <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary shadow-sm shadow-primary/30" />
-            Tendencia de Jobs
+            {t('dashboard.chart.trend')}
           </CardTitle>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400">~{avgPerDay} jobs/día</span>
+            <span className="text-xs text-slate-400">{t('dashboard.chart.jobsPerDay').replace('{count}', String(avgPerDay))}</span>
             {trend !== undefined && trend !== 0 && (
               <Badge variant={trend > 0 ? 'success' : 'danger'} className="text-[10px]">
                 {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
@@ -136,9 +140,9 @@ function JobsChartInner({ data, isLoading, trend }: JobsChartProps) {
                 />
               </svg>
             </div>
-            <p className="text-sm font-medium text-slate-500">No hay datos de tendencia</p>
+            <p className="text-sm font-medium text-slate-500">{t('dashboard.chart.noData')}</p>
             <p className="text-xs text-slate-400 mt-1">
-              Los datos aparecerán después del primer scraping
+              {t('dashboard.chart.noDataDesc')}
             </p>
           </div>
         ) : (
@@ -161,7 +165,7 @@ function JobsChartInner({ data, isLoading, trend }: JobsChartProps) {
                   tick={{ fontSize: 11, fill: 'oklch(0.606 0.036 275.724)' }}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(v) => formatDateLabel(v, range)}
+                  tickFormatter={(v) => formatDateLabel(v, range, locale)}
                   minTickGap={20}
                 />
                 <YAxis
@@ -172,7 +176,7 @@ function JobsChartInner({ data, isLoading, trend }: JobsChartProps) {
                   width={30}
                 />
                 <Tooltip
-                  content={<CustomTooltip />}
+                  content={<CustomTooltip locale={locale} t={t} />}
                   cursor={{
                     stroke: 'oklch(0.606 0.036 275.724 / 0.3)',
                     strokeWidth: 1,

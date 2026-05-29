@@ -61,6 +61,11 @@ export async function matchJobsToCVProfile(jobs: Job[], cvId: string): Promise<u
       interestWeight: userProfile?.interestWeight || 0.3,
       locationWeight: userProfile?.locationWeight || 0.2,
       salaryWeight: userProfile?.salaryWeight || 0.1,
+      summary: userProfile?.summary || null,
+      languages: userProfile?.languages || [],
+      jobTitles: userProfile?.jobTitles || [],
+      industries: userProfile?.industries || [],
+      education: userProfile?.education || [],
     };
 
     // Use existing scoring function

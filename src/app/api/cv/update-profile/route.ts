@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '@/lib/prisma';
+import type { UserProfile } from '@/lib/prisma';
 import {
   calculateYearsOfExperience,
   inferExperienceLevel,
-} from '../../../../lib/cv/skillExtractor';
-import { trackProfileChange } from '../../../../lib/cv/profileHistory';
-import { authenticate } from '../../../../lib/auth/middleware';
+} from '@/lib/cv/skillExtractor';
+import { trackProfileChange } from '@/lib/cv/profileHistory';
+import { authenticate } from '@/lib/auth/middleware';
 
 /**
  * POST /api/cv/update-profile
@@ -19,14 +20,69 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, cvId } = body;
 
-    if (!userId || !cvId) {
+    if (!userId) {
       return NextResponse.json(
-        { success: false, error: 'userId and cvId are required' },
+        { success: false, error: 'userId is required' },
         { status: 400 },
       );
     }
 
-    // Fetch processed CV data
+    // ── Direct profile update (from settings page) ────────────────────────
+    if (!cvId) {
+      // User is manually editing profile fields — no CV involved
+      const updateData: Record<string, unknown> = {};
+      if (body.skills !== undefined) updateData.skills = body.skills;
+      if (body.location !== undefined) updateData.location = body.location;
+      if (body.remoteOnly !== undefined) updateData.remoteOnly = body.remoteOnly;
+      if (body.minSalary !== undefined) updateData.minSalary = body.minSalary;
+      if (body.maxSalary !== undefined) updateData.maxSalary = body.maxSalary;
+      if (body.experienceLevel !== undefined) updateData.experienceLevel = body.experienceLevel;
+      if (body.interests !== undefined) updateData.interests = body.interests;
+      if (body.summary !== undefined) updateData.summary = body.summary;
+      if (body.languages !== undefined) updateData.languages = body.languages;
+      if (body.jobTitles !== undefined) updateData.jobTitles = body.jobTitles;
+      if (body.industries !== undefined) updateData.industries = body.industries;
+      if (body.education !== undefined) updateData.education = body.education;
+
+      const profile = await prisma.userProfile.upsert({
+        where: { userId },
+        update: updateData as Partial<UserProfile>,
+        create: {
+          userId,
+          skills: body.skills || [],
+          interests: body.interests || [],
+          location: body.location || null,
+          remoteOnly: body.remoteOnly ?? false,
+          minSalary: body.minSalary ?? null,
+          maxSalary: body.maxSalary ?? null,
+          experienceLevel: body.experienceLevel || null,
+          summary: body.summary || null,
+          languages: body.languages || [],
+          jobTitles: body.jobTitles || [],
+          industries: body.industries || [],
+          education: body.education || [],
+          skillWeight: 40,
+          interestWeight: 30,
+          locationWeight: 20,
+          salaryWeight: 10,
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        updatedFields: Object.keys(updateData),
+        profile: {
+          skills: profile.skills,
+          location: profile.location,
+          remoteOnly: profile.remoteOnly,
+          minSalary: profile.minSalary,
+          maxSalary: profile.maxSalary,
+          experienceLevel: profile.experienceLevel,
+        },
+      });
+    }
+
+    // ── CV-based profile update (from CV upload) ──────────────────────────
     const cv = await prisma.cV.findUnique({
       where: { id: cvId },
     });

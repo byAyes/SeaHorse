@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, memo } from 'react';
+import { useTranslation } from '@/lib/i18n';
 import { motion } from 'framer-motion';
 import { Briefcase, Target, PlayCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -65,30 +66,30 @@ function AnimatedNumber({ value, delay = 0 }: { value: number; delay?: number })
 
 const statsConfig = [
   {
-    title: 'Total Jobs',
+    titleKey: 'dashboard.stats.totalJobs',
     icon: <Briefcase size={20} />,
-    subtitle: 'Últimos 30 días',
+    subtitleKey: 'dashboard.stats.last30Days',
     color: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400',
     key: 'totalJobs' as const,
   },
   {
-    title: 'Jobs Hoy',
+    titleKey: 'dashboard.stats.jobsToday',
     icon: <TrendingUp size={20} />,
-    subtitle: 'Scrapeados hoy',
+    subtitleKey: 'dashboard.stats.scrapedToday',
     color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',
     key: 'totalJobsToday' as const,
   },
   {
-    title: 'Matches',
+    titleKey: 'dashboard.stats.matches',
     icon: <Target size={20} />,
-    subtitle: 'Encontrados',
+    subtitleKey: 'dashboard.stats.found',
     color: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400',
     key: 'totalMatches' as const,
   },
   {
-    title: 'Pipelines',
+    titleKey: 'dashboard.stats.pipelines',
     icon: <PlayCircle size={20} />,
-    subtitle: 'Ejecutados',
+    subtitleKey: 'dashboard.stats.executed',
     color: 'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400',
     key: 'pipelinesRun' as const,
   },
@@ -107,6 +108,7 @@ interface StatsGridProps {
 }
 
 function StatsGridInner({ data, isLoading }: StatsGridProps) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -123,7 +125,7 @@ function StatsGridInner({ data, isLoading }: StatsGridProps) {
         const value = data ? (((data as Record<string, unknown>)[stat.key] as number) ?? 0) : 0;
         return (
           <motion.div
-            key={stat.title}
+            key={stat.titleKey}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -136,7 +138,7 @@ function StatsGridInner({ data, isLoading }: StatsGridProps) {
               <div className="relative flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                    {stat.title}
+                    {t(stat.titleKey)}
                   </span>
                   <div className="flex items-baseline gap-2 mt-2">
                     <motion.span
@@ -164,7 +166,7 @@ function StatsGridInner({ data, isLoading }: StatsGridProps) {
                         </span>
                       )}
                   </div>
-                  <p className="mt-1 text-xs text-slate-400">{stat.subtitle}</p>
+                  <p className="mt-1 text-xs text-slate-400">{t(stat.subtitleKey)}</p>
                 </div>
                 <div
                   className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl ${stat.color} group-hover:scale-110 transition-transform duration-200`}

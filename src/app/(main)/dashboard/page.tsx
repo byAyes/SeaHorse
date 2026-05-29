@@ -12,22 +12,14 @@ import {
   FileText,
   BarChart3,
   Zap,
+  Shield,
+  Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { StatsGrid } from '@/components/dashboard/stats-grid';
 import dynamic from 'next/dynamic';
 const JobsChart = dynamic(() => import('@/components/dashboard/jobs-chart').then(m => m.JobsChart), {
-  ssr: false,
-  loading: () => (
-    <div className="lg:col-span-2 rounded-xl border bg-card p-6">
-      <div className="h-[280px] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-xs text-slate-400">Cargando gráfico...</span>
-        </div>
-      </div>
-    </div>
-  ),
+  ssr: false,      loading: () => null,
 });
 import { RecentMatches } from '@/components/dashboard/recent-matches';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -37,6 +29,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useStats } from '@/lib/api-client';
 import { formatDate } from '@/lib/utils';
 import { useTranslation } from '@/lib/i18n';
+import { useAiStatus } from '@/lib/hooks/use-ai-status';
 
 const quickActions = [
   {
@@ -75,8 +68,9 @@ const quickActions = [
 
 export default function DashboardPage() {
   const { data: stats, isLoading, refetch, isRefetching } = useStats();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const { hasAiKey, loading: aiLoading } = useAiStatus();
 
   const handleRefresh = useCallback(() => {
     refetch();
@@ -94,7 +88,7 @@ export default function DashboardPage() {
         <div className="min-w-0">
           <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
             <Sparkles size={18} className="text-primary shrink-0" />
-            <span className="truncate">Dashboard</span>
+            <span className="truncate">{t('dashboard.title')}</span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
             {t('dashboard.subtitle')}
@@ -102,7 +96,7 @@ export default function DashboardPage() {
           {lastRefreshed && (
             <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
               <Clock size={10} />
-              Última actualización: {lastRefreshed.toLocaleTimeString('es-ES')}
+              {t('dashboard.lastUpdated')}: {lastRefreshed.toLocaleTimeString(locale)}
             </p>
           )}
         </div>
@@ -125,6 +119,43 @@ export default function DashboardPage() {
           </Link>
         </div>
       </motion.div>
+
+      {/* API Key Warning Banner */}
+      {!aiLoading && !hasAiKey && (
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-800/40 flex-shrink-0">
+                  <Shield size={20} className="text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                    {t('dashboard.apiKeyRequired')}
+                  </p>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                    {t('dashboard.apiKeyRequiredDesc')}
+                  </p>
+                  <div className="mt-3 flex gap-3 flex-wrap">
+                    <Link href="/setup">
+                      <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                        <Zap size={14} />
+                        {t('dashboard.setupWizard')}
+                      </Button>
+                    </Link>
+                    <Link href="/settings">
+                      <Button size="sm" variant="outline" className="border-amber-300 dark:border-amber-700">
+                        <Settings size={14} />
+                        {t('pipeline.goToSettings')}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
@@ -262,7 +293,7 @@ export default function DashboardPage() {
                     {formatDate(stats.lastPipelineRun.startedAt)}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {new Date(stats.lastPipelineRun.startedAt).toLocaleTimeString('es-ES', {
+                    {new Date(stats.lastPipelineRun.startedAt).toLocaleTimeString(locale, {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}

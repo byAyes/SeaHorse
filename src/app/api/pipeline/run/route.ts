@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ScraperRunner } from '@/scrapers/index';
 import { scoreAndSortJobs } from '@/matching/scorer';
+import { analyzeJob, isValidJobUrl } from '@/matching/jobAnalyzer';
 import { saveNewJobs, cleanupEmailedJobs, cleanupOldJobs } from '@/lib/automation/job-history';
 import { authenticate } from '@/lib/auth/middleware';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
@@ -67,19 +68,36 @@ function addLog(runId: string, message: string) {
   }
 }
 
-function convertToJob(scraped: Record<string, unknown>): Job {
+function convertToJob(scraped: Record<string, unknown>): Job | null {
+  const url = (scraped.link as string) || (scraped.url as string) || '';
+
+  // Filter out jobs with invalid/empty URLs
+  if (!isValidJobUrl(url)) {
+    console.log(`[Pipeline] Filtered job "${scraped.title as string}" at ${scraped.company as string}: invalid URL`);
+    return null;
+  }
+
+  const scrapedSkills = Array.isArray(scraped.skills) ? (scraped.skills as string[]) : [];
+  const scrapedCategory = (scraped.category as string) || null;
+  const scrapedSalary = (scraped.salary as number) ?? null;
+  const title = (scraped.title as string) || '';
+  const description = (scraped.description as string) || null;
+
+  // Analyze description to enrich missing fields
+  const analysis = analyzeJob(title, description);
+
   return {
     id: scraped.id as string,
-    title: scraped.title as string,
+    title,
     company: scraped.company as string,
     location: (scraped.location as string) || null,
-    description: (scraped.description as string) || null,
-    url: (scraped.link as string) || (scraped.url as string),
-    salary: (scraped.salary as number) ?? null,
+    description,
+    url,
+    salary: scrapedSalary ?? analysis.salary,
     postedAt: (scraped.postedAt as Date) || null,
     scrapedAt: (scraped.scrapedAt as Date) || new Date(),
-    skills: Array.isArray(scraped.skills) ? (scraped.skills as string[]) : [],
-    category: (scraped.category as string) || null,
+    skills: scrapedSkills.length > 0 ? scrapedSkills : analysis.skills,
+    category: scrapedCategory || analysis.category,
   };
 }
 
@@ -123,11 +141,13 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
     });
     await saveToDb();
 
-    // Step 2: Convert to Job format
-    const allJobs = (scrapedJobs as unknown as Array<Record<string, unknown>>).map(
+    // Step 2: Convert to Job format (filters out invalid URLs)
+    const rawJobs = (scrapedJobs as unknown as Array<Record<string, unknown>>).map(
       (j: Record<string, unknown>) => convertToJob(j),
     );
-    addLog(runId, `${allJobs.length} jobs convertidos al formato interno`);
+    const allJobs = rawJobs.filter(Boolean) as Job[];
+    const filteredCount = rawJobs.length - allJobs.length;
+    addLog(runId, `${allJobs.length} jobs convertidos al formato interno${filteredCount > 0 ? ` (${filteredCount} filtrados por URL inválida)` : ''}`);
 
     // Step 3: Save to DB
     let savedCount = 0;
@@ -163,10 +183,15 @@ async function executePipelineRun(runId: string, profile?: Record<string, unknow
         experienceLevel: (profile.experienceLevel as ExperienceLevel) || null,
         minSalary: null,
         maxSalary: null,
-        skillWeight: 0.4,
-        interestWeight: 0.3,
-        locationWeight: 0.2,
-        salaryWeight: 0.1,
+        skillWeight: 40,
+        interestWeight: 30,
+        locationWeight: 20,
+        salaryWeight: 10,
+        summary: (profile.summary as string) || null,
+        languages: (profile.languages as Array<{language: string; level?: string}>) || [],
+        jobTitles: (profile.jobTitles as string[]) || [],
+        industries: (profile.industries as string[]) || [],
+        education: (profile.education as Array<{degree: string; institution: string; graduationYear?: string}>) || [],
       };
 
       matches = scoreAndSortJobs(allJobs, userProfile, 0);

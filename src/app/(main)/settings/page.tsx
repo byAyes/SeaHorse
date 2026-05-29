@@ -14,21 +14,29 @@ import {
   Sun,
   Camera,
   Globe,
+  Sparkles,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { useAiStatus } from '@/lib/hooks/use-ai-status';
 import { useProfile, useUpdateProfile, DEFAULT_USER_ID } from '@/lib/api-client';
 import { useTheme } from '@/components/layout/theme-provider';
 import { useTranslation } from '@/lib/i18n';
 import { useToast } from '@/components/ui/toast';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { t, locale, setLocale } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { data: profile } = useProfile();
   const updateProfile = useUpdateProfile();
   const { showToast } = useToast();
+  const { refetch: refetchAiStatus, ...aiStatus } = useAiStatus();
 
   // Profile form
   const [skillsInput, setSkillsInput] = useState('');
@@ -108,6 +116,8 @@ export default function SettingsPage() {
 
       setSavedKeys(true);
       showToast('success', t('settings.saved'));
+      // Refresh AI status badges and config summary immediately
+      refetchAiStatus();
       setTimeout(() => setSavedKeys(false), 2000);
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : t('settings.saveError'));
@@ -162,9 +172,112 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h2 className="text-xl font-semibold">{t('settings.title')}</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('settings.subtitle')}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-semibold">{t('settings.title')}</h2>
+              {!aiStatus.loading && !aiStatus.hasAiKey && (
+                <Badge variant="warning" className="animate-pulse">
+                  {t('settings.setupIncomplete')}
+                </Badge>
+              )}
+              {!aiStatus.loading && aiStatus.hasAiKey && (
+                <Badge variant="success">
+                  {t('settings.setupComplete')}
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('settings.subtitle')}</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push('/setup')}
+            className="shrink-0 gap-2"
+          >
+            <Sparkles size={14} />
+            {t('settings.rerunSetup')}
+          </Button>
+        </div>
       </motion.div>
+
+      {/* Configuration Summary Card */}
+      {!aiStatus.loading && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03, type: 'spring', stiffness: 200, damping: 20 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <CheckCircle2 size={16} className="text-primary" />
+                {t('settings.configSummary.title')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  {
+                    key: 'gemini' as const,
+                    label: t('settings.apiKeys.gemini'),
+                    icon: '🔷',
+                  },
+                  {
+                    key: 'openrouter' as const,
+                    label: t('settings.apiKeys.openrouter'),
+                    icon: '🟣',
+                  },
+                  {
+                    key: 'nim' as const,
+                    label: t('settings.apiKeys.nim'),
+                    icon: '💚',
+                  },
+                  {
+                    key: 'jsearch' as const,
+                    label: t('settings.apiKeys.jsearch'),
+                    icon: '🔍',
+                  },
+                ].map((provider) => {
+                  const isConfigured = aiStatus.configured[provider.key];
+                  return (
+                    <div
+                      key={provider.key}
+                      className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${
+                        isConfigured
+                          ? 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-900/10'
+                          : 'border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/30'
+                      }`}
+                    >
+                      <span className="text-lg shrink-0">{provider.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{provider.label}</p>
+                        <p className="text-[11px] mt-0.5 flex items-center gap-1">
+                          {isConfigured ? (
+                            <>
+                              <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
+                              <span className="text-emerald-600 dark:text-emerald-400">
+                                {t('common.configured')}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle size={12} className="text-slate-300 dark:text-slate-600 shrink-0" />
+                              <span className="text-slate-400 dark:text-slate-500">
+                                {t('common.notConfigured')}
+                              </span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Profile */}

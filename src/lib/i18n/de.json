@@ -4,16 +4,26 @@
   },
   "header": {
     "dashboard": "Dashboard",
+    "dashboardSub": "Übersicht und Statistiken",
     "upload": "CV Hochladen",
+    "uploadSub": "Profil hochladen und extrahieren",
     "jobs": "Ergebnisse",
+    "jobsSub": "Jobs bewertet nach Profil",
     "pipeline": "Pipeline",
-    "settings": "Einstellungen"
+    "pipelineSub": "Automatisiertes Scraping und Matching",
+    "settings": "Einstellungen",
+    "profile": "Profil",
+    "profileSub": "Dein vollständiges Berufsprofil",
+    "settingsSub": "Profil, E-Mail & API-Schlüssel",
+    "setupSub": "In 5 Schritten einrichten"
   },
   "sidebar": {
     "dashboard": "Dashboard",
     "upload": "CV Hochladen",
     "jobs": "Ergebnisse",
     "pipeline": "Pipeline",
+    "profile": "Profil",
+    "setup": "Setup-Assistent",
     "settings": "Einstellungen",
     "collapse": "Einklappen",
     "expand": "Sidebar erweitern"
@@ -49,7 +59,33 @@
     "matched": "übereinstimmend",
     "noRuns": "Keine vorherigen Läufe",
     "noRunsDesc": "Führen Sie die Pipeline aus, um Ergebnisse zu sehen",
-    "execute": "Ausführen"
+    "execute": "Ausführen",
+    "setupWizard": "Setup-Assistent",
+    "apiKeyRequired": "KI-API-Schlüssel Erforderlich",
+    "apiKeyRequiredDesc": "Konfiguriere einen KI-API-Schlüssel für Profil-Extraktion und intelligentes Matching.",
+    "recentMatches": "Letzte Treffer",
+    "noMatchData": "Noch keine Treffer",
+    "noMatchDataDesc": "Laden Sie einen CV hoch oder führen Sie die Pipeline aus, um Ergebnisse zu sehen",
+    "stats": {
+      "totalJobs": "Gesamt Jobs",
+      "last30Days": "Letzte 30 Tage",
+      "jobsToday": "Jobs Heute",
+      "scrapedToday": "Heute gescrapt",
+      "matches": "Treffer",
+      "found": "Gefunden",
+      "pipelines": "Pipelines",
+      "executed": "Ausgeführt"
+    },
+    "chart": {
+      "trend": "Job-Trend",
+      "7d": "7 Tage",
+      "30d": "30 Tage",
+      "90d": "90 Tage",
+      "jobsPerDay": "~{count} Jobs/Tag",
+      "noData": "Keine Trenddaten",
+      "noDataDesc": "Daten erscheinen nach dem ersten Scraping",
+      "jobsCount": "{count} Jobs"
+    }
   },
   "jobs": {
     "title": "Matching-Ergebnisse",
@@ -90,7 +126,10 @@
       "good": "Gut",
       "potential": "Potenzial"
     },
-    "loading": "Lade Jobs..."
+    "loading": "Lade Jobs...",
+    "noLink": "Kein Link verfügbar",
+    "apiKeyRequired": "KI-API-Schlüssel Erforderlich",
+    "apiKeyRequiredDesc": "Ein KI-API-Schlüssel wird benötigt, um dein Berufsprofil aus dem CV zu extrahieren."
   },
   "upload": {
     "title": "CV Hochladen",
@@ -147,6 +186,12 @@
     "title": "Einstellungen",
     "subtitle": "Konfigurieren Sie Ihr Profil, E-Mail und API-Schlüssel",
     "saved": "Einstellungen erfolgreich gespeichert",
+    "setupIncomplete": "Setup unvollständig",
+    "setupComplete": "Setup abgeschlossen",
+    "rerunSetup": "Setup erneut ausführen",
+    "configSummary": {
+      "title": "Konfigurationsübersicht"
+    },
     "saveError": "Fehler beim Speichern",
     "profile": {
       "title": "Berufsprofil",
@@ -217,8 +262,6 @@
   "pipeline": {
     "title": "Pipeline",
     "subtitle": "Führen Sie die Job-Scraping- und Matching-Pipeline aus",
-    "apiKeyRequired": "KI-API-Schlüssel Erforderlich",
-    "apiKeyRequiredDesc": "Sie benötigen mindestens einen KI-API-Schlüssel (Gemini, OpenRouter oder NVIDIA NIM), um die Pipeline auszuführen.",
     "gettingStarted": "Erste Schritte",
     "guide": {
       "uploadCv": "CV hochladen",
@@ -228,6 +271,8 @@
       "runPipeline": "Pipeline ausführen",
       "runPipelineDesc": "Sammeln Sie Jobs aus mehreren Quellen und gleichen Sie sie mit Ihrem Profil ab"
     },
+    "apiKeyRequired": "KI-API-Schlüssel Erforderlich",
+    "apiKeyRequiredDesc": "Sie benötigen mindestens einen KI-API-Schlüssel (Gemini, OpenRouter oder NVIDIA NIM), um die Pipeline auszuführen.",
     "goToSettings": "Zu den Einstellungen",
     "run": "Pipeline Ausführen",
     "running": "Wird ausgeführt...",
@@ -275,6 +320,106 @@
       "failed": "Fehlgeschlagen"
     }
   },
+  "setup": {
+    "title": "Erste Schritte",
+    "subtitle": "Seahorse in wenigen Schritten konfigurieren",
+    "preconfigured": "✓ Bereits konfiguriert — unten kannst du es ändern",
+    "skip": "Überspringen",
+    "finish": "Setup Abschließen",
+    "goToDashboard": "Zum Dashboard",
+    "saved": "Konfiguration gespeichert!",
+    "step": {
+      "welcome": "Willkommen",
+      "ai-key": "KI-Schlüssel",
+      "jsearch": "JSearch",
+      "profile": "Profil",
+      "done": "Fertig"
+    },
+    "welcome": {
+      "title": "Willkommen bei Seahorse",
+      "desc": "Richten Sie Ihre Job-Automatisierung in wenigen Schritten ein.",
+      "step1": "KI-API-Schlüssel hinzufügen",
+      "step1Desc": "Für intelligente Profilextraktion",
+      "step2": "JSearch-Schlüssel hinzufügen",
+      "step2Desc": "Für Job-Scraping (optional)",
+      "step3": "Profil einrichten",
+      "step3Desc": "Definieren Sie Ihre Fähigkeiten und Ihren Standort",
+      "step4": "Matching starten",
+      "step4Desc": "Erhalten Sie passende Jobs"
+    },
+    "aiKey": {
+      "title": "KI-API-Schlüssel",
+      "desc": "Fügen Sie einen Gemini-API-Schlüssel für KI-gestützte Profilextraktion und Matching hinzu.",
+      "recommended": "Empfohlen",
+      "recommendedDesc": "Gemini 2.0 Flash ist kostenlos und schnell. Holen Sie sich Ihren Schlüssel bei Google AI Studio.",
+      "howTo": "So erhalten Sie Ihren Gemini-API-Schlüssel:",
+      "howTo1": "Gehen Sie zu aistudio.google.com",
+      "howTo2": "Klicken Sie auf 'Get API Key' in der Seitenleiste",
+      "howTo3": "Erstellen Sie einen neuen Schlüssel und fügen Sie ihn hier ein"
+    },
+    "jsearch": {
+      "title": "JSearch-API-Schlüssel (Optional)",
+      "desc": "Fügen Sie einen JSearch-API-Schlüssel für Job-Scraping aus mehreren Quellen hinzu.",
+      "optional": "Dieser Schritt ist optional. Die Pipeline funktioniert auch mit Python-Scrapern.",
+      "free": "Holen Sie sich einen kostenlosen JSearch-Schlüssel bei",
+      "getKey": "RapidAPI / JSearch"
+    },
+    "profile": {
+      "title": "Ihr Profil",
+      "desc": "Erzählen Sie uns von Ihrem Berufsprofil, damit wir passende Jobs finden können.",
+      "skills": "Fähigkeiten (kommasepariert)",
+      "skillsPlaceholder": "z.B. JavaScript, Python, Content Writing, Marketing",
+      "location": "Bevorzugter Standort",
+      "locationPlaceholder": "z.B. Remote, Berlin, München",
+      "optionalDesc": "Sie können später auch einen CV hochladen, um Ihre Fähigkeiten automatisch zu extrahieren.",
+      "canEditLater": "Alle Einstellungen können später auf der Einstellungsseite geändert werden."
+    },
+    "done": {
+      "title": "Alles bereit!",
+      "desc": "Ihre Konfiguration ist abgeschlossen.",
+      "nextSteps": "Laden Sie einen CV hoch, führen Sie die Pipeline aus und finden Sie Ihre nächste Gelegenheit.",
+      "aiConfigured": "KI konfiguriert",
+      "jsearchConfigured": "JSearch konfiguriert",
+      "skillsAdded": "Fähigkeiten hinzugefügt"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Dein Berufsprofil auf einen Blick",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "noProfile": "Noch keine Profildaten",
+    "noProfileDesc": "Lade einen CV hoch oder konfiguriere dein Profil in den Einstellungen, um es hier zu sehen",
+    "skills": "Fähigkeiten",
+    "experienceLevel": "Erfahrungsstufe",
+    "location": "Standort",
+    "salaryRange": "Gehaltsspanne",
+    "remote": "Remote-Arbeit",
+    "remoteYes": "Ja",
+    "remoteNo": "Nein",
+    "languages": "Sprachen",
+    "noSkills": "Keine Fähigkeiten registriert",
+    "noSkillsDesc": "Erscheint nach der Extraktion deines Profils aus einem CV",
+    "noSummary": "Keine berufliche Zusammenfassung",
+    "noSummaryDesc": "Erscheint nach der Extraktion deines Profils aus einem CV",
+    "noLanguages": "Keine Sprachen registriert",
+    "noLanguagesDesc": "Sprachen in den Einstellungen hinzufügen",
+    "interests": "Interessen",
+    "summary": "Berufliche Zusammenfassung",
+    "jobTitles": "Zielpositionen",
+    "industries": "Branchen",
+    "education": "Ausbildung",
+    "matchingWeights": "Matching-Gewichtung",
+    "salaryName": "Gehalt",
+    "noJobTitles": "Noch keine Zielpositionen",
+    "noJobTitlesDesc": "Erscheint nach der Extraktion deines Profils aus einem CV",
+    "noIndustries": "Noch keine Branchen",
+    "noIndustriesDesc": "Erscheint nach der Extraktion deines Profils aus einem CV",
+    "noEducation": "Keine Ausbildung eingetragen",
+    "noEducationDesc": "Erscheint nach der Extraktion deines Profils aus einem CV",
+    "degree": "Abschluss",
+    "institution": "Einrichtung",
+    "graduationYear": "Jahr"
+  },
   "common": {
     "loading": "Lädt...",
     "saving": "Speichere...",
@@ -293,6 +438,8 @@
     "retry": "Wiederholen",
     "yes": "Ja",
     "no": "Nein",
+    "configured": "Konfiguriert",
+    "notConfigured": "Nicht konfiguriert",
     "days": "Tage",
     "hours": "Stunden",
     "minutes": "Minuten",
