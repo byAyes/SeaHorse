@@ -13,7 +13,6 @@ export interface PDFUploadResult {
   error?: string;
   /**
    * Extraction confidence score (0.0–1.0)
-   * Only available when using pdfmux extraction
    */
   confidence?: number;
 }
@@ -37,7 +36,6 @@ export interface ExtractedJob {
 export interface PDFProcessingOptions {
   /**
    * Minimum confidence threshold for job detection
-   * Jobs below this threshold will be filtered out
    * @default 0.5
    */
   minConfidence?: number;

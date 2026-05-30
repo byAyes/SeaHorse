@@ -28,7 +28,7 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Jina Reader fallback → M
 |  5   | **Email** curated digest        | Premium HTML with emojis, scores, stats, CC support                                         |
 |  6   | **Cleanup** old jobs            | 3-month retention policy                                                                    |
 
-> **PDF Extraction:** Seahorse uses **pdfmux** (auto-detected Python library) for enhanced PDF text extraction with OCR fallback and confidence scoring. Falls back to pdf-parse automatically if pdfmux is not installed. No Docker required — just `pip install -r scrapers/requirements.txt`.
+> **PDF Extraction:** Seahorse uses **pypdf** (pure-Python library) for lightweight PDF text extraction via subprocess. Falls back to pdf-parse automatically if pypdf is not installed. No Docker required — just `pip install -r scrapers/requirements.txt`.
 
 ---
 
@@ -39,7 +39,7 @@ Upload CV/PDF → Extract profile (AI) → Scrape → Jina Reader fallback → M
 - **Node.js 20+** and **Python 3.12+**
 - **Gmail account** with App Password (for SMTP) — or Resend/Gmail API key
 - **No database needed** — local JSON storage, zero config
-- **Enhanced PDF extraction** — pdfmux auto-detected (Python), no config needed
+- **Enhanced PDF extraction** — pypdf auto-detected (Python), no config needed
 - **Docker** (optional) — for self-hosted Jina Reader fallback with full LinkedIn/Indeed support
 
 ### Setup Scripts
@@ -125,11 +125,13 @@ JINA_READER_BASE_URL=http://localhost:3001
 ```
 
 Open `http://localhost:3000/setup` for the **setup wizard** where you can:
+
 1. Configure API keys (Gemini, JSearch, etc.) from the UI
 2. Edit your professional profile (skills, experience, location)
 3. Configure email (SMTP, Resend, etc.)
 
 Then visit these sections:
+
 - **Profile** (`/profile`) — Full professional profile view
 - **Pipeline** (`/pipeline`) — Run scraping + matching manually
 - **Upload** (`/upload`) — Upload CV/PDF for automatic profile extraction
@@ -153,13 +155,12 @@ In ~60-90 seconds you'll get an HTML email with jobs matched to your profile.
 
 ### PDF Extraction
 
-| Feature                     | Method                         | File                                |
-| --------------------------- | ------------------------------ | ----------------------------------- |
-| **pdfmux** enhanced extract | Python library (auto-detect)   | `scripts/pdfmux_extract.py`         |
-| pdf-parse fallback          | Node.js library                | `src/lib/pdf/pdfParser.ts`          |
-| pdfmux HTTP server (Docker) | FastAPI server (optional)      | `scripts/pdfmux_server.py`          |
+| Feature                    | Method                       | File                       |
+| -------------------------- | ---------------------------- | -------------------------- |
+| **pypdf** enhanced extract | Python library (auto-detect) | `scripts/pypdf_extract.py` |
+| pdf-parse fallback         | Node.js library              | `src/lib/pdf/pdfParser.ts` |
 
-pdfmux is **auto-detected** — no env vars needed. If installed, it's used automatically via Python subprocess with OCR fallback and confidence scoring.
+pypdf is **auto-detected** — no env vars needed. If installed, it's used automatically via Python subprocess.
 
 ### AI PDF Profile Extraction
 
@@ -178,10 +179,10 @@ pdfmux is **auto-detected** — no env vars needed. If installed, it's used auto
 | **Computrabajo**       | Python Scrapling    | ✅ Reliable         |   ~10    |
 | **Indeed**             | Python Scrapling    | ⚠️ Intermittent     |   0-10   |
 | **Glassdoor**          | Python Scrapling    | ⚠️ Intermittent     |   0-10   |
-| **LinkedIn**           | Python Scrapling    | ❌ Blocked          |    0     || **pdfmux**         | Python (auto subprocess)       | ✅ Auto-detected    |    —     |
-| **Jina Reader**     | Headless Chrome API            | ✅ Fallback rescuer |  +1-10   |
+| **LinkedIn**           | Python Scrapling    | ❌ Blocked          |    0     |
+| **Jina Reader**        | Headless Chrome API | ✅ Fallback rescuer |  +1-10   |
 
-> **pdfmux** enhances CV/PDF extraction with auto-healing, OCR fallback, and confidence scoring. Installed automatically with `pip install -r scrapers/requirements.txt`. No config needed.
+> **pypdf** enhances CV/PDF extraction with lightweight PDF text extraction. Installed automatically with `pip install -r scrapers/requirements.txt`. No config needed.
 
 > **Jina Reader** acts as an automatic fallback. When `JINA_READER_BASE_URL` is set, `ScraperRunner` detects failed sources (e.g., LinkedIn blocked, Indeed intermittent) and fires Jina Reader's headless Chrome to scrape them. With **self-hosting via Docker**, LinkedIn yields **10 jobs**, Glassdoor and Computrabajo work fully.
 
@@ -339,11 +340,9 @@ Full API reference at [`docs/API.md`](docs/API.md). Quick overview:
 
 ```
 seahorse/
-├── pdfmux.Dockerfile              # Docker image for pdfmux HTTP server (optional)
-├── docker-compose.yml             # Jina Reader + pdfmux services (optional)
+├── docker-compose.yml             # Jina Reader service (optional)
 ├── scripts/
-│   ├── pdfmux_server.py           # FastAPI server for pdfmux (optional, Docker)
-│   ├── pdfmux_extract.py          # Standalone pdfmux extraction (auto subprocess)
+│   ├── pypdf_extract.py           # Standalone pypdf extraction (auto subprocess)
 ├── .github/workflows/
 │   └── main.yml                  # Primary pipeline (incl. optional JINA_READER_BASE_URL)
 ├── .planning/                    # Roadmap, specs, refactoring plans
@@ -359,8 +358,8 @@ seahorse/
 ├── src/
 │   ├── lib/
 │   │   ├── pdf/
-│   │   │   ├── pdfParser.ts       # PDF parser entry point (auto-selects pdfmux)
-│   │   │   ├── pdfmuxParser.ts    # pdfmux client (HTTP + subprocess + fallback)
+│   │   │   ├── pdfParser.ts       # PDF parser entry point (auto-selects pypdf)
+│   │   │   ├── pypdfParser.ts     # pypdf subprocess client (Python)
 ├── src/
 │   ├── app/
 │   │   ├── (main)/               # Dashboard pages
@@ -546,14 +545,12 @@ npx jest tests/pdfProfileExtractor.test.ts
 
 ### API Keys
 
-| Variable          | Description           |         Required          |
-| ----------------- | --------------------- | :-----------------------: |
-| Variable            | Description                      | Required                     |
+| Variable            | Description                      |           Required           |
 | ------------------- | -------------------------------- | :--------------------------: |
-| `PDFMUX_QUALITY`    | fast / standard / premium        | Optional (default: standard) |
-| `PDFMUX_URL`        | pdfmux HTTP server endpoint      | Optional (Docker mode only)  |
-| `JSEARCH_API_KEY`   | RapidAPI JSearch key             | For JSearch scraper          |
-| `GEMINI_API_KEY`    | Google Gemini API key            | For AI profile extraction    |
+| Variable            | Description                      |           Required           |
+| ------------------- | -------------------------------- | :--------------------------: |
+| `JSEARCH_API_KEY`   | RapidAPI JSearch key             |     For JSearch scraper      |
+| `GEMINI_API_KEY`    | Google Gemini API key            |  For AI profile extraction   |
 
 ### Alternative Email Providers
 
@@ -656,40 +653,15 @@ on:
 | 7   | Frontend UI Dashboard               | Complete               |
 | 8   | Local JSON Storage (0 config DB)    | Complete               |
 | 9   | **Jina Reader Chrome Fallback**     | **Complete**           |
-| 10  | **pdfmux Enhanced PDF Extraction**  | **Complete**           |
+| 10  | **PDF Extraction (pypdf)**          | **Complete**           |
 
 ---
 
-## pdfmux — Enhanced PDF Extraction
+## PDF Extraction (pypdf)
 
-pdfmux is an orchestrated PDF extraction library that auto-detects and extracts text with OCR fallback and confidence scoring.
+Seahorse uses **pypdf** for lightweight PDF text extraction. pypdf is a pure-Python PDF library that extracts text from digital PDFs without any heavy dependencies (no OCR, no PyMuPDF, no Docker needed).
 
-**No setup needed** — just `pip install -r scrapers/requirements.txt` (already in setup scripts).
-
-### Quality Modes
-
-| Mode      | Use Case                        | Speed |
-| --------- | ------------------------------- | ----- |
-| `fast`    | Clean digital PDFs              | High  |
-| `standard` | Mixed documents/tables         | Moderate |
-| `premium` | Scans, handwriting, complex layouts | Lower |
-
-### Configuration
-
-```env
-# Optional: default is standard
-PDFMUX_QUALITY=standard
-
-# Optional: use HTTP server mode (Docker) instead of subprocess
-# PDFMUX_URL=http://localhost:3100
-```
-
-### Self-Hosting with Docker (optional)
-
-```bash
-docker compose build pdfmux
-docker compose up -d pdfmux
-```
+**No setup needed** — just `pip install -r scrapers/requirements.txt`. pypdf is auto-detected and used automatically via subprocess when available. Falls back to pdf-parse (JavaScript) if pypdf is not installed.
 
 ---
 

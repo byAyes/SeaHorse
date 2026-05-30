@@ -2,9 +2,8 @@
  * PDF Parser Module
  * Extracts text content from PDF documents using pdf-parse library.
  *
- * When PDFMUX_URL env var is set, automatically uses pdfmux (Python-based
- * orchestrated extraction with OCR fallback and confidence scoring) via
- * the pdfmux HTTP server, falling back to pdf-parse if unavailable.
+ * Automatically uses pypdf (Python-based extraction) via subprocess
+ * for enhanced text extraction. Falls back to pdf-parse if unavailable.
  */
 
 import { PDFParse } from 'pdf-parse';
@@ -28,27 +27,22 @@ if (fs.existsSync(PDF_WORKER_PATH)) {
 /**
  * Parse a PDF buffer and extract text content.
  *
- * Auto-detects pdfmux (Python library) and uses it for enhanced extraction
- * with OCR fallback and confidence scoring. Falls back to pdf-parse when
- * pdfmux is unavailable.
- *
- * No env vars needed — if pdfmux Python package is installed, it's used
- * automatically via subprocess. Optionally, PDFMUX_URL can be set to use
- * an HTTP server (Docker) instead.
+ * No env vars needed — if pypdf Python package is installed, it's used
+ * automatically via subprocess.
  *
  * @param buffer - PDF file as Buffer
  * @returns Promise resolving to PDFUploadResult with extracted text and metadata
  */
 export async function parsePDF(buffer: Buffer): Promise<PDFUploadResult> {
-  // Try pdfmux first — auto-detects HTTP server or subprocess, falls back internally
+  // Try pypdf first — auto-detects subprocess, falls back internally
   try {
-    const { parsePDF: pdfmuxParse } = await import('./pdfmuxParser');
-    const result = await pdfmuxParse(buffer);
+    const { parsePDF: pypdfParse } = await import('./pypdfParser');
+    const result = await pypdfParse(buffer);
     if (result.success && result.text) {
       return result;
     }
   } catch {
-    // pdfmux unavailable — fall through to pdf-parse
+    // pypdf unavailable — fall through to pdf-parse
   }
 
   return parsePDFWithPdfJs(buffer);
@@ -56,8 +50,8 @@ export async function parsePDF(buffer: Buffer): Promise<PDFUploadResult> {
 
 /**
  * Parse a PDF buffer using pdf-parse (pdf.js based).
- * Exported for use by pdfmuxParser.ts as a direct fallback (avoids
- * circular re-entry through the pdfmux-checking parsePDF).
+ * Exported for use by pypdfParser.ts as a direct fallback (avoids
+ * circular re-entry through the pypdf-checking parsePDF).
  */
 export async function parsePDFWithPdfJs(buffer: Buffer): Promise<PDFUploadResult> {
   let parser: PDFParse | null = null;

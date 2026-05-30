@@ -5,5 +5,5 @@ patchright==1.60.0
 browserforge==1.2.4
 pyyaml==6.0.3
 msgspec==0.21.1
-# PDF extraction with auto-healing, OCR fallback, and confidence scoring
-pdfmux
+# PDF text extraction (pure-Python, lightweight)
+pypdf

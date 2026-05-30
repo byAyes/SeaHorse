@@ -1,25 +1,4 @@
 services:
-  pdfmux:
-    build:
-      context: .
-      dockerfile: pdfmux.Dockerfile
-    container_name: seahorse-pdfmux
-    restart: unless-stopped
-    ports:
-      - "3100:3100"
-    environment:
-      - PDFMUX_HOST=0.0.0.0
-      - PDFMUX_PORT=3100
-    # Optional: mount a cache/temp directory
-    # volumes:
-    #   - pdfmux-tmp:/data
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3100/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
   jina-reader:
     image: ghcr.io/jina-ai/reader:oss
     container_name: seahorse-jina-reader

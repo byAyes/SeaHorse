@@ -27,10 +27,10 @@ Automated job board scraper → AI profile extraction → AI matcher → email d
 | Command                                                                              | Purpose                                                                          |
 | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
 | `npx tsx scripts/run-profile-pipeline.ts path/to/cv.pdf`                             | Full pipeline: extract profile → scrape → score → email                          |
-| `npm run dev:clean`                                                                  | Clean dev start — kills zombie servers first                                    |
+| `npm run dev:clean`                                                                  | Clean dev start — kills zombie servers first                                     |
 | `npm run dev`                                                                        | Start Next.js dev server                                                         |
 | `npm run automate`                                                                   | Basic pipeline (scrape → email, no profile extraction)                           |
-| `./scripts/run.sh` / `.\scripts\run.ps1`                                              | Dashboard default; `--cv`, `--basic`, `--jina-reader` flags                      |
+| `./scripts/run.sh` / `.\scripts\run.ps1`                                             | Dashboard default; `--cv`, `--basic`, `--jina-reader` flags                      |
 | `npx tsx src/scrapers/index.ts "query" 5`                                            | Pipeline CLI with JinaReader fallback                                            |
 | `JINA_READER_BASE_URL=http://localhost:3001 npx tsx src/scrapers/index.ts "query" 5` | Pipeline with self-hosted Jina Reader                                            |
 | `npx tsx src/scrapers/strategies/jinaReader.ts <source> "query" 10`                  | Test Jina Reader standalone (sources: linkedin, indeed, computrabajo, glassdoor) |
@@ -47,26 +47,25 @@ Automated job board scraper → AI profile extraction → AI matcher → email d
 
 ## Key Code Locations
 
-| Component                | Location                                                                      |
-| ------------------------ | ----------------------------------------------------------------------------- |
-| Pipeline (with profile)  | `scripts/run-profile-pipeline.ts` → `src/automation/orchestrator.ts`          |
-| Pipeline (basic)         | `src/automation/scheduler.ts` → `src/automation/orchestrator.ts`              |
-| AI Profile Extraction    | `src/lib/ai/pdfProfileExtractor.ts` (Gemini + keyword fallback)               |
-| Scrape Strategy Builder  | `src/lib/ai/scrapeStrategy.ts`                                                |
-| Profile Page UI          | `src/app/(main)/profile/page.tsx` (dedicated profile view)                    |
-| Setup Wizard UI          | `src/app/(main)/setup/page.tsx` (5-step onboarding in browser)                |
-| Runner scripts           | `scripts/run.sh` / `scripts/run.ps1` (dashboard default, `--cv`/`--basic`)    |
-| Dev server scripts       | `scripts/dev.sh` / `scripts/dev.ps1` + `npm run dev:clean` (zombie killer)    |
-| ScraperRunner            | `src/scrapers/index.ts` (orchestrates all scrapers + JinaReader fallback)     |
-| JinaReader Fallback      | `src/scrapers/strategies/jinaReader.ts` (headless Chrome for blocked sources) |
-| **PDF Extraction**       | `src/lib/pdf/pdfParser.ts` (pdf-parse) + `src/lib/pdf/pdfmuxParser.ts` (pdfmux)| |
-| **pdfmux Server**        | `scripts/pdfmux_server.py` (FastAPI) + `pdfmux.Dockerfile`                    |
-| Python scrapers          | `scrapers/*.py` + bridge `src/scrapers/bridge/pythonBridge.ts`                |
-| Matching                 | `src/matching/` (scorer, skill, location, salary, interest)                   |
-| Email                    | `src/lib/email/` (SMTP/Resend/SendGrid/Gmail providers)                       |
-| Email Template           | `src/lib/email/template.ts` (Premium HTML + emojis + scores)                  |
-| Scraper config           | `scrapers.yaml`                                                               |
-| Docker config            | `docker-compose.yml`                                                          |
+| Component               | Location                                                                      |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| Pipeline (with profile) | `scripts/run-profile-pipeline.ts` → `src/automation/orchestrator.ts`          |
+| Pipeline (basic)        | `src/automation/scheduler.ts` → `src/automation/orchestrator.ts`              |
+| AI Profile Extraction   | `src/lib/ai/pdfProfileExtractor.ts` (Gemini + keyword fallback)               |
+| Scrape Strategy Builder | `src/lib/ai/scrapeStrategy.ts`                                                |
+| Profile Page UI         | `src/app/(main)/profile/page.tsx` (dedicated profile view)                    |
+| Setup Wizard UI         | `src/app/(main)/setup/page.tsx` (5-step onboarding in browser)                |
+| Runner scripts          | `scripts/run.sh` / `scripts/run.ps1` (dashboard default, `--cv`/`--basic`)    |
+| Dev server scripts      | `scripts/dev.sh` / `scripts/dev.ps1` + `npm run dev:clean` (zombie killer)    |
+| ScraperRunner           | `src/scrapers/index.ts` (orchestrates all scrapers + JinaReader fallback)     |
+| JinaReader Fallback     | `src/scrapers/strategies/jinaReader.ts` (headless Chrome for blocked sources) |
+| **PDF Extraction**      | `src/lib/pdf/pdfParser.ts` (pdf-parse) + `src/lib/pdf/pypdfParser.ts` (pypdf) |
+| Python scrapers         | `scrapers/*.py` + bridge `src/scrapers/bridge/pythonBridge.ts`                |
+| Matching                | `src/matching/` (scorer, skill, location, salary, interest)                   |
+| Email                   | `src/lib/email/` (SMTP/Resend/SendGrid/Gmail providers)                       |
+| Email Template          | `src/lib/email/template.ts` (Premium HTML + emojis + scores)                  |
+| Scraper config          | `scrapers.yaml`                                                               |
+| Docker config           | `docker-compose.yml`                                                          |
 
 ---
 
@@ -300,8 +299,8 @@ npx jest tests/jinaReader.integration.test.ts --verbose
 
 ## Open Issues
 
-| #   | Title | Link |
-| --- | ----- | ---- |
+| #   | Title                                              | Link                                                |
+| --- | -------------------------------------------------- | --------------------------------------------------- |
 | 34  | feat: Auto-Apply — Postulación automatizada con IA | [#34](https://github.com/byAyes/SeaHorse/issues/34) |
 
 ---
@@ -343,58 +342,26 @@ npx jest tests/jinaReader.integration.test.ts --verbose
 
 ---
 
-## pdfmux — Enhanced PDF Extraction
+## PDF Extraction (pypdf)
 
-[pdfmux](https://pdfmux.com) is an orchestrated PDF extraction library (Python) that analyzes documents page-by-page, routes each page to the best backend (PyMuPDF, OCR, Docling), and self-heals low-confidence pages.
+Seahorse uses **pypdf** for lightweight PDF text extraction via Python subprocess. pypdf is a pure-Python PDF library that extracts text without heavy dependencies (no OCR, no PyMuPDF, no Docker needed).
 
 ### Architecture
 
 ```
-Upload CV → pdfParser.ts → pdfmuxParser.ts ─┬─ HTTP Server (Docker, optional)
-                                              ├─ Python Subprocess (auto, default)
-                                              └─ pdf-parse (fallback)
+Upload CV → pdfParser.ts → pypdfParser.ts ── Python Subprocess (auto, default)
+                                         └─ pdf-parse (fallback)
 ```
 
-**No setup needed** — just run `pip install -r scrapers/requirements.txt` (already in setup scripts).
-pdfmux is auto-detected: if installed, it's used automatically via subprocess.
-
-### Quality Modes
-
-| Mode      | Use Case                        | Speed | Reliability |
-| --------- | ------------------------------- | ----- | ----------- |
-| `fast`    | Clean digital PDFs              | High  | Moderate    |
-| `standard` | Mixed documents/tables         | Moderate | High      |
-| `premium` | Scans, handwriting, complex layouts | Lower | Very High |
-
-### Optional: Docker HTTP Server
-
-For multi-request caching, you can run pdfmux as a Docker service:
-
-```bash
-docker compose build pdfmux
-docker compose up -d pdfmux
-echo "PDFMUX_URL=http://localhost:3100" >> .env
-```
-
-### Configuration
-
-| Env Var         | Default                   | Description                                   |
-| --------------- | ------------------------- | --------------------------------------------- |
-| `PDFMUX_URL`    | (empty)                   | Set to use HTTP server mode (Docker)          |
-| `PDFMUX_QUALITY` | `standard`              | Quality: `fast`, `standard`, or `premium`     |
-
-No env vars needed for default subprocess mode — pdfmux is auto-detected.
+**No setup needed** — just run `pip install -r scrapers/requirements.txt`. pypdf is auto-detected and used automatically via subprocess.
 
 ### Files
 
-| File                          | Purpose                                    |
-| ----------------------------- | ------------------------------------------ |
-| `scripts/pdfmux_extract.py`   | Standalone Python extraction script        |
-| `scripts/pdfmux_server.py`    | FastAPI HTTP server (Docker)               |
-| `pdfmux.Dockerfile`           | Docker image definition (optional)         |
-| `src/lib/pdf/pdfmuxParser.ts` | TypeScript client (HTTP + subprocess + fallback) |
-| `src/lib/pdf/pdfParser.ts`    | Entry point — auto-detects pdfmux          |
-| `src/types/pdf.ts`            | Added optional `confidence` field          |
+| File                         | Purpose                                   |
+| ---------------------------- | ----------------------------------------- |
+| `scripts/pypdf_extract.py`   | Standalone Python extraction script       |
+| `src/lib/pdf/pypdfParser.ts` | TypeScript client (subprocess + fallback) |
+| `src/lib/pdf/pdfParser.ts`   | Entry point — auto-detects pypdf          |
 
 ---
 
@@ -402,12 +369,12 @@ No env vars needed for default subprocess mode — pdfmux is auto-detected.
 
 `CLAUDE.md` in the project root defines mandatory rules for all AI agents:
 
-| Rule | Description |
-|---|---|
-| **Documentar** | Update `knowledge.md`, `README.md`, `AGENTS.md`, etc. after every change |
-| **Commit atómico** | One Conventional Commit per logical change |
-| **Push inmediato** | Push after every commit, no local commits left behind |
-| **Workflow 8 pasos** | Context → Implement → Typecheck → Review → Document → Commit → Push |
+| Rule                 | Description                                                              |
+| -------------------- | ------------------------------------------------------------------------ |
+| **Documentar**       | Update `knowledge.md`, `README.md`, `AGENTS.md`, etc. after every change |
+| **Commit atómico**   | One Conventional Commit per logical change                               |
+| **Push inmediato**   | Push after every commit, no local commits left behind                    |
+| **Workflow 8 pasos** | Context → Implement → Typecheck → Review → Document → Commit → Push      |
 
 ### Conventional Commit Types
 
@@ -422,6 +389,7 @@ Planned feature for automated job applications with AI-powered CV customization.
 **Issue:** [#34 — feat: Auto-Apply](https://github.com/byAyes/SeaHorse/issues/34)
 
 **Core modules:**
+
 - `cv-generator/` — AI CV customization per job (HTML → PDF via Playwright)
 - `cover-letter-generator/` — AI cover letters tailored to each job description
 - `apply-bot/` — Headless browser automation per portal (LinkedIn, Indeed, Computrabajo, Glassdoor)
